@@ -5,7 +5,7 @@ aliucord {
     // Changelog of your plugin
     changelog.set(
         """
-        # 0.0.1
+        # 1.0.0
         * Initial plugin release!
         """.trimIndent(),
     )
