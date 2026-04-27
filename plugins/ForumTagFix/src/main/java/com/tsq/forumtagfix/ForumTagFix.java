@@ -56,7 +56,7 @@ public class ForumTagFix extends Plugin {
 
     @Override
     public void start(Context context) throws NoSuchMethodException {
-		try {
+		/* try {
 			// use 'public final String d()' 
 			java.lang.reflect.Method stringMethod = okhttp3.ResponseBody.class.getDeclaredMethod("d");
 
@@ -74,7 +74,7 @@ public class ForumTagFix extends Plugin {
 			logger.error("Failed to patch ResponseBody.d()", e);
 		} catch (Throwable e) {
 			logger.error(e);
-		}
+		} */ // for debug
 		
 		Method cMethod = okhttp3.MultipartBody.a.class.getDeclaredMethod("b");
 		
