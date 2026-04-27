@@ -197,6 +197,7 @@ public class ForumTagFix extends Plugin {
 			int padding = DimenUtils.dpToPx(16);
 			layout.setPadding(padding, padding, padding, padding);
 			layout.setOrientation(LinearLayout.VERTICAL);
+            layout.setBackgroundColor(0xFF2C2F33); 
 
 			TextView title = new TextView(context);
 			title.setText("Select Tags");
