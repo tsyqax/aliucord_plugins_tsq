@@ -1,4 +1,4 @@
-version = "1.0.3" // Plugin version. Increment this to trigger an update
+version = "1.0.4" // Plugin version. Increment this to trigger an update
 description = "Fix Tag When post forum" // Plugin description that will be shown to user
 
 aliucord {
