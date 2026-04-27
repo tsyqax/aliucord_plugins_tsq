@@ -156,7 +156,8 @@ public class ForumTagFix extends Plugin {
 					// 6. Inject tags to MultipartBody.a (Origin: Builder.addPart)
 					// we inject to instance
 					((MultipartBody.a) cf.thisObject).a(myPart);
-					
+
+                    selectedTagIds.clear();
 					logger.info(jsonContent); // for debug
 				} catch (Exception e) {
 					logger.error(">>> Append Failed", e);
@@ -241,7 +242,10 @@ public class ForumTagFix extends Plugin {
 
 			DangerButton cancel = new DangerButton(context);
 			cancel.setText("Cancel");
-			cancel.setOnClickListener(v -> closePage());
+			cancel.setOnClickListener(v -> {
+                selectedTagIds.clear();
+                closePage();
+            });
 			layout.addView(cancel);
 
 			addView(layout);
