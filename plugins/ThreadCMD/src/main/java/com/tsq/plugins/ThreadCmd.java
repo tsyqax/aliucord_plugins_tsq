@@ -1,4 +1,4 @@
-package com.tsq.ThreadCmd;
+package com.tsq.plugins;
 
 import android.content.Context;
 import android.graphics.Color;
