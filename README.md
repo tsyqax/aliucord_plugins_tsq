@@ -18,7 +18,7 @@ Note: Some parts may contain bugs; if so, please create an issue.
 ### Why Working
 1. FriendFix -> Hook the UI to pass 12345 if there is nothing after #. Then, hook to replace 12345 with the string "null".
 3. ForumTagFix -> Hook Multipart into the Build to insert the tag list as payload_json.
-5. When getting the channel type, hook it so that if it is 16, it becomes 15.
+5. MediaChannelFix -> When getting the channel type, hook it so that if it is 16, it becomes 15.
 
 ---
 ## Why is this necessary? (Maybe Radical)
