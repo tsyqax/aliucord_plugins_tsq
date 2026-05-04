@@ -23,7 +23,7 @@ Note: Some parts may contain bugs; if so, please create an issue.
 ---
 ## Why is this necessary? (Maybe Radical)
 ### FriendFix
-The official service has still not resolved the issue of being unable to add friends, which dates back two years. Despite having #601 PR that they were confident in, the problem has remained dormant in their struggles for over a year. Although this plugin started later than them, it simply solves the friend adding issue in a lighter and faster way.
+The official service has still not resolved the issue of being unable to add friends, which dates back two years. Despite having #601 PR, the problem has remained dormant in their struggles for over a year. Although this plugin started later than them, it simply solves the friend adding issue in a lighter and faster way.
 
 ### ThreadCMD
 This adds a very simple command, but when experimental features and blocked solutions are being discussed in official issues, it resolves UI issues with a very simple command as users want.
