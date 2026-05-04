@@ -1,5 +1,7 @@
 # Aliucord Plugins
-Maybe there are bugs but just fix at least temporary
+This fixes parts not covered by the official code.  
+
+Note: Some parts may contain bugs; if so, please create an issue.
 
 ## LIST
 - [FriendFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FriendFix.zip): Fixes issue of sending request to new username style user.
