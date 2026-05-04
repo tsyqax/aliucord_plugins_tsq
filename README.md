@@ -29,7 +29,7 @@ The official service has still not resolved the issue of being unable to add fri
 This adds a very simple command, but when experimental features and blocked solutions are being discussed in official issues, it resolves UI issues with a very simple command as users want.
 
 ### ForumTagFix
-For some forum channels, applying tags may be mandatory. Regarding the question "Why is this mandatory?" raised by some, this is not a setting configured by unauthorized users, nor is it a plugin designed with the usefulness (categorization) of tags in mind. When writing a forum post, if applicable tags are available, it adds a somewhat crude UI to allow you to select them. While this crude UI might be criticized by some, it is at least faster and works better than the official one.
+For some forum channels, applying tags may be mandatory. Regarding the question "Why is this mandatory?" raised by some, this is not a setting configured by unauthorized users, or, just usefulness (categorization) of tags in mind. When writing a forum post, if applicable tags are available, it adds a somewhat crude UI to allow you to select them. While this crude UI might be criticized by some, it is at least faster and works better than the official not working.
 
 ### MediaChannelFix
 Media channels are a variation of forum channels, primarily featuring files and images. It is said to be a feature that is visible only on certain servers or can be added or activated if specific conditions are met. It is also reportedly related to server subscriptions. However, this does not excuse the need for all users. At the very least, this plugin adds a way for users to see and interact with content.
