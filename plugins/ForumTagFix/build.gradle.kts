@@ -1,4 +1,4 @@
-version = "1.1.0" // Plugin version. Increment this to trigger an update
+version = "1.1.1" // Plugin version. Increment this to trigger an update
 description = "Fix Tag When post forum" // Plugin description that will be shown to user
 
 aliucord {
@@ -12,9 +12,10 @@ aliucord {
         * selectedTagIds.clear();
         * background color
 
-        # 1.1.0
+        # 1.1.1
         * Refactor UI Logic
         * background improvement
+        * Text Fix
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
