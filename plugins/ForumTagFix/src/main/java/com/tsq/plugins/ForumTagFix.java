@@ -50,6 +50,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Observable;
+import com.lytefast.flexinput.R;
 
 @AliucordPlugin
 public class ForumTagFix extends Plugin {
@@ -207,11 +208,11 @@ public class ForumTagFix extends Plugin {
 			root.setPadding(p, p, p, p);
 			root.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
 
-			TextView title = new TextView(context);
+			TextView title = new TextView(context, null, 0, R.i.UiKit_Settings_Text);
 			title.setText("Select Tags");
 			title.setTextSize(18f);
 			title.setTypeface(null, android.graphics.Typeface.BOLD);
-			title.setTextColor(Color.WHITE);
+			//title.setTextColor(Color.WHITE);
 			title.setPadding(0, 0, 0, p);
 			root.addView(title);
 
@@ -254,10 +255,9 @@ public class ForumTagFix extends Plugin {
 
 			@Override
 			public VH onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
-				TextView tv = new TextView(parent.getContext());
+				TextView tv = new TextView(parent.getContext(), null, 0, R.i.UiKit_Settings_Text);
 				int p = DimenUtils.dpToPx(16);
 				tv.setPadding(p, p, p, p);
-				tv.setTextColor(Color.WHITE);
 				tv.setLayoutParams(new RecyclerView.LayoutParams(-1, -2));
 				return new VH(tv);
 			}
