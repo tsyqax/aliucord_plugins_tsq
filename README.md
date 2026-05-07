@@ -1,4 +1,4 @@
-# Aliucord Plugins
+# Aliucord Plugins Tsq
 This fixes parts not covered by the official code.  
 
 Note: Some parts may contain bugs; if so, please create an issue.
