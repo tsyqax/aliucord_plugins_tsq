@@ -165,7 +165,7 @@ public class ForumTagFix extends Plugin {
 					// we inject to instance
 					((MultipartBody.a) cf.thisObject).a(myPart);
 					
-					logger.info(jsonContent); // for debug
+					//logger.info(jsonContent); // for debug
 				} catch (Exception e) {
 					logger.error(">>> Append Failed", e);
 				}
