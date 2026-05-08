@@ -1,21 +1,25 @@
-version = "1.1.1" // Plugin version. Increment this to trigger an update
+version = "1.1.2" // Plugin version. Increment this to trigger an update
 description = "Fix Tag When post forum" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
-        # 1.0.0
-        * Initial plugin release!
+        # 1.1.2
+        * Remove Debug code
+        * Change changelog lol
+
+        # 1.1.1
+        * Refactor UI Logic
+        * background improvement
+        * Text Fix.
 
         # 1.0.2
         * selectedTagIds.clear();
         * background color
 
-        # 1.1.1
-        * Refactor UI Logic
-        * background improvement
-        * Text Fix
+        # 1.0.0
+        * Initial plugin release!
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
