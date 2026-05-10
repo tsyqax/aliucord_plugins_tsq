@@ -182,15 +182,9 @@ public class ThreadDel extends Plugin {
 							String channelName = ChannelUtils.getDisplayName(willDeleteThread);
 
 							FragmentManager fm = Utils.getAppActivity().getSupportFragmentManager();
-							Fragment oldFrag = fm.findFragmentByTag("confirm_tag2");
-
-							if (oldFrag != null) {
-								fm.beginTransaction().remove(oldFrag).commitAllowingStateLoss();
-								fm.executePendingTransactions();
-							}
 
 							ConfirmDialog dialog = new ConfirmDialog();
-							
+
 							dialog.setTitle(context.getString(titleRes));
 							dialog.setDescription(MDUtils.render(context.getString(bodyRes).replace("!!{channelName}!!", channelName)));
 
@@ -200,11 +194,12 @@ public class ThreadDel extends Plugin {
 								dialog.dismiss();
 								actions.dismiss();
 								RestAPI.api.deleteChannel(willDeleteThread.k()).V(channel -> {});
-								
+								StoreStream.getMessagesLoader().jumpToMessage(1L, 1L);
+								Utils.showToast("YEEEEEEEEEE! If not done, wait a second!");
 							});
 							
 							
-							dialog.show(Utils.getAppActivity().getSupportFragmentManager(), "confirm_tag2");
+							dialog.show(fm, "confirm_tag");
 
 						} catch (Exception e) {
 							logger.error("Error in re-implemented confirmDelete", e);
@@ -266,12 +261,6 @@ public class ThreadDel extends Plugin {
 							String channelName = ChannelUtils.getDisplayName(willDeleteThread);
 
 							FragmentManager fm = Utils.getAppActivity().getSupportFragmentManager();
-							Fragment oldFrag = fm.findFragmentByTag("confirm_tag1");
-
-							if (oldFrag != null) {
-								fm.beginTransaction().remove(oldFrag).commitAllowingStateLoss();
-								fm.executePendingTransactions();
-							}
 
 							ConfirmDialog dialog = new ConfirmDialog();
 							
@@ -281,12 +270,14 @@ public class ThreadDel extends Plugin {
 							dialog.setIsDangerous(true);
 							
 							dialog.setOnOkListener(w -> {
-								RestAPI.api.deleteChannel(willDeleteThread.k()).V(channel -> {});
 								dialog.dismiss();
 								actions.dismiss();
+								RestAPI.api.deleteChannel(willDeleteThread.k()).V(channel -> {});
+								StoreStream.getMessagesLoader().jumpToMessage(1L, 1L);
+								Utils.showToast("YEEEEEEEEEE! If not done, wait a second!");
 							});
 							
-							dialog.show(Utils.getAppActivity().getSupportFragmentManager(), "confirm_tag1");
+							dialog.show(fm, "confirm_tag");
 							
 							
 						} catch (Exception e) {
