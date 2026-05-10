@@ -12,7 +12,6 @@ Note: Some parts may contain bugs; if so, please create an issue.
 
 ### ThreadDEL Temporary Fix (for Alpha)
 1. When make channel or thread -> Restart app, then confirmDialog will be visual.
-2. When click 'OK' button on confirmDialog -> change selected channel (or UI renewal), then Channel/Thread will be deleted.
 3. Other bugs -> Maybe Fixed if you restart app.
 
 ### Why Working
