@@ -9,15 +9,21 @@ Note: Some parts may contain bugs; if so, please create an issue.
 - [ForumTagFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ForumTagFix.zip): Adds method for adding tags to post forum.
 - [ThreadDEL (Alpha)](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadDEL.zip): Add button to delete channel or thread on channel_list. (NOTE: this is alpha)
 - [MediaChannelFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MediaChannelFix.zip): Make MediaChannel to ForumChannel.
+- [HeicFix (Alpha)](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Make heic to jpg when you send image.
 
-### ThreadDEL Temporary Fix (for Alpha)
-1. When make channel or thread -> Restart app, then confirmDialog will be visual.
-3. Other bugs -> Maybe Fixed if you restart app.
+### ThreadDEL Note (for Alpha)
+1. When make channel or thread, or entered channel setting page -> Restart app, then confirmDialog will be visual.
+2. Other bugs -> Maybe Fixed if you restart app.
+
+### HeicFix NOTE (for Alpha)
+1. When you did send many heic image, you should clear app's cache on android settings, if you don't like big disk usage.
+2. This maybe has some lag for some certain situation.
 
 ### Why Working
 1. FriendFix -> Hook the UI to pass 12345 if there is nothing after #. Then, hook to replace 12345 with the string "null".
 3. ForumTagFix -> Hook Multipart into the Build to insert the tag list as payload_json.
 5. MediaChannelFix -> When getting the channel type, hook it so that if it is 16, it becomes 15.
+7. HeicFix -> Hook Attachment and convert heic to jpg... (making process, this may okay lol)
 
 ---
 ## Why is this necessary? (Maybe Radical)
