@@ -73,6 +73,12 @@ import com.discord.media_picker.MediaPicker;
 import com.discord.dialogs.ImageUploadDialog;
 import com.lytefast.flexinput.model.Attachment;
 import android.net.Uri;
+import com.discord.widgets.chat.MessageManager;
+import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.functions.Function2;
+
+
 
 @AliucordPlugin(requiresRestart = false)
 @SuppressWarnings("unused")
@@ -84,18 +90,33 @@ public class HeicFix extends Plugin {
     @Override
     public void start(@NonNull Context context) throws Throwable { 
 		
-		/* patcher.patch(RestAPI.class.getDeclaredMethod("sendMessage", long.class, PayloadJSON.class, MultipartBody.Part[].class), new Hook(cf -> {
+		try {
+			File cacheDir = context.getCacheDir();
+			File[] garbage = cacheDir.listFiles((dir, name) -> name.startsWith("heic_fix_"));
+			int count = 0;
+			
+			for (File f : garbage) {
+				if (f.getName().startsWith("heic_fix_")) {
+			    	if (f.delete()) {
+						count++;
+					}
+				}
+			
+			logger.info("Removed " + count + " cache images");
+			
+			}
+		} catch (Exception e) {
+			logger.error("Error", e);
+		}
+		
+		/* patcher.patch(MessageManager.class.getDeclaredMethod("sendMessage", String.class, List.class, MessageManager.AttachmentsRequest.class, Long.class, List.class, boolean.class, Function2.class, Function2.class, Function1.class),
+		new Hook(cf -> {
 			logger.info(">>> sendMessage Hooked! <<<");
 			try {
 				File cacheDir = context.getCacheDir();
 				File[] garbage = cacheDir.listFiles((dir, name) -> name.startsWith("heic_fix_"));
 				
-				if (garbage == null) {
-					logger.info("garbage == null");
-					return;
-				}
-				
-				if (!isTarget2) return;
+				//if (!isTarget2) return;
 
 				int count = 0;
 				for (File f : garbage) {
@@ -122,7 +143,7 @@ public class HeicFix extends Plugin {
 		patcher.patch(Attachment.class.getDeclaredConstructor(long.class, Uri.class, String.class, Object.class, boolean.class), 
 			new PreHook(cf -> {
 				try {
-					
+
 					boolean isTarget = false;	
 					Uri uri = (Uri) cf.args[1];
 					String fileName = (String) cf.args[2];
@@ -132,7 +153,7 @@ public class HeicFix extends Plugin {
 					String className =  stackTrace[9].getClassName();
 					if (className.contains("compressImageAttachments")) {
 						isTarget = true;
-						isTarget2 = true;
+						//isTarget2 = true;
 					}
 					
 					if (!isTarget) return;
@@ -171,7 +192,6 @@ public class HeicFix extends Plugin {
 				}
 			})
 		);
-
     }
 
     @Override
