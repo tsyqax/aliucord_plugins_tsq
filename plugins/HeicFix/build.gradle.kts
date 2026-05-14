@@ -1,4 +1,4 @@
-version = "1.0.0" // Plugin version. Increment this to trigger an update
+version = "1.0.1" // Plugin version. Increment this to trigger an update
 description = "Fix to send heic image" // Plugin description that will be shown to user
 
 aliucord {
@@ -7,6 +7,9 @@ aliucord {
         """
         NOTE: For using this, turn on "Image Compress"
         NOTE: If biiiig caches exists due to this, just restart app
+
+        # 1.0.1
+        * Change check for heic (maybe lighter)
 
         # 1.0.0
         * Added logic to remove old caches when start app
