@@ -7,13 +7,9 @@ Note: Some parts may contain bugs; if so, please create an issue.
 - [FriendFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FriendFix.zip): Fixes issue of sending request to new username style user.
 - [ThreadCMD](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadCMD.zip): Add /thread for making thread.
 - [ForumTagFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ForumTagFix.zip): Adds method for adding tags to post forum.
-- [ThreadDEL (Alpha)](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadDEL.zip): Add button to delete channel or thread on channel_list. (NOTE: this is alpha)
+- [ThreadDEL](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadDEL.zip): Add button to delete channel or thread on channel_list.
 - [MediaChannelFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MediaChannelFix.zip): Make MediaChannel to ForumChannel.
 - [HeicFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Make heic to jpg when you send image.
-
-### ThreadDEL Note (for Alpha)
-1. When make channel or thread, or entered channel setting page -> Restart app, then confirmDialog will be visual.
-2. Other bugs -> Maybe Fixed if you restart app.
 
 ### HeicFix NOTE
 1. When you looked big cache due to this, just restart app, then it will clear old cache.
