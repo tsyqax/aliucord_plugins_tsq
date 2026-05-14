@@ -1,10 +1,13 @@
-version = "0.0.2" // Plugin version. Increment this to trigger an update
+version = "1.0.0" // Plugin version. Increment this to trigger an update
 description = "Add thread/channel delete button on long tab menu" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.0.0
+        * Fixed not displaying dialog when entered chan/thread settings or created them.
+
         # 0.0.2
         * Fixed an issue where the screen had to be manually changed to delete.
         * some change
