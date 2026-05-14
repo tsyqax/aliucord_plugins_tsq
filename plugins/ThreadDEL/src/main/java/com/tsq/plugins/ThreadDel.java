@@ -180,9 +180,7 @@ public class ThreadDel extends Plugin {
 							//int themeId = Utils.getResId("Base_Theme_AppCompat_Dialog_Alert", "style");
 							
 							String channelName = ChannelUtils.getDisplayName(willDeleteThread);
-
-							FragmentManager fm = Utils.getAppActivity().getSupportFragmentManager();
-
+							FragmentManager fm = actions.getParentFragmentManager();
 							ConfirmDialog dialog = new ConfirmDialog();
 
 							dialog.setTitle(context.getString(titleRes));
@@ -192,10 +190,10 @@ public class ThreadDel extends Plugin {
 							
 							dialog.setOnOkListener(w -> {
 								dialog.dismiss();
-								actions.dismiss();
 								RestAPI.api.deleteChannel(willDeleteThread.k()).V(channel -> {});
 								StoreStream.getMessagesLoader().jumpToMessage(1L, 1L);
-								Utils.showToast("YEEEEEEEEEE! If not done, wait a second!");
+								actions.dismiss();
+								Utils.showToast("If not done, wait a second!");
 							});
 							
 							
@@ -259,26 +257,24 @@ public class ThreadDel extends Plugin {
 							//int themeId = Utils.getResId("Base_Theme_AppCompat_Dialog_Alert", "style");
 							
 							String channelName = ChannelUtils.getDisplayName(willDeleteThread);
-
-							FragmentManager fm = Utils.getAppActivity().getSupportFragmentManager();
-
+							//FragmentManager fm = Utils.appActivity.getSupportFragmentManager();
+							FragmentManager fm = actions.getParentFragmentManager();
 							ConfirmDialog dialog = new ConfirmDialog();
 							
 							dialog.setTitle(context.getString(titleRes));
 							dialog.setDescription(MDUtils.render(context.getString(bodyRes).replace("!!{channelName}!!", channelName)));
 
 							dialog.setIsDangerous(true);
-							
+
 							dialog.setOnOkListener(w -> {
 								dialog.dismiss();
-								actions.dismiss();
 								RestAPI.api.deleteChannel(willDeleteThread.k()).V(channel -> {});
 								StoreStream.getMessagesLoader().jumpToMessage(1L, 1L);
-								Utils.showToast("YEEEEEEEEEE! If not done, wait a second!");
+								actions.dismiss();
+								Utils.showToast("If not done, wait a second!");
 							});
 							
 							dialog.show(fm, "confirm_tag");
-							
 							
 						} catch (Exception e) {
 							logger.error("Error in re-implemented confirmDelete", e);
