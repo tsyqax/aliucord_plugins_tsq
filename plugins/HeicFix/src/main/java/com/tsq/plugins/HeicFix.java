@@ -89,7 +89,6 @@ public class HeicFix extends Plugin {
 	
     @Override
     public void start(@NonNull Context context) throws Throwable { 
-		
 		try {
 			File cacheDir = context.getCacheDir();
 			File[] garbage = cacheDir.listFiles((dir, name) -> name.startsWith("heic_fix_"));
@@ -108,6 +107,7 @@ public class HeicFix extends Plugin {
 		} catch (Exception e) {
 			logger.error("Error", e);
 		}
+		
 		
 		/* patcher.patch(MessageManager.class.getDeclaredMethod("sendMessage", String.class, List.class, MessageManager.AttachmentsRequest.class, Long.class, List.class, boolean.class, Function2.class, Function2.class, Function1.class),
 		new Hook(cf -> {
@@ -148,21 +148,16 @@ public class HeicFix extends Plugin {
 					Uri uri = (Uri) cf.args[1];
 					String fileName = (String) cf.args[2];
 
-					StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-					
-					String className =  stackTrace[9].getClassName();
-					if (className.contains("compressImageAttachments")) {
-						isTarget = true;
-						//isTarget2 = true;
-					}
-					
-					if (!isTarget) return;
-					
-					//isTarget = false;
-					
 					if (uri == null || fileName == null || 
 						!(fileName.toLowerCase().endsWith(".heic") || uri.toString().toLowerCase().endsWith(".heic"))) {
 						return; 
+					}
+
+					StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+					
+					String className =  stackTrace[9].getClassName();
+					if (!className.contains("compressImageAttachments")) {
+						return;
 					}
 
 					var contentResolver = context.getContentResolver();
