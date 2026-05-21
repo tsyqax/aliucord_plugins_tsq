@@ -1,10 +1,16 @@
-version = "1.1.2" // Plugin version. Increment this to trigger an update
-description = "Fix Tag When post forum" // Plugin description that will be shown to user
+version = "1.2.0" // Plugin version. Increment this to trigger an update
+description = "Fix issues with Tags on ForumChannel" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.0
+        * NOW SUPPORT CHANGE TAG!!!
+        * To use it, you should in forum channel (intuitively, post list)
+        * then long press post that you want to change tags
+        * Will display Tag select menus!
+
         # 1.1.2
         * Remove Debug code
         * Change changelog lol
@@ -19,7 +25,7 @@ aliucord {
         * background color
 
         # 1.0.0
-        * Initial plugin release!
+        * IPR!
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
