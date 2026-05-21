@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliucord.Logger;
 import com.aliucord.Utils;
+import com.aliucord.Http;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.*;
@@ -28,6 +29,7 @@ import com.aliucord.views.Divider;
 import com.aliucord.widgets.BottomSheet;
 import com.aliucord.wrappers.ChannelWrapper;
 
+import com.discord.api.channel.Channel;
 import com.discord.api.channel.ForumTag;
 import com.discord.app.AppBottomSheet;
 import com.discord.stores.StoreStream;
@@ -35,6 +37,15 @@ import com.discord.stores.StoreThreadDraft;
 import com.discord.utilities.rest.RestAPI;
 import com.discord.widgets.chat.MessageManager;
 import com.discord.widgets.forums.ForumPostCreateManager;
+import com.discord.widgets.channels.list.WidgetChannelsListItemThreadActions;
+import com.aliucord.fragments.SettingsPage;
+import com.aliucord.views.TextInput;
+import com.discord.api.permission.Permission;
+import com.discord.utilities.permissions.PermissionUtils;
+import com.aliucord.api.SettingsAPI;
+import android.graphics.drawable.Drawable;
+import androidx.core.content.ContextCompat;
+import com.discord.widgets.share.WidgetIncomingShare;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -42,6 +53,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Properties;
 
 import d0.t.n;
 import kotlin.jvm.functions.Function2;
@@ -54,6 +68,7 @@ import com.lytefast.flexinput.R;
 
 @AliucordPlugin
 public class ForumTagFix extends Plugin {
+	public static SettingsAPI staticSettings;
     private final Logger logger = new Logger("ForumTagFix");
     private final List<Long> selectedTagIds = new ArrayList<>();
     private boolean isReinvoked = false;
@@ -62,29 +77,57 @@ public class ForumTagFix extends Plugin {
 	private String bonmun;
 	private String name;
 
+	public ForumTagFix() { 
+		settingsTab = new SettingsTab(Settings.class, SettingsTab.Type.PAGE);
+	}
+	
+	// ----- settings start -----
+	public static class Settings extends SettingsPage {
+
+		@Override
+		public void onViewCreated(View view, Bundle bundle) {
+			super.onViewCreated(view, bundle);
+			setActionBarTitle("ForumTagFix Settings");
+
+			var context = view.getContext();
+			var layout = getLinearLayout();
+
+			var threadInput = new TextInput(context, "Tag Change Label", "Label in context menu");
+			threadInput.getEditText().setText(ForumTagFix.staticSettings.getString("change_tag", "Change Tags"));
+
+			var saveButton = new Button(context);
+			saveButton.setText("Save Settings");
+			saveButton.setOnClickListener(v -> {
+				String threadVal = threadInput.getEditText().getText().toString().trim();
+
+				ForumTagFix.staticSettings.setString("change_tag", threadVal.isEmpty() ? "Change Tags" : threadVal);
+
+				Utils.showToast("Settings saved. Will Apply when restart App.");
+				
+				close();
+			});
+
+			layout.addView(threadInput);
+			layout.addView(saveButton);
+		}
+	}
+	// ----- settings end -----
+
+
     @Override
     public void start(Context context) throws NoSuchMethodException {
-		/* try {
-			// use 'public final String d()' 
-			java.lang.reflect.Method stringMethod = okhttp3.ResponseBody.class.getDeclaredMethod("d");
-
-			patcher.patch(stringMethod, new com.aliucord.patcher.Hook(cf -> {
-				String content = (String) cf.getResult();
-
-				
-				if (content != null ) {
-					logger.info("─── [FOUND SERVER RESPONSE] ───");
-					logger.info(content);
-					logger.info("───────────────────────────────");
-				}
-			}));
-		} catch (NoSuchMethodException e) {
-			logger.error("Failed to patch ResponseBody.d()", e);
-		} catch (Throwable e) {
-			logger.error(e);
-		} */
+		
+		staticSettings = settings;
+		var viewId1 = View.generateViewId();
+		
+		Method bindingReflection = WidgetIncomingShare.class.getDeclaredMethod("getBinding");
+		bindingReflection.setAccessible(true);
+		
+		Drawable changeIcon = ContextCompat.getDrawable(Utils.appActivity, R.e.ic_edit_24dp).mutate();
+		Utils.tintToTheme(changeIcon);
 		
 		Method cMethod = okhttp3.MultipartBody.a.class.getDeclaredMethod("b");
+		String changeTagText = settings.getString("change_tag", "Change Tags");
 		
 		// [1] UI Trigger
         patcher.patch(ForumPostCreateManager.class.getDeclaredMethod("createForumPostWithMessage", 
@@ -99,13 +142,14 @@ public class ForumTagFix extends Plugin {
 				
 				final List<ForumTag> availableTags = wrapper.getAvailableTags();
 
-				if (availableTags == null || availableTags.isEmpty()) return;
-
 				selectedTagIds.clear();
 				
+				if (availableTags == null || availableTags.isEmpty()) return;
+
 				TagPickerSheet sheet = new TagPickerSheet(availableTags, () -> {
 					try {
 						isReinvoked = true;
+						((Method) cf.method).setAccessible(true); 
 						((Method) cf.method).invoke(cf.thisObject, cf.args);
 					} catch (Exception e) { 
 						logger.error(e); 
@@ -165,22 +209,148 @@ public class ForumTagFix extends Plugin {
 					// we inject to instance
 					((MultipartBody.a) cf.thisObject).a(myPart);
 					
-					//logger.info(jsonContent); // for debug
+					selectedTagIds.clear();
+					
+					logger.info(jsonContent); // for debug
 				} catch (Exception e) {
 					logger.error(">>> Append Failed", e);
 				}
 			}
 		}));
 		
+		//thread actions (for tags)
+		patcher.patch(WidgetChannelsListItemThreadActions.class.getDeclaredMethod("configureUI", WidgetChannelsListItemThreadActions.Model.class),
+            new PreHook(cf -> {
+
+                var actions = (WidgetChannelsListItemThreadActions) cf.thisObject;
+                var scrollView = (NestedScrollView) actions.getView();
+                var lay = (LinearLayout) scrollView.getChildAt(0);
+				
+				long channelId = StoreStream.getChannelsSelected().getId();
+				long permissions = StoreStream.getPermissions().getPermissionsByChannel().get(channelId);
+				
+				WidgetChannelsListItemThreadActions.Model model = (WidgetChannelsListItemThreadActions.Model) cf.args[0];
+				Channel willDelete = model.getChannel();
+
+				ChannelWrapper wrapper2 = new ChannelWrapper(StoreStream.getChannels().getChannel(channelId));
+				//ChannelWrapper wrapper1 = new ChannelWrapper(willDelete);
+				List<Long> appliedTags = wrapper2.getAppliedTags();
+				List<ForumTag> availableTags = wrapper2.getAvailableTags();
+				Integer chType = wrapper2.getType();
+				
+				logger.info("CHtype: " + chType);
+				if (chType != 15 && chType != 16) return; // 15 = forum, 16 = media
+				
+				if (!PermissionUtils.can(Permission.MANAGE_THREADS, permissions)) return;
+				
+				selectedTagIds.clear();
+				
+				lay.removeView(lay.findViewById(viewId1));
+                if (lay.findViewById(viewId1) == null) {
+                    TextView tw = new TextView(lay.getContext(), null, 0, com.lytefast.flexinput.R.i.UiKit_Settings_Item_Icon);
+                    tw.setId(viewId1);
+                    tw.setText(changeTagText);
+					
+                    tw.setCompoundDrawablesRelativeWithIntrinsicBounds(changeIcon, null, null, null);
+					
+                    int childrenCount = lay.getChildCount();
+                    boolean foundIndex = false;
+					
+                    for (int i = 0; i < childrenCount; i++) {
+                        View view = lay.getChildAt(i);
+                        if (view.getId() == Utils.getResId("channels_list_item_thread_actions_leave", "id")) {
+                            foundIndex = true;
+                            lay.addView(tw, i - 2);
+                            break;
+                        }
+                    }
+					
+                    if (!foundIndex) lay.addView(tw, 7);
+					
+					TagPickerSheet sheet = new TagPickerSheet(availableTags, appliedTags, () -> {
+						try {
+							logger.info("applied: " + appliedTags);
+							//logger.info("available: " + availableTags);
+							logger.info("Selected: " + selectedTagIds);
+							//String jsonStr = String.format("{\"applied_tags\":%s}", selectedTagIds.toString().replace(" ", ""));
+							Map<String, Object> requestBody = new HashMap<>();
+							requestBody.put("applied_tags", selectedTagIds);
+							
+							new Thread(new Runnable() {
+								@Override
+								public void run() {
+									try {
+										// refered from EditWebooks by c10udburst-discord
+										Http.Response response = Http.Request.newDiscordRequest(String.format("/channels/%s", String.valueOf(willDelete.k())), "PATCH").executeWithJson(requestBody);
+										//logger.info("res: " + response.text());
+
+									} catch (Exception e) {
+										String err = e.getMessage();
+										String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
+										Properties p = new Properties();
+										String msg;
+										try {
+											p.load(new java.io.StringReader("m=" + rawMsg));
+											msg = p.getProperty("m");
+										} catch (Exception ignored) {
+											msg = err;
+										}
+
+										Utils.showToast(msg);
+										logger.error("Error", e);
+									}
+								}
+							}).start();
+
+						} catch (Exception e) { 
+							logger.error(e); 
+						} finally {
+							isReinvoked = false;
+						}
+					});
+					
+                    tw.setOnClickListener((v) -> {
+						Utils.openPageWithProxy(lay.getContext(), sheet);
+					});
+                }
+            })
+		);
+		
+		/* try {
+			// use 'public final String d()' 
+			java.lang.reflect.Method stringMethod = okhttp3.ResponseBody.class.getDeclaredMethod("d");
+
+			patcher.patch(stringMethod, new com.aliucord.patcher.Hook(cf -> {
+				String content = (String) cf.getResult();
+
+				
+				if (content != null ) {
+					logger.info("─── [FOUND SERVER RESPONSE] ───");
+					logger.info(content);
+					logger.info("───────────────────────────────");
+				}
+			}));
+		} catch (NoSuchMethodException e) {
+			logger.error("Failed to patch ResponseBody.d()", e);
+		} catch (Throwable e) {
+			logger.error(e);
+		} */
 	}
 
 
 	public class TagPickerSheet extends BottomSheet {
 		private final List<ForumTag> tags;
+		private List<Long> apl_tags;
 		private final Runnable onComplete;
 
 		public TagPickerSheet(List<ForumTag> tags, Runnable onComplete) {
 			this.tags = tags;
+			this.onComplete = onComplete;
+		}
+		
+		public TagPickerSheet(List<ForumTag> tags, List<Long> apl_tags, Runnable onComplete) {
+			this.tags = tags;
+			this.apl_tags = apl_tags;
 			this.onComplete = onComplete;
 		}
 		
@@ -200,8 +370,14 @@ public class ForumTagFix extends Plugin {
 			super.onViewCreated(view, bundle);
 			Context context = view.getContext();
 			int p = DimenUtils.dpToPx(16);
+			Set<Long> selectedSet;
 			
-			Set<Long> selectedSet = new java.util.HashSet<>(selectedTagIds);
+			
+			if (apl_tags == null) {
+				selectedSet = new java.util.HashSet<>(selectedTagIds);
+			} else {
+				selectedSet = new java.util.HashSet<>(apl_tags);
+			}
 
 			LinearLayout root = new LinearLayout(context);
 			root.setOrientation(LinearLayout.VERTICAL);
@@ -282,8 +458,14 @@ public class ForumTagFix extends Plugin {
 			}
 
 			@Override
-			public int getItemCount() { return data.size(); }
-
+			public int getItemCount() {
+				try {
+					return data.size();
+				} catch (Exception e) {
+					return 0;
+				}
+			}
+			
 			static class VH extends RecyclerView.ViewHolder {
 				TextView tv;
 				VH(View v) { super(v); tv = (TextView) v; }
