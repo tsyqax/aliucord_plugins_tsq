@@ -233,8 +233,8 @@ public class ForumTagFix extends Plugin {
 				Channel willDelete = model.getChannel();
 
 				ChannelWrapper wrapper2 = new ChannelWrapper(StoreStream.getChannels().getChannel(channelId));
-				//ChannelWrapper wrapper1 = new ChannelWrapper(willDelete);
-				List<Long> appliedTags = wrapper2.getAppliedTags();
+				ChannelWrapper wrapper1 = new ChannelWrapper(willDelete);
+				List<Long> appliedTags = wrapper1.getAppliedTags();
 				List<ForumTag> availableTags = wrapper2.getAvailableTags();
 				Integer chType = wrapper2.getType();
 				
