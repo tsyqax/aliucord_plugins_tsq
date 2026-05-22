@@ -1,6 +1,5 @@
 # Aliucord Plugins Tsq
 This fixes parts not covered by the official code.  
-
 Note: Some parts may contain bugs; if so, please create an issue.
 
 ## LIST
@@ -10,6 +9,7 @@ Note: Some parts may contain bugs; if so, please create an issue.
 - [ThreadDEL](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadDEL.zip): Add button to delete channel or thread on channel_list.
 - [MediaChannelFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MediaChannelFix.zip): Make MediaChannel to ForumChannel.
 - [HeicFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Make heic to jpg when you send image.
+- [CopyBackTick](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/CopyBackTick.zip): Make copy to clipboard when you click backtick.
 
 ### HeicFix NOTE
 1. When you looked big cache due to this, just restart app, then it will clear old cache.
@@ -20,6 +20,7 @@ Note: Some parts may contain bugs; if so, please create an issue.
 3. ForumTagFix -> Hook Multipart into the Build to insert the tag list as payload_json.
 5. MediaChannelFix -> When getting the channel type, hook it so that if it is 16, it becomes 15.
 7. HeicFix -> Hook Attachment and convert heic to jpg.
+8. CopyBackTick -> Hook and add ClickSpan to SpannableStringBuilder.
 
 ---
 ## Why is this necessary? (Maybe Radical)
