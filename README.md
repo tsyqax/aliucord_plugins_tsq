@@ -10,6 +10,7 @@ Note: Some parts may contain bugs; if so, please create an issue.
 - [MediaChannelFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MediaChannelFix.zip): Make MediaChannel to ForumChannel.
 - [HeicFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Make heic to jpg when you send image.
 - [CopyBackTick](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/CopyBackTick.zip): Make copy to clipboard when you click backtick.
+- [FileNameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FileNameFix.zip): Fix filename when it shoulded unicoded (but not restore yet)
 
 ### HeicFix NOTE
 1. When you looked big cache due to this, just restart app, then it will clear old cache.
