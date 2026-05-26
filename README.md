@@ -25,7 +25,7 @@ Note: Some parts may contain bugs; if so, please create an issue.
 8. CopyBackTick -> Hook and add ClickSpan to SpannableStringBuilder.
 ---
 ## Is it Backport?
-※ modified = not same exactly original
+※ modified = not same exactly original  
 ※ simplified = small than original
 
 ### Yes
@@ -38,7 +38,9 @@ Note: Some parts may contain bugs; if so, please create an issue.
 - CopyBackTick
 - FilenameFix (simplified)
 - EmojiRank (modified)
+
 ---
+
 ## Why is this necessary? (Maybe Radical)
 ### FriendFix
 The official service has still not resolved the issue of being unable to add friends, which dates back two years. Despite having #601 PR, the problem has remained dormant in their struggles for over a year. Although this plugin started later than them, it simply solves the friend adding issue in a lighter and faster way.
