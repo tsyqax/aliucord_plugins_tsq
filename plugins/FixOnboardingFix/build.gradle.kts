@@ -1,10 +1,12 @@
 version = "0.0.1" // Plugin version. Increment this to trigger an update
-description = "Temporary patch while waiting official backport" // Plugin description that will be shown to user
+description = "add /onboarding command to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        * NOTE: This is temporary patch while waiting official backport!
+
         # 0.0.1
         * IPR!
         * refered from FixOnboarding by @scourage_main
