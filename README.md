@@ -21,9 +21,23 @@ Note: Some parts may contain bugs; if so, please create an issue.
 1. FriendFix -> Hook the UI to pass 12345 if there is nothing after #. Then, hook to replace 12345 with the string "null".
 3. ForumTagFix -> Hook Multipart into the Build to insert the tag list as payload_json.
 5. MediaChannelFix -> When getting the channel type, hook it so that if it is 16, it becomes 15.
-7. HeicFix -> Hook Attachment and convert heic to jpg.
+7. HeicFix -> Hook Attachment(with stackTrace) and convert heic to jpg.
 8. CopyBackTick -> Hook and add ClickSpan to SpannableStringBuilder.
+---
+## Is it Backport?
+※ modified = not same exactly original
+※ simplified = small than original
 
+### Yes
+- FriendFix
+- ThreadCMD
+- ForumTagFix (modified)
+- threadDEL
+- MediaChannelFix
+- HeicFix
+- CopyBackTick
+- FilenameFix (simplified)
+- EmojiRank (modified)
 ---
 ## Why is this necessary? (Maybe Radical)
 ### FriendFix
