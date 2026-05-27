@@ -105,29 +105,24 @@ public class EmojiRank extends Plugin {
 					return;
 				}
 
-                
-				new Thread(() -> {
-                    try {
-                        if (cached != nowId) {
-                            String response = Http.Request.newDiscordRequest(
-                                String.format("/guilds/%s/top-emojis", nowId), "GET"
-                            ).execute().text();
+                if (cached != nowId) {
+    				new Thread(() -> {
+                        try {
+                            String response = Http.Request.newDiscordRequest(String.format("/guilds/%s/top-emojis", nowId), "GET").execute().text();
                             trendMojiList = parseEmojiIds(response);
                             cachedList = new ArrayList<>(trendMojiList);
                             cached = nowId;
-                            logger.info("Cached List updated: " + nowId);
                             logger.info("Cached updated: " + cached + "->" + nowId);
-                        } else {
+                        } catch (Exception e) {
                             trendMojiList = cachedList;
-                            logger.info("Cached List Used");
+                            logger.error("ERROR02", e);
                         }
-                    } catch (Exception e) {
-                        logger.error("ERROR02", e);
-                    }
-                }).start();
-                
+                    }).start();
+                } else {
+                    trendMojiList = cachedList;
+                    logger.info("Cached List Used");
+                }
 				if (trendMojiList.size() > 0) {
-					
 					List<Object> trendList = new ArrayList<>();
 					for (String id : trendMojiList) {
 						Object originalEmoji = emojiIndex.get(id);
