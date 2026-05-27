@@ -101,7 +101,7 @@ public class EmojiRank extends Plugin {
 				Map<String, Object> emojiIndex = (Map<String, Object>) args[2];
 				String nowId = String.valueOf(StoreStream.getGuildSelected().getSelectedGuildId());
 				
-				if (nowId == 0L) {
+				if (nowId == "0") {
 					return;
 				}
 
