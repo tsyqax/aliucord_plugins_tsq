@@ -105,27 +105,22 @@ public class EmojiRank extends Plugin {
 					return;
 				}
 				
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							if (cached != nowId) {
-								jsonResponse = Http.Request.newDiscordRequest(String.format("/guilds/%s/top-emojis", nowId), "GET").execute().text();
-								logger.info("New Request Sended: " + cached + "/" + nowId);
-							}
-						} catch (Exception e) {
-							logger.error("ERROR02", e);
-						}
-					}}).start();
-				
-				if (cached != nowId) {
-					trendMojiList = parseEmojiIds(jsonResponse);
-					cachedList = new ArrayList<>(trendMojiList);
-                    logger.info("Cached List updated");
-				} else {
-					trendMojiList = cachedList;
-				}
-				
+				new Thread(() -> {
+                    try {
+                        if (cached != nowId) {
+                            String response = Http.Request.newDiscordRequest(
+                                String.format("/guilds/%s/top-emojis", nowId), "GET"
+                            ).execute().text();
+                            trendMojiList = parseEmojiIds(response);
+                            cachedList = new ArrayList<>(trendMojiList);
+                            cached = nowId;
+                            logger.info("Cached List updated: " + nowId);
+                        }
+                    } catch (Exception e) {
+                        logger.error("ERROR02", e);
+                    }
+                }).start();
+			
 				if (trendMojiList.size() > 0) {
 					cached = nowId;
 					logger.info("Cached updated: " + cached + "->" + nowId);
