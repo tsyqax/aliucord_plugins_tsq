@@ -111,8 +111,8 @@ public class EmojiRank extends Plugin {
                             String response = Http.Request.newDiscordRequest(String.format("/guilds/%s/top-emojis", nowId), "GET").execute().text();
                             trendMojiList = parseEmojiIds(response);
                             cachedList = new ArrayList<>(trendMojiList);
-                            cached = nowId;
                             logger.info("Cached updated: " + cached + "->" + nowId);
+                            cached = nowId;
                         } catch (Exception e) {
                             trendMojiList = cachedList;
                             logger.error("ERROR02", e);
@@ -133,7 +133,9 @@ public class EmojiRank extends Plugin {
 					//customEmojis.put(TREND_ID, trendList);
 					//param.args[1] = customEmojis;
 					param.args[3] = trendList;
-				}
+				} else {
+                    return;
+                }
 			} catch (Throwable th) {
 				logger.error("ERROR04", th);
 			}
