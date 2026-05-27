@@ -83,7 +83,7 @@ public class EmojiRank extends Plugin {
 	private final Logger logger = new Logger("EmojiRank");
 	private String name;
 	private String jsonResponse;
-	private static long cached;
+	private static String cached;
 	private static List<String> cachedList = new ArrayList<>();
 	final Class<?> emojiSetClass = EmojiSet.class;
 	//final long TREND_ID = 9999999999999L;
@@ -99,7 +99,7 @@ public class EmojiRank extends Plugin {
 				//Map<Long, List<Object>> customEmojis = (Map<Long, List<Object>>) args[1];
 				//List<Object> recentEmojis = (List<Object>) args[3];
 				Map<String, Object> emojiIndex = (Map<String, Object>) args[2];
-				long nowId = StoreStream.getGuildSelected().getSelectedGuildId();
+				String nowId = String.valueOf(StoreStream.getGuildSelected().getSelectedGuildId());
 				
 				if (nowId == 0L) {
 					return;
