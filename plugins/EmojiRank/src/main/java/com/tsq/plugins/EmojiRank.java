@@ -121,14 +121,14 @@ public class EmojiRank extends Plugin {
 				if (cached != nowId) {
 					trendMojiList = parseEmojiIds(jsonResponse);
 					cachedList = new ArrayList<>(trendMojiList);
+                    logger.info("Cached List updated");
 				} else {
 					trendMojiList = cachedList;
 				}
 				
 				if (trendMojiList.size() > 0) {
 					cached = nowId;
-					logger.info("Cached: " + cached);
-					
+					logger.info("Cached updated: " + cached + "->" + nowId);
 					List<Object> trendList = new ArrayList<>();
 					for (String id : trendMojiList) {
 						Object originalEmoji = emojiIndex.get(id);
