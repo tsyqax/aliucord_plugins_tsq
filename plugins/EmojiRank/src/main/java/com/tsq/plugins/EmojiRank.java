@@ -105,37 +105,37 @@ public class EmojiRank extends Plugin {
 					return;
 				}
 
-                if (cached != nowId) {
-    				new Thread(() -> {
-                        try {
+    			new Thread(() -> {
+                    try {
+                        if (cached != nowId) {
                             String response = Http.Request.newDiscordRequest(String.format("/guilds/%s/top-emojis", nowId), "GET").execute().text();
                             trendMojiList = parseEmojiIds(response);
                             cachedList = new ArrayList<>(trendMojiList);
                             logger.info("Cached updated: " + cached + "->" + nowId);
                             cached = nowId;
-                        } catch (Exception e) {
+                        } else {
                             trendMojiList = cachedList;
-                            logger.error("ERROR02", e);
                         }
-                    }).start();
-                } else {
-                    trendMojiList = cachedList;
-                    logger.info("Cached List Used");
-                }
-				if (trendMojiList.size() > 0) {
-					List<Object> trendList = new ArrayList<>();
-					for (String id : trendMojiList) {
-						Object originalEmoji = emojiIndex.get(id);
-						if (originalEmoji != null) {
-							trendList.add(originalEmoji);
-						}
-					}
-					//customEmojis.put(TREND_ID, trendList);
-					//param.args[1] = customEmojis;
-					param.args[3] = trendList;
-				} else {
-                    return;
-                }
+                        if (trendMojiList.size() > 0) {
+        					List<Object> trendList = new ArrayList<>();
+        					for (String id : trendMojiList) {
+        						Object originalEmoji = emojiIndex.get(id);
+        						if (originalEmoji != null) {
+        							trendList.add(originalEmoji);
+        						}
+        					}
+        					//customEmojis.put(TREND_ID, trendList);
+        					//param.args[1] = customEmojis;
+        					param.args[3] = trendList;
+        				} else {
+                            return;
+                        }   
+                    } catch (Exception e) {
+                        trendMojiList = cachedList;
+                        logger.error("ERROR02", e);
+                    }
+                }).start();
+
 			} catch (Throwable th) {
 				logger.error("ERROR04", th);
 			}
