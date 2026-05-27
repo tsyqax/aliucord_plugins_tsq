@@ -104,7 +104,8 @@ public class EmojiRank extends Plugin {
 				if (nowId == 0L) {
 					return;
 				}
-				
+
+                
 				new Thread(() -> {
                     try {
                         if (cached != nowId) {
@@ -115,15 +116,17 @@ public class EmojiRank extends Plugin {
                             cachedList = new ArrayList<>(trendMojiList);
                             cached = nowId;
                             logger.info("Cached List updated: " + nowId);
-                        }
+                            logger.info("Cached updated: " + cached + "->" + nowId);
+                        } else {
+                            trendMojiList = cachedList;
+                            logger.info("Cached List Used");
                     } catch (Exception e) {
                         logger.error("ERROR02", e);
                     }
                 }).start();
-			
+                
 				if (trendMojiList.size() > 0) {
-					cached = nowId;
-					logger.info("Cached updated: " + cached + "->" + nowId);
+					
 					List<Object> trendList = new ArrayList<>();
 					for (String id : trendMojiList) {
 						Object originalEmoji = emojiIndex.get(id);
