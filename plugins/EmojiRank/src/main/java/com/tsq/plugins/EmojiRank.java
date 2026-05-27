@@ -120,6 +120,7 @@ public class EmojiRank extends Plugin {
                         } else {
                             trendMojiList = cachedList;
                             logger.info("Cached List Used");
+                        }
                     } catch (Exception e) {
                         logger.error("ERROR02", e);
                     }
