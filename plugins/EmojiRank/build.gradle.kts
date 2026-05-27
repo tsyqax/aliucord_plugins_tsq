@@ -1,10 +1,13 @@
-version = "1.0.0" // Plugin version. Increment this to trigger an update
+version = "1.0.1" // Plugin version. Increment this to trigger an update
 description = "Make recent category to guild top emojis" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.0.1
+        * Fix not displaying bug maybe
+
         # 1.0.0
         * IPR!
         """.trimIndent(),
