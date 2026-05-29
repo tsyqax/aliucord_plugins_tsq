@@ -15,7 +15,7 @@ Note: Some parts may contain bugs; if so, please create an issue.
 - [FixOnboardingFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FixOnboardingFork.zip): add /onboarding command to do onboarding.
 
 ## HOW TO USE?
-Look [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)
+Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)**
 
 ### HeicFix NOTE
 1. When you looked big cache due to this, just restart app, then it will clear old cache.
@@ -30,11 +30,17 @@ Look [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)
 10. FixOnboardingFix -> GET on /guilds/%s/onboarding and POST on /guilds/%s/onboarding-responses with newDiscordRequest();
 
 ---
-## Is it Backport?
+## Says
+### What is Fork?
+It refers to the unofficial succession of plugins that solve the same problem. Maybe remaking?   
+Usually, the term "Fork" implies an improved version, but the forks I create have similar flows but often different logic.  
+However, I refer to them as "Forks" of the originals out of courtesy and respect for the developers.
+
+### Is it Backport?
 ※ modified = not same exactly original  
 ※ simplified = small than original
 
-### Yes
+#### Yes
 - FriendFix
 - ThreadCMD
 - ForumTagFix (modified)
