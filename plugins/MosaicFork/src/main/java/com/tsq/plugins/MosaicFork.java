@@ -1,0 +1,298 @@
+package com.aliucord.plugins;
+
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import android.widget.GridLayout;
+import android.util.DisplayMetrics;
+
+import com.aliucord.Logger;
+import com.aliucord.entities.Plugin;
+import com.aliucord.patcher.*;
+import com.aliucord.annotations.AliucordPlugin;
+
+import com.discord.models.message.Message;
+import com.discord.models.member.GuildMember;
+import com.discord.api.message.attachment.MessageAttachment;
+
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapter;
+import com.discord.widgets.chat.list.entries.ChatListEntry;
+import com.discord.widgets.chat.list.entries.AttachmentEntry;
+import com.discord.widgets.chat.list.entries.EmbedEntry;
+import com.discord.widgets.chat.list.entries.AutoModSystemMessageEmbedEntry;
+import com.discord.widgets.media.WidgetMedia;
+
+import com.discord.stores.StoreMessageState;
+
+import com.discord.utilities.mg_recycler.MGRecyclerViewHolder;
+
+import com.discord.api.channel.Channel;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import com.discord.utilities.images.MGImages;
+import com.facebook.drawee.view.SimpleDraweeView;
+//import com.facebook.drawee.generic.RoundingParams;
+
+
+@AliucordPlugin
+public class MosaicFork extends Plugin {
+	private final Logger logger = new Logger("MosaicFork");
+	private static final int MOSAIC_VIEW_TYPE = 1234;
+	private static int realWidth;
+	
+
+	@Override
+	public void start(Context context) throws Throwable {
+		
+		DisplayMetrics dm = context.getResources().getDisplayMetrics();
+		int screenWidth = dm.widthPixels; 
+		realWidth = (int) (screenWidth * 0.8f);
+		
+		Method createEmbedEntriesMethod = ChatListEntry.Companion.getClass().getDeclaredMethod("createEmbedEntries", Message.class, StoreMessageState.State.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, Channel.class, GuildMember.class, Map.class, Map.class);
+		
+		//  Message, StoreMessageState.State, boolean, boolean, boolean, boolean, boolean, Channel, GuildMember, Map, Map
+		patcher.patch(createEmbedEntriesMethod, new Hook(param -> {
+			List<Object> originalList = (List<Object>) param.getResult();
+			
+			if (originalList == null || originalList.isEmpty()) {
+				return;
+			}
+			
+			if (originalList.size() <= 1) {
+				return; 
+			}
+			
+			List<MessageAttachment> images = new ArrayList<>();
+			
+			// for (Object unKnown: originalList)
+			for (int i = originalList.size() - 1; i >= 0; i--) { //reverse
+				Object entry = originalList.get(i);
+				
+				if (entry != null && entry.getClass() == AttachmentEntry.class) {
+					
+					AttachmentEntry attachmentEntry = (AttachmentEntry) entry;
+					MessageAttachment attachment = attachmentEntry.getAttachment();
+					int fileType = attachment.e().ordinal();
+					
+					if (fileType == 0 || fileType == 1) { 
+						images.add(attachment);
+						originalList.remove(i);
+					}
+				}
+			}
+
+			if (images.size() > 1) {				
+				originalList.add(0, new MosaicEntry(images));
+			}
+
+			param.setResult(originalList);
+		}));
+
+		Method chatListAdapterMethod = WidgetChatListAdapter.class.getDeclaredMethod("onCreateViewHolder", ViewGroup.class, int.class);
+		patcher.patch(chatListAdapterMethod, new Hook(param -> {
+			int viewType = (int) param.args[1];
+			ViewGroup parent = (ViewGroup) param.args[0];
+			WidgetChatListAdapter adapter = (WidgetChatListAdapter) param.thisObject;
+			
+			if (viewType == MOSAIC_VIEW_TYPE) {
+				GridLayout gridLayout = new GridLayout(parent.getContext());
+				gridLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+				gridLayout.setPadding(150, 0, 0, 0); 
+				
+				MosaicViewHolder mosaicViewHolder = new MosaicViewHolder(gridLayout, adapter);
+				
+				param.setResult(mosaicViewHolder); 
+			}
+		}));
+	}
+	
+	@Override
+	public void stop(Context context) {
+		patcher.unpatchAll();
+	}
+
+
+	public static class MosaicEntry extends ChatListEntry {
+		private final List<MessageAttachment> images;
+
+		public MosaicEntry(List<MessageAttachment> images) {
+			super();
+			this.images = images;
+		}
+
+		public List<MessageAttachment> getImages() {
+			return this.images;
+		}
+
+		@Override
+		public int getType() {
+			return MOSAIC_VIEW_TYPE;
+		}
+		
+		@Override
+		public String getKey() {
+			return String.valueOf(images.hashCode());
+		}
+
+		
+	}
+
+
+	public static class MosaicViewHolder extends MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEntry> {
+		private final GridLayout gridLayout;
+		//private final List<SimpleDraweeView> cachedImageViews = new ArrayList<>(); //for reuse
+
+		public MosaicViewHolder(GridLayout gridLayout, WidgetChatListAdapter adapter) {
+			super(gridLayout, adapter);
+			this.gridLayout = gridLayout;
+			
+			/* for (int i = 0; i < 10; i++) {
+				SimpleDraweeView iv = new SimpleDraweeView(gridLayout.getContext());
+				//RoundingParams rp = RoundingParams.fromCornersRadius(24f);
+				//iv.getHierarchy().setRoundingParams(rp);
+				
+				cachedImageViews.add(iv);
+			} */
+		}
+
+		public GridLayout getGridLayout() {
+			return this.gridLayout;
+		}
+		
+		@Override
+		public void onConfigure(int position, ChatListEntry data) {
+			super.onConfigure(position, data);
+
+			if (data instanceof MosaicEntry) {
+				MosaicEntry mosaicEntry = (MosaicEntry) data;
+				List<MessageAttachment> images = mosaicEntry.getImages();
+				int total = images.size();
+				
+				ViewGroup.LayoutParams gridParams = gridLayout.getLayoutParams();
+				
+				gridParams.width = realWidth;
+				
+				gridLayout.removeAllViews();
+				gridLayout.setLayoutParams(gridParams);
+				gridLayout.setColumnCount(6);
+				
+				for (int i = 0; i < total; i++) {
+					int imgPosition = i;
+					int spanSize = getSpanSize(total, i); 
+					
+					SimpleDraweeView imageView = new SimpleDraweeView(gridLayout.getContext());
+					imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+					
+					GridLayout.Spec rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
+					GridLayout.Spec colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f);
+					GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
+					
+					MessageAttachment attachment = images.get(i);
+					params.width = 0; //getWidth() = attachment.g();
+					params.height = 300; //getHeight() = attachment.b();
+					imageView.setLayoutParams(params);
+					
+					String imageUrl = attachment.c(); //getProxyUrl(); // getUrl() = attachment.f(); 
+					final MessageAttachment finalAttachment = attachment;
+					
+					MGImages.setImage(imageView, imageUrl);
+					
+					imageView.setOnClickListener(new android.view.View.OnClickListener() {
+							@Override
+							public void onClick(android.view.View v) {
+								try {
+									WidgetMedia.Companion.launch(v.getContext(), finalAttachment);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+					});
+					
+					gridLayout.addView(imageView);
+				}
+				
+				/* for (int i = 0; i < cachedImageViews.size(); i++) {
+					SimpleDraweeView imageView = cachedImageViews.get(i);
+
+					if (i < total) {
+						int spanSize = getSpanSize(total, i); 
+						
+						imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+						GridLayout.Spec rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
+						GridLayout.Spec colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f);
+						GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
+						
+						params.width = 0; 
+						params.height = 300;
+						params.setMargins(4, 4, 4, 4);
+						imageView.setLayoutParams(params);
+
+						MessageAttachment attachment = images.get(i);
+						String imageUrl = attachment.c(); 
+						
+						MGImages.setImage(imageView, imageUrl);
+						imageView.setVisibility(android.view.View.VISIBLE);
+						
+						final MessageAttachment finalAttachment = attachment;
+						
+						imageView.setOnClickListener(new android.view.View.OnClickListener() {
+							@Override
+							public void onClick(android.view.View v) {
+								try {
+									WidgetMedia.Companion.launch(v.getContext(), finalAttachment);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						});
+						
+						gridLayout.addView(imageView);
+					} else {
+						imageView.setVisibility(android.view.View.GONE);
+					}
+				} */
+				
+				
+			}
+		}
+		
+		private int getSpanSize(int total, int position) {
+			if (total == 1) return 6;
+			if (total == 2) return 3;
+
+			if (total == 3) {
+				return (position < 2) ? 3 : 6;
+			}
+
+			if (total >= 4 && total <= 6) {
+				if (total == 4) return 3;
+				if (total == 5) return (position < 3) ? 2 : 3;
+				if (total == 6) return 2;
+			}
+
+			if (total >= 7 && total <= 9) {
+				if (total == 7) return (position < 3) ? 2 : 3;
+				if (total == 8) return (position < 6) ? 2 : 3;
+				if (total == 9) return 2;
+			}
+
+			if (total == 10) {
+				return (position < 9) ? 2 : 6;
+			}
+
+			return 6;
+		}
+		
+	}
+}
