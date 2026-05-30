@@ -54,6 +54,6 @@ However, I refer to them as "Forks" of the originals out of courtesy and respect
 - HeicFix
 - CopyBackTick
 - FilenameFix (simplified)
-- EmojiRank (modified)
+- ~~EmojiRank (modified)~~
 - FixOnboardingFix (modified, simplified)
 - MosaicFork
