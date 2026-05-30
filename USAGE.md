@@ -36,7 +36,7 @@
 ### FileNameFix
 - You don't have to do anything.
 
-### EmojiRank
+### EmojiRank (Deprecated)
 - You don't have to do anything.
 - this will change 'Recent' sections on emoji selector
 - if you did not want that, just turn off this plugin
