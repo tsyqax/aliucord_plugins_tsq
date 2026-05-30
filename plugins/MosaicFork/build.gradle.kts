@@ -1,10 +1,14 @@
-version = "1.1.0" // Plugin version. Increment this to trigger an update
+version = "1.1.1" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.1.1
+        * Add margin 6px
+        * Add rounding 8px
+
         # 1.1.0
         * Fixed Very Huge huge lag!
 		
