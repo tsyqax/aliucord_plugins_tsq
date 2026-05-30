@@ -1,11 +1,12 @@
-version = "1.0.0" // Plugin version. Increment this to trigger an update
+version = "1.1.0" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
-		* NOTE: This may cause some lag!
+        # 1.1.0
+        * Fixed Very Huge huge lag!
 		
         # 1.0.0
         * IPR!
