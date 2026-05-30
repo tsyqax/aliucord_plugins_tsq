@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.GridLayout;
 import android.util.DisplayMetrics;
+import android.graphics.Outline;
 
 import com.aliucord.Logger;
 import com.aliucord.entities.Plugin;
@@ -42,7 +43,6 @@ import java.util.UUID;
 
 import com.discord.utilities.images.MGImages;
 import com.facebook.drawee.view.SimpleDraweeView;
-//import com.facebook.drawee.generic.RoundingParams;
 
 
 @AliucordPlugin
@@ -195,12 +195,20 @@ public class MosaicFork extends Plugin {
 				} else {
 					imageView = new SimpleDraweeView(gridLayout.getContext());
 					imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+					imageView.setOutlineProvider(new android.view.ViewOutlineProvider() {
+						@Override
+						public void getOutline(View view, Outline outline) {
+							outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), 8);
+						}
+					});
+					imageView.setClipToOutline(true);
 					gridLayout.addView(imageView);
 				}
 
 				GridLayout.Spec rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
 				GridLayout.Spec colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f);
 				GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
+				params.setMargins(6, 6, 6, 6);
 				
 				params.width = 0;
 				params.height = targetHeight; 
