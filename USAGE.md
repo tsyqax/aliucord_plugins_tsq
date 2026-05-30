@@ -46,3 +46,6 @@
 - If you join server and message is not sent, use /onboarding command
 - /onboarding command will display simple onboarding dialog
 - not supporting to change onboarding answers you did on past
+
+### MosaicFork
+- You don't have to do anything.
