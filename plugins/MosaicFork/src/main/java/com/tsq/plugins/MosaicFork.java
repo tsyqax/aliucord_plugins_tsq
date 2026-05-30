@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.discord.utilities.images.MGImages;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -49,13 +50,14 @@ public class MosaicFork extends Plugin {
 	private final Logger logger = new Logger("MosaicFork");
 	private static final int MOSAIC_VIEW_TYPE = 1234;
 	private static int realWidth;
-	
+	private static int screenWidth;
+	private static final int targetHeight = 300;
 
 	@Override
 	public void start(Context context) throws Throwable {
 		
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
-		int screenWidth = dm.widthPixels; 
+		screenWidth = dm.widthPixels; 
 		realWidth = (int) (screenWidth * 0.8f);
 		
 		Method createEmbedEntriesMethod = ChatListEntry.Companion.getClass().getDeclaredMethod("createEmbedEntries", Message.class, StoreMessageState.State.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, Channel.class, GuildMember.class, Map.class, Map.class);
@@ -124,10 +126,12 @@ public class MosaicFork extends Plugin {
 
 	public static class MosaicEntry extends ChatListEntry {
 		private final List<MessageAttachment> images;
+		private final String uniqueKey;
 
 		public MosaicEntry(List<MessageAttachment> images) {
 			super();
 			this.images = images;
+			this.uniqueKey = UUID.randomUUID().toString();
 		}
 
 		public List<MessageAttachment> getImages() {
@@ -141,7 +145,7 @@ public class MosaicFork extends Plugin {
 		
 		@Override
 		public String getKey() {
-			return String.valueOf(images.hashCode());
+			return this.uniqueKey;
 		}
 
 		
@@ -156,13 +160,10 @@ public class MosaicFork extends Plugin {
 			super(gridLayout, adapter);
 			this.gridLayout = gridLayout;
 			
-			/* for (int i = 0; i < 10; i++) {
-				SimpleDraweeView iv = new SimpleDraweeView(gridLayout.getContext());
-				//RoundingParams rp = RoundingParams.fromCornersRadius(24f);
-				//iv.getHierarchy().setRoundingParams(rp);
+			ViewGroup.LayoutParams gridParams = gridLayout.getLayoutParams();
+			gridParams.width = realWidth;
 				
-				cachedImageViews.add(iv);
-			} */
+			gridLayout.setLayoutParams(gridParams);
 		}
 
 		public GridLayout getGridLayout() {
@@ -171,102 +172,56 @@ public class MosaicFork extends Plugin {
 		
 		@Override
 		public void onConfigure(int position, ChatListEntry data) {
-			super.onConfigure(position, data);
+			if (!(data instanceof MosaicEntry)) return;
 
-			if (data instanceof MosaicEntry) {
-				MosaicEntry mosaicEntry = (MosaicEntry) data;
-				List<MessageAttachment> images = mosaicEntry.getImages();
-				int total = images.size();
-				
-				ViewGroup.LayoutParams gridParams = gridLayout.getLayoutParams();
-				
-				gridParams.width = realWidth;
-				
-				gridLayout.removeAllViews();
-				gridLayout.setLayoutParams(gridParams);
-				gridLayout.setColumnCount(6);
-				
-				for (int i = 0; i < total; i++) {
-					int imgPosition = i;
-					int spanSize = getSpanSize(total, i); 
-					
-					SimpleDraweeView imageView = new SimpleDraweeView(gridLayout.getContext());
+			MosaicEntry mosaicEntry = (MosaicEntry) data;
+			List<MessageAttachment> images = mosaicEntry.getImages();
+			int total = images.size();
+
+			gridLayout.setColumnCount(6);
+
+			int currentChildCount = gridLayout.getChildCount();
+
+			if (currentChildCount > total) {
+				gridLayout.removeViews(total, currentChildCount - total);
+			}
+
+			for (int i = 0; i < total; i++) {
+				SimpleDraweeView imageView;
+				int spanSize = getSpanSize(total, i);
+
+				if (i < currentChildCount) {
+					imageView = (SimpleDraweeView) gridLayout.getChildAt(i);
+				} else {
+					imageView = new SimpleDraweeView(gridLayout.getContext());
 					imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-					
-					GridLayout.Spec rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
-					GridLayout.Spec colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f);
-					GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
-					
-					MessageAttachment attachment = images.get(i);
-					params.width = 0; //getWidth() = attachment.g();
-					params.height = 300; //getHeight() = attachment.b();
-					imageView.setLayoutParams(params);
-					
-					String imageUrl = attachment.c(); //getProxyUrl(); // getUrl() = attachment.f(); 
-					final MessageAttachment finalAttachment = attachment;
-					
-					MGImages.setImage(imageView, imageUrl);
-					
-					imageView.setOnClickListener(new android.view.View.OnClickListener() {
-							@Override
-							public void onClick(android.view.View v) {
-								try {
-									WidgetMedia.Companion.launch(v.getContext(), finalAttachment);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							}
-					});
-					
 					gridLayout.addView(imageView);
 				}
+
+				GridLayout.Spec rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
+				GridLayout.Spec colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f);
+				GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
 				
-				/* for (int i = 0; i < cachedImageViews.size(); i++) {
-					SimpleDraweeView imageView = cachedImageViews.get(i);
+				params.width = 0;
+				params.height = targetHeight; 
+				imageView.setLayoutParams(params);
 
-					if (i < total) {
-						int spanSize = getSpanSize(total, i); 
-						
-						imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+				MessageAttachment attachment = images.get(i);
+				String imageUrl = attachment.c();
 
-						GridLayout.Spec rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
-						GridLayout.Spec colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f);
-						GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
-						
-						params.width = 0; 
-						params.height = 300;
-						params.setMargins(4, 4, 4, 4);
-						imageView.setLayoutParams(params);
+				int targetWidth = screenWidth / 2;
+				MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);  //log-resolution preview
 
-						MessageAttachment attachment = images.get(i);
-						String imageUrl = attachment.c(); 
-						
-						MGImages.setImage(imageView, imageUrl);
-						imageView.setVisibility(android.view.View.VISIBLE);
-						
-						final MessageAttachment finalAttachment = attachment;
-						
-						imageView.setOnClickListener(new android.view.View.OnClickListener() {
-							@Override
-							public void onClick(android.view.View v) {
-								try {
-									WidgetMedia.Companion.launch(v.getContext(), finalAttachment);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							}
-						});
-						
-						gridLayout.addView(imageView);
-					} else {
-						imageView.setVisibility(android.view.View.GONE);
+				imageView.setOnClickListener(v -> {
+					try {
+						WidgetMedia.Companion.launch(v.getContext(), attachment);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				} */
-				
-				
+				});
 			}
 		}
-		
+
 		private int getSpanSize(int total, int position) {
 			if (total == 1) return 6;
 			if (total == 2) return 3;
@@ -293,6 +248,5 @@ public class MosaicFork extends Plugin {
 
 			return 6;
 		}
-		
 	}
 }
