@@ -22,11 +22,6 @@ Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)
 1. When you looked big cache due to this, just restart app, then it will clear old cache.
 2. This maybe has some lag for some certain situation.
 
-### MosaicFork NOTE
-1. This may cause lag, I already try to reduce, but that is not easy.
-2. This is not compatible with SwipeMediaViewer, but they are not crash or bug, just not swiped with this.
-3. This is not perfect, can have bugs, etc.
-
 ### Why Working
 1. FriendFix -> Hook the UI to pass 12345 if there is nothing after #. Then, hook to replace 12345 with the string "null".
 3. ForumTagFix -> Hook Multipart into the Build to insert the tag list as payload_json.
