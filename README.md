@@ -15,7 +15,7 @@ Note: Some parts may contain bugs; if so, please create an issue.
 - [FixOnboardingFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FixOnboardingFork.zip): add /onboarding command to do onboarding.
 - [MosaicFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MosaicFork.zip): Make images to grid images.
 
-### Deprecated
+### Deprecated (only some part of work correctly)
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
 
 ## HOW TO USE?
