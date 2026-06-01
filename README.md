@@ -1,6 +1,6 @@
 # Aliucord Plugins Tsq
 This fixes parts not covered by the official code.  
-And... It is really stupid to just make something and not release it.  
+And... It is really bad to just make something and not release it.  
 
 Note: Some plugins may contain bugs; if so, please create an issue.
 
