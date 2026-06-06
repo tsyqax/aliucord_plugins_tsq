@@ -1,10 +1,14 @@
-version = "1.1.1" // Plugin version. Increment this to trigger an update
+version = "1.1.2" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.1.2
+        * Add support for SwipeMediaViewer
+        * Increasing width and height (will go to setting later)
+
         # 1.1.1
         * Add margin 6px
         * Add rounding 8px
@@ -14,7 +18,7 @@ aliucord {
 		
         # 1.0.0
         * IPR!
-		* Refered Mozaic by zt
+		* impressed by Mozaic of zt!
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
