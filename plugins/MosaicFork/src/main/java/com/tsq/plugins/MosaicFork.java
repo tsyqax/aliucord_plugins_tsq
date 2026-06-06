@@ -237,13 +237,16 @@ public class MosaicFork extends Plugin {
 						Class<?> cl = PluginManager.plugins.get("SwipeMediaViewer").getClass(); //yeeeeeees
 						if (cl == null) {
 							WidgetMedia.Companion.launch(v.getContext(), attachment);
-							Utils.showToast("SMV is not found");
+							//Utils.showToast("SMV is not found");
 						} else {
 							Method launchGroupMethod = cl.getDeclaredMethod("launchGroup", Context.class, List.class, MessageAttachment.class);
 							launchGroupMethod.setAccessible(true);
 							launchGroupMethod.invoke(null, v.getContext(), images, attachment);
 						}
-					}
+					} catch (NullPointerException e) {
+						WidgetMedia.Companion.launch(v.getContext(), attachment);
+						//Utils.showToast("SMV is not found");
+					} 
 					catch (Exception e) {
 						e.printStackTrace();
 					}
