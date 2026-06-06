@@ -8,7 +8,8 @@ And... It is really bad to just make something and not release it.
 ### Giveup: QRscanFix, someone to do?
 I would like someone to fix the QR code login issue using QRscanFix.  
 I frequently used QR code login when I went out home. (I would like to fix this in advance :<)  
-Find Code with [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/giveup/QRscanFix.java) in giveup folder.
+Find Code with [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/giveup/QRscanFix.java) in giveup folder.  
+Detail: [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/issues/3)  
 
 ## LIST
 - [FriendFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FriendFix.zip): Fixes issue of sending request to new username style user.
