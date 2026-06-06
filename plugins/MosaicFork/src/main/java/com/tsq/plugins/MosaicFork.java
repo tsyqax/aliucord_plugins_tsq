@@ -57,14 +57,21 @@ public class MosaicFork extends Plugin {
 	private static final int MOSAIC_VIEW_TYPE = 1234;
 	private static int realWidth;
 	private static int screenWidth;
-	private static final int targetHeight = 380;
+	private static int targetHeight;
+	private static int paddingLeft;
+	private static float density;
+	private static final int targetHeightDP = 145; //380px at me
+	private static final int paddingLeftDP = 57; //150px at me
 	
 	@Override
 	public void start(Context context) throws Throwable {
 		
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
+		density = dm.density;
 		screenWidth = dm.widthPixels; 
 		realWidth = (int) (screenWidth * 0.83f);
+		targetHeight = (int) (targetHeightDP * density + 0.5f);
+		paddingLeft = (int) (paddingLeftDP * density + 0.5f);
 		
 		Method createEmbedEntriesMethod = ChatListEntry.Companion.getClass().getDeclaredMethod("createEmbedEntries", Message.class, StoreMessageState.State.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, Channel.class, GuildMember.class, Map.class, Map.class);
 		
@@ -115,7 +122,7 @@ public class MosaicFork extends Plugin {
 			if (viewType == MOSAIC_VIEW_TYPE) {
 				GridLayout gridLayout = new GridLayout(parent.getContext());
 				gridLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-				gridLayout.setPadding(150, 0, 0, 0); 
+				gridLayout.setPadding(paddingLeft, 0, 0, 0); 
 				
 				MosaicViewHolder mosaicViewHolder = new MosaicViewHolder(gridLayout, adapter);
 				
