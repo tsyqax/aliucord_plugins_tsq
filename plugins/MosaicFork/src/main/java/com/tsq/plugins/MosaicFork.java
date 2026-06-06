@@ -12,10 +12,14 @@ import android.util.DisplayMetrics;
 import android.graphics.Outline;
 
 import com.aliucord.Logger;
+import com.aliucord.Utils;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.*;
 import com.aliucord.annotations.AliucordPlugin;
+import com.aliucord.PluginManager;
 
+
+import com.discord.embed.RenderableEmbedMedia;
 import com.discord.models.message.Message;
 import com.discord.models.member.GuildMember;
 import com.discord.api.message.attachment.MessageAttachment;
@@ -26,10 +30,12 @@ import com.discord.widgets.chat.list.entries.AttachmentEntry;
 import com.discord.widgets.chat.list.entries.EmbedEntry;
 import com.discord.widgets.chat.list.entries.AutoModSystemMessageEmbedEntry;
 import com.discord.widgets.media.WidgetMedia;
+import com.discord.widgets.chat.list.InlineMediaView.ViewParams;
 
 import com.discord.stores.StoreMessageState;
 
 import com.discord.utilities.mg_recycler.MGRecyclerViewHolder;
+import com.discord.utilities.embed.EmbedResourceUtils;
 
 import com.discord.api.channel.Channel;
 
@@ -51,14 +57,14 @@ public class MosaicFork extends Plugin {
 	private static final int MOSAIC_VIEW_TYPE = 1234;
 	private static int realWidth;
 	private static int screenWidth;
-	private static final int targetHeight = 300;
-
+	private static final int targetHeight = 380;
+	
 	@Override
 	public void start(Context context) throws Throwable {
 		
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
 		screenWidth = dm.widthPixels; 
-		realWidth = (int) (screenWidth * 0.8f);
+		realWidth = (int) (screenWidth * 0.83f);
 		
 		Method createEmbedEntriesMethod = ChatListEntry.Companion.getClass().getDeclaredMethod("createEmbedEntries", Message.class, StoreMessageState.State.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, Channel.class, GuildMember.class, Map.class, Map.class);
 		
@@ -147,8 +153,6 @@ public class MosaicFork extends Plugin {
 		public String getKey() {
 			return this.uniqueKey;
 		}
-
-		
 	}
 
 
@@ -215,15 +219,25 @@ public class MosaicFork extends Plugin {
 				imageView.setLayoutParams(params);
 
 				MessageAttachment attachment = images.get(i);
+				int fileType = attachment.e().ordinal();
 				String imageUrl = attachment.c();
-
 				int targetWidth = screenWidth / 2;
+				
 				MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);  //log-resolution preview
 
 				imageView.setOnClickListener(v -> {
 					try {
-						WidgetMedia.Companion.launch(v.getContext(), attachment);
-					} catch (Exception e) {
+						Class<?> cl = PluginManager.plugins.get("SwipeMediaViewer").getClass(); //yeeeeeees
+						if (cl == null) {
+							WidgetMedia.Companion.launch(v.getContext(), attachment);
+							Utils.showToast("SMV is not found");
+						} else {
+							Method launchGroupMethod = cl.getDeclaredMethod("launchGroup", Context.class, List.class, MessageAttachment.class);
+							launchGroupMethod.setAccessible(true);
+							launchGroupMethod.invoke(null, v.getContext(), images, attachment);
+						}
+					}
+					catch (Exception e) {
 						e.printStackTrace();
 					}
 				});
