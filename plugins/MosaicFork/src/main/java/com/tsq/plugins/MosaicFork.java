@@ -10,6 +10,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.widget.GridLayout;
 import android.util.DisplayMetrics;
 import android.graphics.Outline;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.view.Gravity;
+import android.graphics.Color;
+import android.view.ViewOutlineProvider;
+import android.graphics.drawable.GradientDrawable;
 
 import com.aliucord.Logger;
 import com.aliucord.Utils;
@@ -17,7 +24,6 @@ import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.*;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.PluginManager;
-
 
 import com.discord.embed.RenderableEmbedMedia;
 import com.discord.models.message.Message;
@@ -30,7 +36,7 @@ import com.discord.widgets.chat.list.entries.AttachmentEntry;
 import com.discord.widgets.chat.list.entries.EmbedEntry;
 import com.discord.widgets.chat.list.entries.AutoModSystemMessageEmbedEntry;
 import com.discord.widgets.media.WidgetMedia;
-import com.discord.widgets.chat.list.InlineMediaView.ViewParams;
+import com.discord.widgets.chat.list.InlineMediaView;
 
 import com.discord.stores.StoreMessageState;
 
@@ -163,7 +169,7 @@ public class MosaicFork extends Plugin {
 	}
 
 
-	public static class MosaicViewHolder extends MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEntry> {
+	public class MosaicViewHolder extends MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEntry> {
 		private final GridLayout gridLayout;
 		//private final List<SimpleDraweeView> cachedImageViews = new ArrayList<>(); //for reuse
 
@@ -198,12 +204,18 @@ public class MosaicFork extends Plugin {
 			}
 
 			for (int i = 0; i < total; i++) {
+				FrameLayout container;
 				SimpleDraweeView imageView;
 				int spanSize = getSpanSize(total, i);
 
 				if (i < currentChildCount) {
-					imageView = (SimpleDraweeView) gridLayout.getChildAt(i);
+					container = (FrameLayout) gridLayout.getChildAt(i);
+					imageView = (SimpleDraweeView) container.getChildAt(0);
+					if (container.getChildCount() > 1) {
+						container.removeViews(1, container.getChildCount() - 1);
+					}
 				} else {
+					container = new FrameLayout(gridLayout.getContext());
 					imageView = new SimpleDraweeView(gridLayout.getContext());
 					imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 					imageView.setOutlineProvider(new android.view.ViewOutlineProvider() {
@@ -213,8 +225,11 @@ public class MosaicFork extends Plugin {
 						}
 					});
 					imageView.setClipToOutline(true);
-					gridLayout.addView(imageView);
+					container.addView(imageView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+					gridLayout.addView(container);
 				}
+
+				final FrameLayout finalContainer = container;
 
 				GridLayout.Spec rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
 				GridLayout.Spec colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f);
@@ -223,15 +238,64 @@ public class MosaicFork extends Plugin {
 				
 				params.width = 0;
 				params.height = targetHeight; 
-				imageView.setLayoutParams(params);
+				finalContainer.setLayoutParams(params);
 
 				MessageAttachment attachment = images.get(i);
 				int fileType = attachment.e().ordinal();
-				String imageUrl = attachment.c();
 				int targetWidth = screenWidth / 2;
-				
-				MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);  //log-resolution preview
+				String imageUrl = attachment.c(); 
 
+				if (fileType == 0) {
+					imageUrl = attachment.c() + "format=jpeg";
+					MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);
+
+					ImageView playButton = new ImageView(gridLayout.getContext());
+					playButton.setImageResource(android.R.drawable.ic_media_play);
+					playButton.setColorFilter(android.graphics.Color.WHITE);
+					
+					GradientDrawable circleBg = new GradientDrawable();
+					circleBg.setShape(GradientDrawable.OVAL);
+					circleBg.setColor(android.graphics.Color.parseColor("#80000000"));
+					playButton.setBackground(circleBg);
+					
+					int padding = (int) (8 * gridLayout.getContext().getResources().getDisplayMetrics().density);
+					playButton.setPadding(padding, padding, padding, padding);
+					
+					int btnSize = (int) (52 * gridLayout.getContext().getResources().getDisplayMetrics().density);
+					FrameLayout.LayoutParams btnParams = new FrameLayout.LayoutParams(btnSize, btnSize);
+					btnParams.gravity = android.view.Gravity.CENTER;
+
+					finalContainer.addView(playButton, btnParams);
+				} else {
+					MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);  //log-resolution preview
+				}
+				
+				if (attachment.h() && !"OPENED".equals(finalContainer.getTag())) {
+					TextView spoilerOverlay = new TextView(gridLayout.getContext());
+					spoilerOverlay.setText("SPOILER");
+					spoilerOverlay.setTextColor(android.graphics.Color.WHITE);
+					spoilerOverlay.setGravity(android.view.Gravity.CENTER);
+					spoilerOverlay.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+					spoilerOverlay.setTextSize(13);
+
+					spoilerOverlay.setBackgroundColor(android.graphics.Color.parseColor("#FF2F3136"));
+
+					spoilerOverlay.setOutlineProvider(new android.view.ViewOutlineProvider() {
+						@Override
+						public void getOutline(View view, Outline outline) {
+							outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), 8);
+						}
+					});
+					spoilerOverlay.setClipToOutline(true);
+
+					spoilerOverlay.setOnClickListener(v -> {
+						finalContainer.setTag("OPENED");
+						finalContainer.removeView(spoilerOverlay);
+					});
+
+					finalContainer.addView(spoilerOverlay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+				}
+				
 				imageView.setOnClickListener(v -> {
 					try {
 						Class<?> cl = PluginManager.plugins.get("SwipeMediaViewer").getClass(); //yeeeeeees
