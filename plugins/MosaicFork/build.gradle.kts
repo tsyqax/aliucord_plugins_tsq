@@ -1,10 +1,13 @@
-version = "1.1.5" // Plugin version. Increment this to trigger an update
+version = "1.1.6" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.1.6
+        * Add support for disabled preview
+
         # 1.1.5
         * Add support for Spoiler
         * Fix issue with video grid
