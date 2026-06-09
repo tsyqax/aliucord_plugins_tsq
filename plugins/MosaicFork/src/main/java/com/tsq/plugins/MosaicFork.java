@@ -39,6 +39,8 @@ import com.discord.widgets.media.WidgetMedia;
 import com.discord.widgets.chat.list.InlineMediaView;
 
 import com.discord.stores.StoreMessageState;
+import com.discord.stores.StoreUserSettings;
+import com.discord.stores.StoreStream;
 
 import com.discord.utilities.mg_recycler.MGRecyclerViewHolder;
 import com.discord.utilities.embed.EmbedResourceUtils;
@@ -68,43 +70,42 @@ public class MosaicFork extends Plugin {
 	private static float density;
 	private static final int targetHeightDP = 145; //380px at me
 	private static final int paddingLeftDP = 57; //150px at me
+	private StoreUserSettings storeUserSettings = StoreStream.getUserSettings();
 	
 	@Override
 	public void start(Context context) throws Throwable {
-		
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
 		density = dm.density;
 		screenWidth = dm.widthPixels; 
 		realWidth = (int) (screenWidth * 0.83f);
 		targetHeight = (int) (targetHeightDP * density + 0.5f);
 		paddingLeft = (int) (paddingLeftDP * density + 0.5f);
-		
+			
 		Method createEmbedEntriesMethod = ChatListEntry.Companion.getClass().getDeclaredMethod("createEmbedEntries", Message.class, StoreMessageState.State.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, Channel.class, GuildMember.class, Map.class, Map.class);
-		
 		//  Message, StoreMessageState.State, boolean, boolean, boolean, boolean, boolean, Channel, GuildMember, Map, Map
 		patcher.patch(createEmbedEntriesMethod, new Hook(param -> {
 			List<Object> originalList = (List<Object>) param.getResult();
-			
-			if (originalList == null || originalList.isEmpty()) {
+				
+			if (!storeUserSettings.getIsAttachmentMediaInline() || originalList == null || originalList.isEmpty()) {
 				return;
 			}
-			
+				
 			if (originalList.size() <= 1) {
 				return; 
 			}
-			
+				
 			List<MessageAttachment> images = new ArrayList<>();
-			
+				
 			// for (Object unKnown: originalList)
 			for (int i = originalList.size() - 1; i >= 0; i--) { //reverse
 				Object entry = originalList.get(i);
-				
-				if (entry != null && entry.getClass() == AttachmentEntry.class) {
 					
+				if (entry != null && entry.getClass() == AttachmentEntry.class) {
+						
 					AttachmentEntry attachmentEntry = (AttachmentEntry) entry;
 					MessageAttachment attachment = attachmentEntry.getAttachment();
 					int fileType = attachment.e().ordinal();
-					
+						
 					if (fileType == 0 || fileType == 1) { 
 						images.add(attachment);
 						originalList.remove(i);
@@ -124,14 +125,14 @@ public class MosaicFork extends Plugin {
 			int viewType = (int) param.args[1];
 			ViewGroup parent = (ViewGroup) param.args[0];
 			WidgetChatListAdapter adapter = (WidgetChatListAdapter) param.thisObject;
-			
+				
 			if (viewType == MOSAIC_VIEW_TYPE) {
 				GridLayout gridLayout = new GridLayout(parent.getContext());
 				gridLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 				gridLayout.setPadding(paddingLeft, 0, 0, 0); 
-				
+					
 				MosaicViewHolder mosaicViewHolder = new MosaicViewHolder(gridLayout, adapter);
-				
+					
 				param.setResult(mosaicViewHolder); 
 			}
 		}));
