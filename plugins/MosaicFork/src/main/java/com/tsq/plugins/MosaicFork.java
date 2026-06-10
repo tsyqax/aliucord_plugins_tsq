@@ -85,6 +85,7 @@ public class MosaicFork extends Plugin {
 		//  Message, StoreMessageState.State, boolean, boolean, boolean, boolean, boolean, Channel, GuildMember, Map, Map
 		patcher.patch(createEmbedEntriesMethod, new Hook(param -> {
 			List<Object> originalList = (List<Object>) param.getResult();
+			Message msg  = (Message) param.args[0];
 				
 			if (!storeUserSettings.getIsAttachmentMediaInline() || originalList == null || originalList.isEmpty()) {
 				return;
@@ -114,7 +115,7 @@ public class MosaicFork extends Plugin {
 			}
 
 			if (images.size() > 1) {				
-				originalList.add(0, new MosaicEntry(images));
+				originalList.add(0, new MosaicEntry(images, msg));
 			}
 
 			param.setResult(originalList);
@@ -147,11 +148,13 @@ public class MosaicFork extends Plugin {
 	public static class MosaicEntry extends ChatListEntry {
 		private final List<MessageAttachment> images;
 		private final String uniqueKey;
+		private Message msg;
 
-		public MosaicEntry(List<MessageAttachment> images) {
+		public MosaicEntry(List<MessageAttachment> images, Message msg) {
 			super();
 			this.images = images;
 			this.uniqueKey = UUID.randomUUID().toString();
+			this.msg = msg;
 		}
 
 		public List<MessageAttachment> getImages() {
@@ -166,6 +169,10 @@ public class MosaicFork extends Plugin {
 		@Override
 		public String getKey() {
 			return this.uniqueKey;
+		}
+
+		public Message getMsg() {
+			return this.msg;
 		}
 	}
 
@@ -194,15 +201,31 @@ public class MosaicFork extends Plugin {
 
 			MosaicEntry mosaicEntry = (MosaicEntry) data;
 			List<MessageAttachment> images = mosaicEntry.getImages();
+			Message msg = mosaicEntry.getMsg(); 
 			int total = images.size();
 
 			gridLayout.setColumnCount(6);
 
 			int currentChildCount = gridLayout.getChildCount();
+			
 
 			if (currentChildCount > total) {
 				gridLayout.removeViews(total, currentChildCount - total);
 			}
+			
+			long guildId = StoreStream.getGuildSelected().getSelectedGuildId();
+			boolean shouldSpoilered = false;
+			
+			try {
+				Class<?> cl = PluginManager.plugins.get("BetterSpoiler").getClass();
+				Object bsInstance = PluginManager.plugins.get("BetterSpoiler");
+				Method shouldMethod = cl.getDeclaredMethod("shouldEnableSpoiler", Message.class, long.class);
+				shouldMethod.setAccessible(true);
+				shouldSpoilered = (boolean) shouldMethod.invoke(bsInstance, msg, guildId);
+			} catch (NullPointerException e) {
+			} catch (Exception e) {
+				logger.error("ERR05", e);
+			} 
 
 			for (int i = 0; i < total; i++) {
 				FrameLayout container;
@@ -270,8 +293,8 @@ public class MosaicFork extends Plugin {
 				} else {
 					MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);  //log-resolution preview
 				}
-				
-				if (attachment.h() && !"OPENED".equals(finalContainer.getTag())) {
+
+				if ((shouldSpoilered || attachment.h()) && !"OPENED".equals(finalContainer.getTag())) {
 					TextView spoilerOverlay = new TextView(gridLayout.getContext());
 					spoilerOverlay.setText("SPOILER");
 					spoilerOverlay.setTextColor(android.graphics.Color.WHITE);
