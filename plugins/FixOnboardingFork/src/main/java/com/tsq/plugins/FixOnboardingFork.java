@@ -244,7 +244,7 @@ public class FixOnboardingFork extends Plugin {
 			payload.put("onboarding_responses_seen", responsesSeenJson);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("ERR06", e);
 			return null;
 		}
 		return payload;
@@ -254,6 +254,12 @@ public class FixOnboardingFork extends Plugin {
 
 		if (index >= questions.size()) { // Questions Ended
 			JSONObject finalPayload = buildPayloadLast(guildId, userId);
+			
+			if (finalPayload == null) {
+				Utils.showToast("Error, you maybe will report it on Github?");
+				return;
+			}
+			
 			logger.info(finalPayload.toString());
 			
 			new Thread(new Runnable() {
