@@ -1,16 +1,27 @@
 # Aliucord Plugins Tsq
-This fixes parts not covered by the official code.  
+This try to fix parts not covered by the official code.  
 And... It is really bad to just make something and not release it.  
 
 ## NOTE
 - Some plugins may contain bugs; if so, please create an issue.
 
-### Giveup: QRscanFix, someone to do?
-I would like someone to fix the QR code login issue using QRscanFix.  
+---
+### Translatable (Draft): Do you have Idea?
+I just think of translatable plugin (providing translated texts for app and plugin)  
+But I don't know about how to implement that and other detail ideas (at least now).  
+So, If you have Idea, please provide that [here](https://github.com/tsyqax/aliucord_plugins_tsq/issues/5) :>
+  
+
+### Giveup: QRscanFix, ~~someone to do?~~
+--> I decided to wait official PRs.  
+But if offical PRs is so slow, I will try to make QRscanFix.
+
+~~I would like someone to fix the QR code login issue using QRscanFix.~~  
 I frequently used QR code login when I went out home. (I would like to fix this in advance :<)  
 Find Code with [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/giveup/QRscanFix.java) in giveup folder.  
 Detail: [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/issues/3)  
 
+---
 ## LIST
 - [FriendFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FriendFix.zip): Fixes issue of sending request to new username style user.
 - [ThreadCMD](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadCMD.zip): Add /thread for making thread.
