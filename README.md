@@ -34,6 +34,8 @@ Detail: [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/issues/3)
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis. 
 - [FixOnboardingFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FixOnboardingFork.zip): add /onboarding command to do onboarding.
 - [MosaicFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MosaicFork.zip): Make images to grid images.
+- [ServerNicknameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ServerNicknameFix.zip): Fix changing server nickname from profile menu.
+
 
 ### Deprecated (only some part of work correctly)
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
@@ -53,6 +55,7 @@ Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)
 8. CopyBackTick -> Hook and add ClickSpan to SpannableStringBuilder.
 10. FixOnboardingFix -> GET on /guilds/%s/onboarding and POST on /guilds/%s/onboarding-responses with newDiscordRequest();
 11. MosaicFork -> Remove vidoes/images from Attachments and add custom entry. And Grid with GridLayout().
+12. ServerNicknameFix -> Remove bio field when bio is empty (this means user is not nitro user).
 
 ---
 ## Says
@@ -77,3 +80,4 @@ However, I refer to them as "Forks" of the originals out of courtesy and respect
 - ~~EmojiRank (modified)~~
 - FixOnboardingFix (modified, simplified)
 - MosaicFork
+- ServerNicknameFix
