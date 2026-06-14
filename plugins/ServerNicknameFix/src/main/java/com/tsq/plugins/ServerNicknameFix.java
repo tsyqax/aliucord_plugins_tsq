@@ -51,19 +51,6 @@ public class ServerNicknameFix extends Plugin {
 	@Override
 	public void start(Context context) throws NoSuchMethodException {
 		try {
-			Method stringMethod = okhttp3.ResponseBody.class.getDeclaredMethod("d");
-
-			patcher.patch(stringMethod, new Hook(cf -> {
-				String content = (String) cf.getResult();
-				logger.info("content: " + content);
-			}));
-		} catch (NoSuchMethodException e) {
-			logger.error("Failed to patch ResponseBody.d()", e);
-		} catch (Throwable e) {
-			logger.error(e);
-		}
-
-		try {
 			Method buildMethod = okhttp3.Request.a.class.getDeclaredMethod("a");
 
 			patcher.patch(buildMethod, new Hook(cf -> {
