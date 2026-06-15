@@ -23,7 +23,7 @@ And... It is really bad to just make something and not release it.
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
 
 ## For Personal (not for formal purposes)
-- [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MoreProfile.zip): MoreProfile 1.0.10 version. This is not the code I wrote.
+- [MoreProfile](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MoreProfile.zip) | [Or this link](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds2/MoreProfile.zip): MoreProfile 1.0.10 version. This is not the code I wrote.
 - [AlternativePluginDownloader](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/AlternativePluginDownloader.zip): Just Add button plugin install when not support's channel
 
 ---
