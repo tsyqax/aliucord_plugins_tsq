@@ -91,8 +91,6 @@ import androidx.core.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 
-
-
 @AliucordPlugin
 public class FixOnboardingFork extends Plugin {
 	private final Logger logger = new Logger("FixOnboardingFork");
@@ -314,11 +312,12 @@ public class FixOnboardingFork extends Plugin {
 			String dialogTitle = " [" + (index + 1) + "/" + questions.size() + "]";
 
 			if (required) {
-				dialogTitle += " · Required";
+				//dialogTitle += " · Required";
+				dialogTitle += " *";
 			}
-			if (!onlyOne) {
+			/* if (!onlyOne) {
 				dialogTitle += " · Multiable";
-			}
+			} */
 			
 			allTitle += dialogTitle;
 			//dialogTitle += "DEBUG:" + Arrays.toString(optionTitles);
