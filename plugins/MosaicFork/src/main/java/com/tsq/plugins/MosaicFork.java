@@ -17,6 +17,7 @@ import android.view.Gravity;
 import android.graphics.Color;
 import android.view.ViewOutlineProvider;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Bundle;
 
 import com.aliucord.Logger;
 import com.aliucord.Utils;
@@ -24,11 +25,14 @@ import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.*;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.PluginManager;
+import com.aliucord.api.SettingsAPI;
+import com.aliucord.fragments.SettingsPage;
+import com.aliucord.views.TextInput;
+import com.aliucord.views.Button;
 
 import com.discord.embed.RenderableEmbedMedia;
 import com.discord.models.message.Message;
 import com.discord.models.member.GuildMember;
-import com.discord.api.message.attachment.MessageAttachment;
 
 import com.discord.widgets.chat.list.adapter.WidgetChatListAdapter;
 import com.discord.widgets.chat.list.entries.ChatListEntry;
@@ -46,6 +50,7 @@ import com.discord.utilities.mg_recycler.MGRecyclerViewHolder;
 import com.discord.utilities.embed.EmbedResourceUtils;
 
 import com.discord.api.channel.Channel;
+import com.discord.api.message.attachment.MessageAttachment;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -54,6 +59,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import com.discord.utilities.images.MGImages;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -68,16 +74,68 @@ public class MosaicFork extends Plugin {
 	private static int targetHeight;
 	private static int paddingLeft;
 	private static float density;
-	private static final int targetHeightDP = 145; //380px at me
-	private static final int paddingLeftDP = 57; //150px at me
+	private static int targetHeightDP = 145; //380px at me
+	private static int paddingLeftDP = 57; //150px at me
 	private StoreUserSettings storeUserSettings = StoreStream.getUserSettings();
+
+	public MosaicFork() { 
+		settingsTab = new SettingsTab(PSettings.class, SettingsTab.Type.PAGE).withArgs(settings);
+	}
+	
+	// ----- settings start -----
+	public static class PSettings extends SettingsPage {
+		private final SettingsAPI settings;
+		
+		public PSettings(SettingsAPI settings) {
+			this.settings = settings;
+		}
+		
+		@Override
+		public void onViewCreated(View view, Bundle bundle) {
+			super.onViewCreated(view, bundle);
+			setActionBarTitle("MosaicFork");
+			setActionBarSubtitle("Settings!");
+
+			var context = view.getContext();
+			var layout = getLinearLayout();
+
+			var width_input = new TextInput(context, "Width Ratio (0.0 ~ 1.0)", String.valueOf(settings.getFloat("width", 0.83f)));
+			var height_input = new TextInput(context, "Height DP (default: 145)", String.valueOf(settings.getInt("height", 145)));
+			var padding_input = new TextInput(context, "Height DP (default: 57)", String.valueOf(settings.getInt("padding", 57)));
+			
+			var saveButton = new Button(context);
+			saveButton.setText("Save");
+			saveButton.setOnClickListener(v -> {
+				var widthVal = ((Supplier<Float>) () -> { try { return Float.valueOf(width_input.getEditText().getText().toString()); } catch (Exception e) { return 0.83f; }}).get();
+				var heightVal = ((Supplier<Integer>) () -> { try { return Integer.valueOf(height_input.getEditText().getText().toString()); } catch (Exception e) { return 145; }}).get();
+				var paddingVal = ((Supplier<Integer>) () -> { try { return Integer.valueOf(padding_input.getEditText().getText().toString()); } catch (Exception e) { return 57; }}).get();
+				
+				settings.setFloat("width", widthVal);
+				settings.setInt("height", heightVal);
+				settings.setInt("padding", paddingVal);
+
+				Utils.promptRestart();
+			});
+
+			layout.addView(width_input);
+			layout.addView(height_input);
+			layout.addView(padding_input);
+			layout.addView(saveButton);
+		}
+	}
+	// ----- settings end -----
 	
 	@Override
 	public void start(Context context) throws Throwable {
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
 		density = dm.density;
 		screenWidth = dm.widthPixels; 
-		realWidth = (int) (screenWidth * 0.83f);
+		
+		Float inputWidth = settings.getFloat("width", 0.83f);
+		targetHeightDP = settings.getInt("height", 145);
+		paddingLeftDP = settings.getInt("padding", 57);
+		
+		realWidth = (int) (screenWidth * inputWidth);
 		targetHeight = (int) (targetHeightDP * density + 0.5f);
 		paddingLeft = (int) (paddingLeftDP * density + 0.5f);
 			
