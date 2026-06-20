@@ -1,10 +1,13 @@
-version = "1.1.7" // Plugin version. Increment this to trigger an update
+version = "1.1.8" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.1.8
+        * Add setting for width, height, padding
+
         # 1.1.7
         * Add support for BetterSpoiler
 
@@ -35,7 +38,7 @@ aliucord {
 		
         # 1.0.0
         * IPR!
-        * impressed by Mozaic of zt!
+        * impressed from Mozaic of zt
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
