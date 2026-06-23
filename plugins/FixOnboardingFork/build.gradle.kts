@@ -1,4 +1,4 @@
-version = "1.0.2" // Plugin version. Increment this to trigger an update
+version = "1.1.0" // Plugin version. Increment this to trigger an update
 description = "add /onboarding command to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
@@ -6,6 +6,10 @@ aliucord {
     changelog.set(
         """
         ## NOTE: This is temporary patch while waiting official backport!
+        # 1.1.0
+        * Better UI: using SettingsPage
+        * Support for dark theme: your eyes are now safe
+        * Back to indicator of 1.0.1
 
         # 1.0.2
         * Change Title Indicator
