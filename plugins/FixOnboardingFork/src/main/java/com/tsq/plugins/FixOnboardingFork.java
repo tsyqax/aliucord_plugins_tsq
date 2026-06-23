@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
+import android.widget.CheckBox;
 import android.os.Handler;
 import android.os.Looper;
 import android.app.Activity;
@@ -249,7 +252,6 @@ public class FixOnboardingFork extends Plugin {
 	}
 
 	private void showChainDialog(Context context, List<JSONObject> questions, int index, String guildId, String userId) {
-
 		if (index >= questions.size()) { // Questions Ended
 			JSONObject finalPayload = buildPayloadLast(guildId, userId);
 			
@@ -299,80 +301,177 @@ public class FixOnboardingFork extends Plugin {
 			String[] optionTitles = new String[options.length()];
 			List<String> allOptionIds = new ArrayList<>(); 
 
-
 			for (int i = 0; i < options.length(); i++) {
 				JSONObject opt = options.getJSONObject(i);
 				optionTitles[i] = opt.getString("title");
 				allOptionIds.add(opt.getString("id"));
 			}
 			
-			
 			userSelection = 0; //initialize
 			userRealSelection = allOptionIds.get(0); //initialize
 			String dialogTitle = " [" + (index + 1) + "/" + questions.size() + "]";
 
 			if (required) {
-				//dialogTitle += " · Required";
-				dialogTitle += " *";
+				dialogTitle += " · Required";
 			}
-			/* if (!onlyOne) {
+			if (!onlyOne) {
 				dialogTitle += " · Multiable";
-			} */
+			}
 			
-			allTitle += dialogTitle;
+			//allTitle += dialogTitle;
 			//dialogTitle += "DEBUG:" + Arrays.toString(optionTitles);
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(context).setTitle(allTitle); // do not use setMessage(dialogTitle);
+			OnboardingPage onpage = new OnboardingPage(questions, promptId, allTitle, dialogTitle, required, onlyOne, options, guildId, userId, allOptionIds, index);
 			
-			if (onlyOne) {
-				builder.setSingleChoiceItems(optionTitles, userSelection, (dialog, which) -> {
-					this.userSelection = which; 
-					this.userRealSelection = allOptionIds.get(which); 
-				});
-			} else {
-				this.multiSelectionFlags = new boolean[options.length()];
-				builder.setMultiChoiceItems(optionTitles, this.multiSelectionFlags, (dialog, which, isChecked) -> {
-					this.multiSelectionFlags[which] = isChecked;
-				});
-			}
-
-			builder.setNegativeButton("Cancel", null);
-			
-			builder.setPositiveButton("Next", (dialog, which) -> {
-				List<String> chosenOptionIds = new ArrayList<>();
-				
-				if (onlyOne) {
-					chosenOptionIds.add(this.userRealSelection);
-					
-				} else {
-					for (int i = 0; i < this.multiSelectionFlags.length; i++) {
-						if (this.multiSelectionFlags[i]) {
-							chosenOptionIds.add(allOptionIds.get(i));
-						}
-					}
-				}
-				
-				if (required && chosenOptionIds.isEmpty()) {
-					showToast(context, "This question is required!");
-					return;
-				}
-				
-				for (String chosenId : chosenOptionIds) {
-					this.addAnswer(promptId, allOptionIds, chosenId);
-				}
-				showChainDialog(context, questions, index + 1, guildId, userId);
-				}
-			);
-
-			AlertDialog dialog = builder.create();
-			dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-			dialog.show();
+			Utils.openPageWithProxy(context, onpage);
 
 		} catch (Exception e) {
 			Utils.showToast(e.getMessage());
 		}
 	}
 	
+
+	public class OnboardingPage extends SettingsPage {
+		private List<JSONObject> questions;
+		private String promptId; //question ID
+		private String allTitle; // questions Title (Unicode Escape Sequence)
+		private String dialogTitle; // subtitle
+		private boolean required; // questions required
+		private boolean onlyOne; // answer is onlyOne?
+		private JSONArray options; //options -> id, title, description(optional)
+		private String guildId;
+		private String userId;
+		private List<String> allOptionIds;
+		private int idx;
+		
+		public OnboardingPage(List<JSONObject> questions, String promptId, String allTitle, String dialogTitle, boolean required, boolean onlyOne, JSONArray options, String guildId, String userId, List<String> allOptionIds, int idx) {
+			this.questions = questions;
+			this.promptId = promptId;
+			this.allTitle = allTitle;
+			this.dialogTitle = dialogTitle;
+			this.required = required;
+			this.onlyOne = onlyOne;
+			this.options = options;
+			this.guildId = guildId;
+			this.userId = userId;
+			this.allOptionIds = allOptionIds;
+			this.idx = idx;
+		}
+		
+		private void closePage() {
+			Utils.mainThread.post(() -> {
+				var fragmentManager = getFragmentManager();
+				if (fragmentManager != null) {
+					try { fragmentManager.popBackStackImmediate(); } catch (Exception ignored) {}
+				}
+				
+				var activity = getActivity();
+				if (activity != null && !activity.isFinishing()) {
+					activity.finish(); 
+				}
+			});
+		}
+		
+		@Override
+		public void onViewCreated(View view, Bundle bundle) {
+			super.onViewCreated(view, bundle);
+			setActionBarTitle(allTitle);
+			setActionBarSubtitle(dialogTitle);
+
+			var context = view.getContext();
+			var layout = getLinearLayout();
+			
+			if (!onlyOne) {
+				multiSelectionFlags = new boolean[options.length()];
+			}
+			
+			RadioGroup radioGroup = null;
+			
+			if (onlyOne) {
+				radioGroup = new RadioGroup(context);
+				radioGroup.setOrientation(android.widget.LinearLayout.VERTICAL);
+			}
+			
+			try {
+				for (int i = 0; i < options.length(); i++) {
+					JSONObject opt = options.getJSONObject(i);
+					String optionTitle = opt.getString("title");
+					String id = opt.getString("id");
+					final int index = i;
+
+					if (onlyOne) {
+						RadioButton rb = new RadioButton(context);
+						rb.setId(index);
+						rb.setText(optionTitle);
+						rb.setTextAppearance(context, R.i.UiKit_Settings_Text);
+						rb.setScaleX(1.1f);
+						rb.setScaleY(1.1f);
+						radioGroup.addView(rb);
+
+					} else {
+						CheckBox cb = new CheckBox(context);
+						cb.setText(optionTitle);
+						cb.setTextAppearance(context, R.i.UiKit_Settings_Text);
+						cb.setScaleX(1.1f);
+						cb.setScaleY(1.1f);
+						cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
+							multiSelectionFlags[index] = isChecked;
+						});
+
+						layout.addView(cb);
+					}
+				}
+			} catch (Exception e) {
+				logger.error("ERR08", e);
+			}
+			
+			if (onlyOne && radioGroup != null) {
+				radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+					try {
+						userSelection = checkedId;
+						userRealSelection = options.getJSONObject(checkedId).getString("id");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+				layout.addView(radioGroup);
+			}
+
+			Button confirm = new Button(context);
+			confirm.setText("Next");
+			confirm.setOnClickListener(v -> {
+				List<String> chosenOptionIds = new ArrayList<>();
+				if (onlyOne) {
+					chosenOptionIds.add(userRealSelection);
+				} else {
+					for (int i = 0; i < multiSelectionFlags.length; i++) {
+						if (multiSelectionFlags[i]) {
+							chosenOptionIds.add(allOptionIds.get(i));
+						}
+					}
+				}
+
+				if (required && chosenOptionIds.isEmpty()) {
+					showToast(context, "This question is required!");
+					return;
+				}
+				
+				for (String chosenId : chosenOptionIds) {
+					addAnswer(promptId, allOptionIds, chosenId);
+				}
+				
+				closePage();
+				showChainDialog(context, questions, idx + 1, guildId, userId);
+			});
+			layout.addView(confirm);
+			
+			DangerButton cancel = new DangerButton(context);
+			cancel.setText("Cancel");
+			cancel.setOnClickListener(v -> closePage());
+			layout.addView(cancel);
+			
+		}
+	}
 	
 	@Override
 	public void stop(Context context) { patcher.unpatchAll(); }
