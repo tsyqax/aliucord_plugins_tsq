@@ -46,6 +46,7 @@
 - If you join server and message is not sent, use /onboarding command
 - /onboarding command will display simple onboarding dialog
 - not supporting to change onboarding answers you did on past
+- Added from 1.1.1, You can onboarding on guild menu, which display when long-press guild icon.
 
 ### MosaicFork
 - You don't have to do anything.
