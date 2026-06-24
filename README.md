@@ -15,7 +15,7 @@ And... It is really bad to just make something and not release it.
 - [CopyBackTick](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/CopyBackTick.zip): Make copy to clipboard when you click backtick.
 - [FileNameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FileNameFix.zip): Fix filename when it shoulded unicoded (but not restore yet)
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis. 
-- [FixOnboardingFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FixOnboardingFork.zip): add /onboarding command to do onboarding.
+- [FixOnboardingFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FixOnboardingFork.zip): add /onboarding command and menu on guild menu to do onboarding.
 - [MosaicFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MosaicFork.zip): Make images to grid images.
 - [ServerNicknameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ServerNicknameFix.zip): Fix changing server nickname from profile menu.
 
