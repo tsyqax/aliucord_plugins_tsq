@@ -32,15 +32,18 @@ import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.*;
 import com.aliucord.utils.DimenUtils;
+import com.aliucord.utils.LazyMethod;
 import com.aliucord.views.Button;
 import com.aliucord.views.DangerButton;
 import com.aliucord.views.Divider;
+import com.aliucord.views.TextInput;
 import com.aliucord.widgets.BottomSheet;
 import com.aliucord.wrappers.ChannelWrapper;
 import com.aliucord.wrappers.GuildWrapper;
 import com.aliucord.api.CommandsAPI;
-import com.discord.api.commands.ApplicationCommandType;
+import com.aliucord.fragments.SettingsPage;
 
+import com.discord.api.commands.ApplicationCommandType;
 import com.discord.api.channel.Channel;
 import com.discord.api.guild.Guild;
 import com.discord.api.channel.ForumTag;
@@ -50,9 +53,10 @@ import com.discord.stores.StoreThreadDraft;
 import com.discord.utilities.rest.RestAPI;
 import com.discord.widgets.chat.MessageManager;
 import com.discord.widgets.forums.ForumPostCreateManager;
-import com.discord.widgets.channels.list.WidgetChannelsListItemThreadActions;
-import com.aliucord.fragments.SettingsPage;
-import com.aliucord.views.TextInput;
+import com.discord.widgets.guilds.contextmenu.GuildContextMenuViewModel;
+import com.discord.widgets.guilds.contextmenu.WidgetGuildContextMenu;
+import com.discord.databinding.WidgetGuildContextMenuBinding;
+
 import com.discord.api.permission.Permission;
 import com.discord.utilities.permissions.PermissionUtils;
 import com.aliucord.api.SettingsAPI;
@@ -94,6 +98,7 @@ import androidx.core.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 
+
 @AliucordPlugin
 public class FixOnboardingFork extends Plugin {
 	private final Logger logger = new Logger("FixOnboardingFork");
@@ -107,6 +112,82 @@ public class FixOnboardingFork extends Plugin {
 
 	@Override
 	public void start(Context context) throws NoSuchMethodException {
+		var viewId1 = View.generateViewId();
+		Drawable mailIcon = ContextCompat.getDrawable(Utils.appActivity, R.e.ic_mail_24dp).mutate();
+        Utils.tintToTheme(mailIcon);
+		
+		// Refered from BetterSpolier by Ushie
+		LazyMethod getServerBindingMethod = new LazyMethod(WidgetGuildContextMenu.class, "getBinding");
+
+		patcher.patch(WidgetGuildContextMenu.class.getDeclaredMethod("configureUI", GuildContextMenuViewModel.ViewState.class),
+            new PreHook(param -> {
+				try {
+					Object ststst = param.args[0];
+					GuildContextMenuViewModel.ViewState.Valid validState = (GuildContextMenuViewModel.ViewState.Valid) ststst;
+					Object bindingObj = getServerBindingMethod.getValue(this, null).invoke(param.thisObject);
+					WidgetGuildContextMenuBinding binding = (WidgetGuildContextMenuBinding) bindingObj;
+					LinearLayout lay = (LinearLayout) binding.e.getParent();
+					
+					lay.removeView(lay.findViewById(viewId1));
+					if (lay.findViewById(viewId1) == null) {
+						TextView tw = new TextView(lay.getContext(), null, 0, R.i.ContextMenuTextOption);
+						tw.setId(viewId1);
+						tw.setText("Onboarding");
+						
+						tw.setCompoundDrawablesRelativeWithIntrinsicBounds(mailIcon, null, null, null);
+		
+						lay.addView(tw);
+						
+						tw.setOnClickListener((v) -> {
+							Context ctx = v.getContext();
+							lay.setVisibility(View.GONE);
+							
+							this.selectedResponses.clear();
+							this.promptsSeen.clear();
+							this.responsesSeen.clear();
+							
+							String guildId = String.valueOf(validState.getGuild().getId());
+							String userId = String.valueOf(StoreStream.getUsers().getMe().getId());
+							
+							new Thread(new Runnable() {
+								@Override
+								public void run() {
+									try {
+										String resText = Http.Request.newDiscordRequest(String.format("/guilds/%s/onboarding", guildId), "GET").execute().text();
+										List<JSONObject> questions = parseQuestions(resText);
+
+										if (questions.isEmpty()) {
+											Utils.showToast("There are no Onboarding.");
+											return;
+										}
+										new Handler(Looper.getMainLooper()).post(() -> {
+											showChainDialog(getSafeActivity(ctx), questions, 0, guildId, userId);
+										});
+										
+									} catch (Exception e) {
+										logger.error("Error", e);
+										String err = e.getMessage();
+										String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
+										Properties p = new Properties();
+										String msg;
+										try {
+											p.load(new java.io.StringReader("m=" + rawMsg));
+											msg = p.getProperty("m");
+										} catch (Exception ignored) {
+											msg = err;
+										}
+										Utils.showToast(msg);
+									}
+								}
+							}).start();
+						});
+					}
+				} catch (Exception e) {
+					logger.error("ERR01", e);
+				}
+            })
+		);
+	
 		commands.registerCommand(
             "onboarding",
             "Display Onboarding",
@@ -173,7 +254,8 @@ public class FixOnboardingFork extends Plugin {
 	
 	//int themeColor = ContextCompat.getColor(context, R.i.UiKit_Settings_Text);
 	
-	private Activity getSafeActivity(Context context) { // refered from FixOnboarding by @scourage_main
+	// refered from FixOnboarding by @scourage_main
+	private Activity getSafeActivity(Context context) { 
 		Context currentCtx = context;
 
 		while (currentCtx instanceof ContextWrapper) {
