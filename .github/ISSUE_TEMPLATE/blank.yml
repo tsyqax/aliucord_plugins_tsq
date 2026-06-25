@@ -1,0 +1,14 @@
+name: Blank Template
+description: Use this template ONLY OTHERS NOT FIT!
+labels: []
+body:
+  - type: textarea
+    id: info-sec
+    attributes:
+      label: Your Story
+      description: Just say what you want to!
+      placeholder: |
+        Your naming skills aren't very good.
+        ...
+    validations:
+      required: true
