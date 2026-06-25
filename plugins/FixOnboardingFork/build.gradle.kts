@@ -1,11 +1,14 @@
-version = "1.1.1" // Plugin version. Increment this to trigger an update
+version = "1.1.2" // Plugin version. Increment this to trigger an update
 description = "Add Method to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
-        ## NOTE: This is temporary patch while waiting official backport!
+        # 1.1.2
+        * Add displaying emoji
+        * Fix bug about title and improve UI
+
         # 1.1.1
         * Now can onboarding from guild menu
         * Guild Menu = the menu that appears when long-press guild icon
@@ -24,10 +27,6 @@ aliucord {
         # 1.0.0
         * IPR!
         * refered from FixOnboarding by @scourage_main
-
-        # JUST THINKING
-        * If you heard there is a better onboarding plugin, I'm so sad.
-        * At least, this plugin works in reality rather than being a mirage.
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
