@@ -17,8 +17,7 @@ body:
       label: What's the problem?
       description: Describe in detail. When, how, why, what, etc.
       placeholder: |
-        Ex)
-        When I open Plugin setting page, but it's not working with saying "ClassCastException".
+        Ex) When I open Plugin setting page, but it's not working with saying "ClassCastException".
     validations:
       required: true
 
@@ -28,8 +27,7 @@ body:
       label: How is it supposed to be?
       description: Describe situation or behavior if it worked correctly.
       placeholder: |
-        Ex)
-        It should open setting page with good working.
+        Ex) It should open setting page with good working.
     validations:
       required: true
 
@@ -49,9 +47,9 @@ body:
   - type: textarea
     id: debug-log
     attributes:
-      label: Denug Log (Optional)
+      label: Debug Log (Optional)
       description: Paste debug log with that plugin.
-      placeholder: |
+      value: |
         ```
         Paste your crash log here
         ```
