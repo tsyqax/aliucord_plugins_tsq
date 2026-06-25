@@ -3,72 +3,54 @@ description: Report a bug or crash in plugin! It might take a long time to resol
 labels: [bug]
 body:
   - type: input
-    id: discord
+    id: pluginName
     attributes:
-      label: Discord username (Optional)
-      description: Your Discord username, in case we need to follow up.
-      placeholder: username123
-    validations:
-      required: false
-
-  - type: textarea
-    id: bug-description
-    attributes:
-      label: What’s the issue?
-      description: Describe what happens, when it happens, and where.
-      placeholder: |
-        Example:
-        When I open the settings page and tap on "Plugins", the app crashes with no warning.
+      label: Plugin Info
+      description: Which plugin has bug? And which version?
+      placeholder: TsqPowerFix (1.2.3)
     validations:
       required: true
 
   - type: textarea
-    id: expected-behaviour
+    id: description
     attributes:
-      label: What did you expect to happen?
-      description: Describe the correct or expected behavior.
+      label: What's the problem?
+      description: Describe in detail. When, how, why, what, etc.
       placeholder: |
-        Example:
-        I expected the "Plugins" page to open without crashing.
+        Ex)
+        When I open Plugin setting page, but it's not working with saying "ClassCastException".
     validations:
       required: true
 
   - type: textarea
-    id: reproduction-steps
+    id: expectation
     attributes:
-      label: How can we reproduce it?
+      label: How is it supposed to be?
+      description: Describe situation or behavior if it worked correctly.
+      placeholder: |
+        Ex)
+        It should open setting page with good working.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction stage
       description: Provide step-by-step instructions.
       placeholder: |
         Steps:
-        1. Go to Settings
-        2. Tap on "Plugins"
-        3. App crashes immediately
-    validations:
-      required: true
-
-  - type: input
-    id: android-version
-    attributes:
-      label: Android Version
-      description: What Android version is this happening on?
-      placeholder: Android 13, or SDK 33
-    validations:
-      required: true
-
-  - type: input
-    id: device-info
-    attributes:
-      label: Device & OS Info
-      description: Device model and ROM/skin (e.g. One UI, LineageOS, Pixel Experience).
-      placeholder: Samsung Galaxy S21, One UI 5.1
+        1. Go to Plugins page on Aliucord.
+        2. Tap on Setting button of TsqPowerFix.
+        3. Boom!
     validations:
       required: true
 
   - type: textarea
-    id: crash-log
+    id: debug-log
     attributes:
-      label: Crash Log (if applicable)
-      description: Paste the crash log (between triple backticks ```).
+      label: Denug Log (Optional)
+      description: Paste debug log with that plugin.
       placeholder: |
         ```
         Paste your crash log here
@@ -84,7 +66,5 @@ body:
       options:
         - label: I’ve checked that this issue hasn’t already been reported.
           required: true
-
-  - type: markdown
-    attributes:
-      value: After creating this issue, please upload a file containing a logcat in a separate comment! See [here](https://pastebin.com/pNhXwhrd) on how to accomplish this.
+        - label: I’ve updated or reinstalled that plugin before making this issue.
+          required: true
