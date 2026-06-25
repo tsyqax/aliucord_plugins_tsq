@@ -1,0 +1,41 @@
+name: Question
+description: I want to ask something!
+labels: [question]
+body:
+  - type: input
+    id: pluginName
+    attributes:
+      label: Plugin Name (Optional)
+      description: Which plugin receives the question? Or not?
+      placeholder: TsqPowerFix
+    validations:
+      required: false
+
+  - type: textarea
+    id: question-short
+    attributes:
+      label: What do you want to ask?
+      description: Describe in detail what you would like to ask.
+      placeholder: Ex) What functions does TsqPowerFix have?
+    validations:
+      required: true
+      
+  - type: textarea
+    id: question-more
+    attributes:
+      label: Go into more detail... (Optional)
+      description: If you want to, you can be more descriptive.
+      placeholder: Ex) I think this may be done by doing this.
+    validations:
+      required: false
+      
+  - type: checkboxes
+    id: agreement-check
+    attributes:
+      label: Before request
+      description: Did you...
+      options:
+        - label: I've checked USAGE.md before making this issue!
+          required: true
+        - label: I've checked to make sure my question is original!
+          required: true
