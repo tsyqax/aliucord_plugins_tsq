@@ -3,6 +3,9 @@ package com.tsq.plugins;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,6 +22,7 @@ import android.os.Looper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.util.TypedValue;
 
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentActivity;
@@ -77,6 +81,9 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.LinkedHashMap;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.InputStream;
 
 import d0.t.n;
 import kotlin.jvm.functions.Function2;
@@ -391,10 +398,11 @@ public class FixOnboardingFork extends Plugin {
 			
 			userSelection = 0; //initialize
 			userRealSelection = allOptionIds.get(0); //initialize
-			String dialogTitle = " [" + (index + 1) + "/" + questions.size() + "]";
+			String dialogTitle = "[" + (index + 1) + "/" + questions.size() + "]";
 
 			if (required) {
 				dialogTitle += " · Required";
+				allTitle += " *";
 			}
 			if (!onlyOne) {
 				dialogTitle += " · Multiable";
@@ -454,14 +462,60 @@ public class FixOnboardingFork extends Plugin {
 			});
 		}
 		
+		private int dpToPx(Context context, int dp) {
+			float density = context.getResources().getDisplayMetrics().density;
+			return Math.round((float) dp * density);
+		}
+		
+		private void adpatCustomEmoji(Context context, String emojiId, String urlStr, TextView view) {
+			new Thread(() -> {
+				try {
+					URL url = new URL(urlStr);
+					HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+					connection.setDoInput(true);
+					connection.connect();
+					
+					InputStream input = connection.getInputStream();
+					Bitmap bitmap = BitmapFactory.decodeStream(input);
+					
+					if (bitmap != null) {
+						new Handler(Looper.getMainLooper()).post(() -> {
+							chapCustomEmoji(context, bitmap, view);
+						});
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}).start();
+		}
+		
+		private void chapCustomEmoji(Context context, Bitmap bitmap, TextView view) {
+			int emojiSize = dpToPx(context, 24);
+			Bitmap scaled = Bitmap.createScaledBitmap(bitmap, emojiSize, emojiSize, true);
+			Drawable drawable = new BitmapDrawable(context.getResources(), scaled);
+			
+			view.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null);
+			view.setCompoundDrawablePadding(dpToPx(context, 8));
+		}
+		
 		@Override
 		public void onViewCreated(View view, Bundle bundle) {
 			super.onViewCreated(view, bundle);
-			setActionBarTitle(allTitle);
-			setActionBarSubtitle(dialogTitle);
+			setActionBarTitle(dialogTitle);
+			//setActionBarSubtitle(dialogTitle);
 
 			var context = view.getContext();
 			var layout = getLinearLayout();
+			
+			TextView title = new TextView(context, null, 0, R.i.UiKit_Settings_Text);
+			title.setText(allTitle);
+			title.setTypeface(null, Typeface.BOLD);
+			
+			float defaultTitleSize = title.getTextSize(); 
+			title.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTitleSize * 1.18f);
+			
+			title.setPadding(0, 0, 0, dpToPx(context, 16)); 
+			layout.addView(title);
 			
 			if (!onlyOne) {
 				multiSelectionFlags = new boolean[options.length()];
@@ -471,14 +525,32 @@ public class FixOnboardingFork extends Plugin {
 			
 			if (onlyOne) {
 				radioGroup = new RadioGroup(context);
-				radioGroup.setOrientation(android.widget.LinearLayout.VERTICAL);
+				radioGroup.setOrientation(LinearLayout.VERTICAL);
 			}
 			
 			try {
+				LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+				itemParams.setMargins(0, 0, 0, dpToPx(context, 8));
+				
 				for (int i = 0; i < options.length(); i++) {
 					JSONObject opt = options.getJSONObject(i);
 					String optionTitle = opt.getString("title");
 					String id = opt.getString("id");
+					JSONObject emojiObj = opt.getJSONObject("emoji");
+					String emojiName = emojiObj.getString("name");
+					String emojiUrl = "";
+					String emojiId = emojiObj.getString("id");
+					
+					if (!emojiObj.isNull("name")) {
+						if (emojiObj.isNull("id")) {
+							optionTitle = emojiName + " " + optionTitle;
+						} else {
+							boolean isAnimated = emojiObj.optBoolean("animated", false);
+							String ext = isAnimated ? "gif" : "png";
+							emojiUrl = "https://cdn.discordapp.com/emojis/" + emojiId + "." + ext;
+						}
+					}
+					
 					final int index = i;
 
 					if (onlyOne) {
@@ -486,16 +558,28 @@ public class FixOnboardingFork extends Plugin {
 						rb.setId(index);
 						rb.setText(optionTitle);
 						rb.setTextAppearance(context, R.i.UiKit_Settings_Text);
-						rb.setScaleX(1.1f);
-						rb.setScaleY(1.1f);
+						
+						adpatCustomEmoji(context, emojiId, emojiUrl, rb);
+						
+						float defaultRbSize = rb.getTextSize();
+						rb.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultRbSize * 1.08f);
+						
+						rb.setPadding(dpToPx(context, 8), dpToPx(context, 10), 0, dpToPx(context, 10));
+						rb.setLayoutParams(itemParams);
 						radioGroup.addView(rb);
 
 					} else {
 						CheckBox cb = new CheckBox(context);
 						cb.setText(optionTitle);
 						cb.setTextAppearance(context, R.i.UiKit_Settings_Text);
-						cb.setScaleX(1.1f);
-						cb.setScaleY(1.1f);
+						
+						adpatCustomEmoji(context, emojiId, emojiUrl, cb);
+						
+						float defaultCbSize = cb.getTextSize();
+						cb.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultCbSize * 1.08f);
+						
+						cb.setPadding(dpToPx(context, 8), dpToPx(context, 10), 0, dpToPx(context, 10));
+						cb.setLayoutParams(itemParams);
 						cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
 							multiSelectionFlags[index] = isChecked;
 						});
