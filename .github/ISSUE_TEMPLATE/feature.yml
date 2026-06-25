@@ -1,7 +1,16 @@
-name: Feature
+name: Feature Reuqest
 description: Request to create or improve feature!
 labels: [enhancement]
 body:
+  - type: input
+    id: pluginName
+    attributes:
+      label: Plugin Name
+      description: Which plugin receive the request? Or new plugin?
+      placeholder: TsqPowerFix
+    validations:
+      required: true
+
   - type: textarea
     id: short-desc
     attributes:
