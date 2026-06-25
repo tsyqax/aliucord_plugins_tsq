@@ -1,0 +1,31 @@
+name: Feature
+description: Request to create or improve feature!
+labels: [enhancement]
+body:
+  - type: textarea
+    id: short-desc
+    attributes:
+      label: How could it be improved?
+      description: Describe in detail what features you would like to see added or improved, and how you would like them to function.
+      placeholder: Ex) I think this should have more power than before. This would be awesome!
+    validations:
+      required: true
+      
+  - type: textarea
+    id: moremore-desc
+    attributes:
+      label: Go into more detail... (Optional)
+      description: If you want to, you can be more descriptive about your request here.
+      placeholder: Ex) I think this may be done by doing this.
+    validations:
+      required: false
+  - type: checkboxes
+    id: agreement-check
+    attributes:
+      label: Before request
+      description: Did you...
+      options:
+        - label: I've checked to make sure my feature request is original!
+          required: true
+        - label: I’ve updated or reinstalled that plugin before making this issue!
+          required: true
