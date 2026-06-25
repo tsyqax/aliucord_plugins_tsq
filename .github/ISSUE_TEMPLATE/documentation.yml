@@ -1,0 +1,44 @@
+name: Documentation
+description: I want to improve or request documentation!
+labels: [documentation]
+body:
+  - type: input
+    id: pluginName
+    attributes:
+      label: Plugin Name (Optional)
+      description: Which plugin needs documentation? Or not?
+      placeholder: TsqPowerFix
+    validations:
+      required: false
+
+  - type: textarea
+    id: document-short
+    attributes:
+      label: What document you want?
+      description: Describe in detail what you would like to.
+      placeholder: Ex) There is no documentation on how to use TsqPowerFix.
+    validations:
+      required: true
+      
+  - type: textarea
+    id: question-more
+    attributes:
+      label: If you want to provide document... (Optional)
+      description: If you want to, you can provide document code.
+      value: |
+        ```
+        Paste your document code
+        ```
+    validations:
+      required: false
+      
+  - type: checkboxes
+    id: agreement-check
+    attributes:
+      label: Before request
+      description: Did you...
+      options:
+        - label: I've checked documents before making this issue!
+          required: true
+        - label: I've checked to make sure this documentation is original!
+          required: true
