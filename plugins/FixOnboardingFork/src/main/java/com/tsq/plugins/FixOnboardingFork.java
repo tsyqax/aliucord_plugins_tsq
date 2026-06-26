@@ -51,15 +51,19 @@ import com.discord.api.commands.ApplicationCommandType;
 import com.discord.api.channel.Channel;
 import com.discord.api.guild.Guild;
 import com.discord.api.channel.ForumTag;
+import com.discord.api.guildjoinrequest.GuildJoinRequest;
 import com.discord.app.AppBottomSheet;
 import com.discord.stores.StoreStream;
 import com.discord.stores.StoreThreadDraft;
+import com.discord.stores.StoreGuildJoinRequest;
+import com.discord.stores.StoreGuilds;
 import com.discord.utilities.rest.RestAPI;
 import com.discord.widgets.chat.MessageManager;
 import com.discord.widgets.forums.ForumPostCreateManager;
 import com.discord.widgets.guilds.contextmenu.GuildContextMenuViewModel;
 import com.discord.widgets.guilds.contextmenu.WidgetGuildContextMenu;
 import com.discord.databinding.WidgetGuildContextMenuBinding;
+import com.discord.views.CheckedSetting;
 
 import com.discord.api.permission.Permission;
 import com.discord.utilities.permissions.PermissionUtils;
@@ -116,6 +120,38 @@ public class FixOnboardingFork extends Plugin {
 	private String userRealSelection;
 	//private String resText;
 	private boolean[] multiSelectionFlags;
+	
+	public FixOnboardingFork() { 
+		settingsTab = new SettingsTab(PSettings.class, SettingsTab.Type.PAGE).withArgs(settings);
+	}
+	
+	// ----- settings start -----
+	public static class PSettings extends SettingsPage {
+		private final SettingsAPI settings;
+		
+		public PSettings(SettingsAPI settings) {
+			this.settings = settings;
+		}
+		
+		@Override
+		public void onViewCreated(View view, Bundle bundle) {
+			super.onViewCreated(view, bundle);
+			setActionBarTitle("FixOnboardingFork");
+			setActionBarSubtitle("Settings!");
+
+			var context = view.getContext();
+			var layout = getLinearLayout();
+
+			CheckedSetting auto = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Auto Onboarding","");
+			auto.setChecked(settings.getBool("auto", true));
+			auto.setOnCheckedListener(Boolean -> {
+				settings.setBool("auto", Boolean);
+			});
+
+			layout.addView(auto);
+		}
+	}
+	// ----- settings end -----
 
 	@Override
 	public void start(Context context) throws NoSuchMethodException {
@@ -194,7 +230,7 @@ public class FixOnboardingFork extends Plugin {
 				}
             })
 		);
-	
+		
 		commands.registerCommand(
             "onboarding",
             "Display Onboarding",
@@ -248,7 +284,63 @@ public class FixOnboardingFork extends Plugin {
                 }
             }
         );
+	
+		Boolean autoMode = settings.getBool("auto", true);
+		logger.info("autho Mode: " + autoMode);
+		if (autoMode) {
+			try {
+				Method guildJoinMethod = StoreGuilds.class.getDeclaredMethod("handleGuildAdd", Guild.class);
+				
+				patcher.patch(guildJoinMethod, new Hook(param -> {
+					Guild guild = (Guild) param.args[0];
+					this.selectedResponses.clear();
+					this.promptsSeen.clear();
+					this.responsesSeen.clear();
+					
+					String guildId = String.valueOf(guild.r());
+					String ownerId = String.valueOf(guild.z());
+					String userId = String.valueOf(StoreStream.getUsers().getMe().getId());
+					
+					if (ownerId.equals(userId)) {
+						return;
+					}
+					
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								String resText = Http.Request.newDiscordRequest(String.format("/guilds/%s/onboarding", guildId), "GET").execute().text();
+								List<JSONObject> questions = parseQuestions(resText);
 
+								if (questions.isEmpty()) {
+									Utils.showToast("There are no Onboarding.");
+									return;
+								}
+								new Handler(Looper.getMainLooper()).post(() -> {
+									showChainDialog(getSafeActivity(context), questions, 0, guildId, userId);
+								});
+							
+							} catch (Exception e) {
+								logger.error("Error", e);
+								String err = e.getMessage();
+								String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
+								Properties p = new Properties();
+								String msg;
+								try {
+									p.load(new java.io.StringReader("m=" + rawMsg));
+									msg = p.getProperty("m");
+								} catch (Exception ignored) {
+									msg = err;
+								}
+								Utils.showToast(msg);
+							}
+						}
+					}).start();
+				}));
+			} catch (Exception e) {
+				logger.error("ERR03", e);
+			}
+		}
 	}
 	
 	public static void showToast(Context context, String message) {
