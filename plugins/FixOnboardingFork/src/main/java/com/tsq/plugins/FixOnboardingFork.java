@@ -1,6 +1,7 @@
 package com.tsq.plugins;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.Bitmap;
@@ -287,8 +288,7 @@ public class FixOnboardingFork extends Plugin {
 	
 		Boolean autoMode = settings.getBool("auto", true);
 		logger.info("autho Mode: " + autoMode);
-        // for wait now
-		/* if (autoMode) {
+		if (autoMode) {
 			try {
 				Method guildJoinMethod = StoreGuilds.class.getDeclaredMethod("handleGuildAdd", Guild.class);
 				
@@ -301,6 +301,8 @@ public class FixOnboardingFork extends Plugin {
 					String guildId = String.valueOf(guild.r());
 					String ownerId = String.valueOf(guild.z());
 					String userId = String.valueOf(StoreStream.getUsers().getMe().getId());
+					
+					//Context ctx = StoreStream.getContext();
 					
 					if (ownerId.equals(userId)) {
 						return;
@@ -318,7 +320,7 @@ public class FixOnboardingFork extends Plugin {
 									return;
 								}
 								new Handler(Looper.getMainLooper()).post(() -> {
-									showChainDialog(getSafeActivity(context), questions, 0, guildId, userId);
+									showChainDialog(Utils.getAppActivity(), questions, 0, guildId, userId);
 								});
 							
 							} catch (Exception e) {
@@ -341,7 +343,7 @@ public class FixOnboardingFork extends Plugin {
 			} catch (Exception e) {
 				logger.error("ERR03", e);
 			}
-		} */
+		}
 	}
 	
 	public static void showToast(Context context, String message) {
@@ -373,7 +375,7 @@ public class FixOnboardingFork extends Plugin {
 			return appActivity;
 		}
 		
-		return null;
+		return Utils.getAppActivity();
 	}
 	
 	public List<JSONObject> parseQuestions(String jsonString) {
