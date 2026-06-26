@@ -287,7 +287,8 @@ public class FixOnboardingFork extends Plugin {
 	
 		Boolean autoMode = settings.getBool("auto", true);
 		logger.info("autho Mode: " + autoMode);
-		if (autoMode) {
+        // for wait now
+		/* if (autoMode) {
 			try {
 				Method guildJoinMethod = StoreGuilds.class.getDeclaredMethod("handleGuildAdd", Guild.class);
 				
@@ -340,7 +341,7 @@ public class FixOnboardingFork extends Plugin {
 			} catch (Exception e) {
 				logger.error("ERR03", e);
 			}
-		}
+		} */
 	}
 	
 	public static void showToast(Context context, String message) {
