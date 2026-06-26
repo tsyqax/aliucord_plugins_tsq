@@ -1,10 +1,14 @@
-version = "1.1.2" // Plugin version. Increment this to trigger an update
+version = "1.1.3" // Plugin version. Increment this to trigger an update
 description = "Add Method to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.1.3
+        * Add support auto mode
+        * This display onboarding if auto mode is on
+
         # 1.1.2
         * Add displaying emoji
         * Fix bug about title and improve UI
