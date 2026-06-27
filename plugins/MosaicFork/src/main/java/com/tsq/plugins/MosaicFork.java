@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.widget.GridLayout;
 import android.util.DisplayMetrics;
 import android.graphics.Outline;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Animatable;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,6 +43,8 @@ import com.discord.widgets.chat.list.entries.EmbedEntry;
 import com.discord.widgets.chat.list.entries.AutoModSystemMessageEmbedEntry;
 import com.discord.widgets.media.WidgetMedia;
 import com.discord.widgets.chat.list.InlineMediaView;
+
+import com.discord.views.CheckedSetting;
 
 import com.discord.stores.StoreMessageState;
 import com.discord.stores.StoreUserSettings;
@@ -103,6 +107,24 @@ public class MosaicFork extends Plugin {
 			var height_input = new TextInput(context, "Height DP (default: 145)", String.valueOf(settings.getInt("height", 145)));
 			var padding_input = new TextInput(context, "Height DP (default: 57)", String.valueOf(settings.getInt("padding", 57)));
 			
+			CheckedSetting auto = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Use Animated Webp instead of Gif","");
+			auto.setChecked(settings.getBool("ani_webp", false));
+			auto.setOnCheckedListener(Boolean -> {
+				settings.setBool("ani_webp", Boolean);
+			});
+			
+			CheckedSetting lowGif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Downgrade Gifs Preview Quality","");
+			lowGif.setChecked(settings.getBool("lowGif", true));
+			lowGif.setOnCheckedListener(Boolean -> {
+				settings.setBool("lowGif", Boolean);
+			});
+			
+			CheckedSetting lowImage = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Downgrade Images Preview Quality","");
+			lowImage.setChecked(settings.getBool("lowImage", false));
+			lowImage.setOnCheckedListener(Boolean -> {
+				settings.setBool("lowImage", Boolean);
+			});
+			
 			var saveButton = new Button(context);
 			saveButton.setText("Save");
 			saveButton.setOnClickListener(v -> {
@@ -120,6 +142,9 @@ public class MosaicFork extends Plugin {
 			layout.addView(width_input);
 			layout.addView(height_input);
 			layout.addView(padding_input);
+			layout.addView(auto);
+			layout.addView(lowGif);
+			layout.addView(lowImage);
 			layout.addView(saveButton);
 		}
 	}
@@ -265,7 +290,7 @@ public class MosaicFork extends Plugin {
 			gridLayout.setColumnCount(6);
 
 			int currentChildCount = gridLayout.getChildCount();
-			
+			int gifCount = 0;
 
 			if (currentChildCount > total) {
 				gridLayout.removeViews(total, currentChildCount - total);
@@ -293,9 +318,7 @@ public class MosaicFork extends Plugin {
 				if (i < currentChildCount) {
 					container = (FrameLayout) gridLayout.getChildAt(i);
 					imageView = (SimpleDraweeView) container.getChildAt(0);
-					if (container.getChildCount() > 1) {
-						container.removeViews(1, container.getChildCount() - 1);
-					}
+					imageView.setImageURI((String) null); 
 				} else {
 					container = new FrameLayout(gridLayout.getContext());
 					imageView = new SimpleDraweeView(gridLayout.getContext());
@@ -326,56 +349,96 @@ public class MosaicFork extends Plugin {
 				int fileType = attachment.e().ordinal();
 				int targetWidth = screenWidth / 2;
 				String imageUrl = attachment.c(); 
-
+				Boolean aniMode = settings.getBool("ani_webp", false);
+				Boolean lowGif = settings.getBool("lowGif", true);
+				Boolean lowImage = settings.getBool("lowImage", false);
+				
 				if (fileType == 0) {
-					imageUrl = attachment.c() + "format=jpeg";
+					if (lowImage) {
+						imageUrl = attachment.c() + "format=jpeg&width=500&height=500";
+					} else {
+						imageUrl = attachment.c() + "format=jpeg";
+					}
+					
 					MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);
 
-					ImageView playButton = new ImageView(gridLayout.getContext());
-					playButton.setImageResource(android.R.drawable.ic_media_play);
-					playButton.setColorFilter(android.graphics.Color.WHITE);
-					
-					GradientDrawable circleBg = new GradientDrawable();
-					circleBg.setShape(GradientDrawable.OVAL);
-					circleBg.setColor(android.graphics.Color.parseColor("#80000000"));
-					playButton.setBackground(circleBg);
-					
-					int padding = (int) (8 * gridLayout.getContext().getResources().getDisplayMetrics().density);
-					playButton.setPadding(padding, padding, padding, padding);
-					
-					int btnSize = (int) (52 * gridLayout.getContext().getResources().getDisplayMetrics().density);
-					FrameLayout.LayoutParams btnParams = new FrameLayout.LayoutParams(btnSize, btnSize);
-					btnParams.gravity = android.view.Gravity.CENTER;
+					if (container.getChildCount() == 1) {
+						ImageView playButton = new ImageView(gridLayout.getContext());
+						playButton.setImageResource(android.R.drawable.ic_media_play);
+						playButton.setColorFilter(android.graphics.Color.WHITE);
+						
+						GradientDrawable circleBg = new GradientDrawable();
+						circleBg.setShape(GradientDrawable.OVAL);
+						circleBg.setColor(android.graphics.Color.parseColor("#80000000"));
+						playButton.setBackground(circleBg);
+						
+						int padding = (int) (8 * gridLayout.getContext().getResources().getDisplayMetrics().density);
+						playButton.setPadding(padding, padding, padding, padding);
+						
+						int btnSize = (int) (52 * gridLayout.getContext().getResources().getDisplayMetrics().density);
+						FrameLayout.LayoutParams btnParams = new FrameLayout.LayoutParams(btnSize, btnSize);
+						btnParams.gravity = Gravity.CENTER;
 
-					finalContainer.addView(playButton, btnParams);
+						finalContainer.addView(playButton, btnParams);
+					}
 				} else {
+					if (container.getChildCount() > 1 && !(container.getChildAt(1) instanceof TextView)) {
+						container.removeViewAt(1); 
+					}
+					
+					if (imageUrl.toLowerCase().contains(".gif")) {
+						if (aniMode) {
+							imageUrl = attachment.c() + "animated=true&format=webp";
+						}
+						
+						if (lowGif) {
+							imageUrl = imageUrl + "&width=200&height=200";
+						}
+					} else {
+						if (lowImage) {
+							imageUrl = imageUrl + "width=500&height=500";
+						}
+					}
+
 					MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);  //log-resolution preview
 				}
-
+				
+				boolean hasSpoilerView = false;
+				
+				if (container.getChildCount() > 0 && container.getChildAt(container.getChildCount() - 1) instanceof TextView) {
+					hasSpoilerView = true;
+				}
+				
 				if ((shouldSpoilered || attachment.h()) && !"OPENED".equals(finalContainer.getTag())) {
-					TextView spoilerOverlay = new TextView(gridLayout.getContext());
-					spoilerOverlay.setText("SPOILER");
-					spoilerOverlay.setTextColor(android.graphics.Color.WHITE);
-					spoilerOverlay.setGravity(android.view.Gravity.CENTER);
-					spoilerOverlay.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-					spoilerOverlay.setTextSize(13);
+					if (!hasSpoilerView) {
+						TextView spoilerOverlay = new TextView(gridLayout.getContext());
+						spoilerOverlay.setText("SPOILER");
+						spoilerOverlay.setTextColor(android.graphics.Color.WHITE);
+						spoilerOverlay.setGravity(android.view.Gravity.CENTER);
+						spoilerOverlay.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+						spoilerOverlay.setTextSize(13);
 
-					spoilerOverlay.setBackgroundColor(android.graphics.Color.parseColor("#FF2F3136"));
+						spoilerOverlay.setBackgroundColor(android.graphics.Color.parseColor("#FF2F3136"));
 
-					spoilerOverlay.setOutlineProvider(new android.view.ViewOutlineProvider() {
-						@Override
-						public void getOutline(View view, Outline outline) {
-							outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), 8);
-						}
-					});
-					spoilerOverlay.setClipToOutline(true);
+						spoilerOverlay.setOutlineProvider(new android.view.ViewOutlineProvider() {
+							@Override
+							public void getOutline(View view, Outline outline) {
+								outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), 8);
+							}
+						});
+						spoilerOverlay.setClipToOutline(true);
 
-					spoilerOverlay.setOnClickListener(v -> {
-						finalContainer.setTag("OPENED");
-						finalContainer.removeView(spoilerOverlay);
-					});
+						spoilerOverlay.setOnClickListener(v -> {
+							finalContainer.setTag("OPENED");
+							finalContainer.removeView(spoilerOverlay);
+						});
 
-					finalContainer.addView(spoilerOverlay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+						finalContainer.addView(spoilerOverlay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+					}
+				} else {
+					if (hasSpoilerView) {
+						finalContainer.removeViewAt(finalContainer.getChildCount() - 1);
+					}
 				}
 				
 				imageView.setOnClickListener(v -> {
