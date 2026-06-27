@@ -107,9 +107,15 @@ public class MosaicFork extends Plugin {
 			var height_input = new TextInput(context, "Height DP (default: 145)", String.valueOf(settings.getInt("height", 145)));
 			var padding_input = new TextInput(context, "Height DP (default: 57)", String.valueOf(settings.getInt("padding", 57)));
 			
-			CheckedSetting auto = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Use Animated Webp instead of Gif","");
-			auto.setChecked(settings.getBool("ani_webp", false));
-			auto.setOnCheckedListener(Boolean -> {
+			CheckedSetting autoGif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Toggle auto play Gif","");
+			autoGif.setChecked(settings.getBool("autoGif", true));
+			autoGif.setOnCheckedListener(Boolean -> {
+				settings.setBool("autoGif", Boolean);
+			});
+			
+			CheckedSetting ani_webp = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Use Animated Webp instead of Gif","");
+			ani_webp.setChecked(settings.getBool("ani_webp", false));
+			ani_webp.setOnCheckedListener(Boolean -> {
 				settings.setBool("ani_webp", Boolean);
 			});
 			
@@ -142,7 +148,8 @@ public class MosaicFork extends Plugin {
 			layout.addView(width_input);
 			layout.addView(height_input);
 			layout.addView(padding_input);
-			layout.addView(auto);
+			layout.addView(autoGif);
+			layout.addView(ani_webp);
 			layout.addView(lowGif);
 			layout.addView(lowImage);
 			layout.addView(saveButton);
@@ -352,12 +359,13 @@ public class MosaicFork extends Plugin {
 				Boolean aniMode = settings.getBool("ani_webp", false);
 				Boolean lowGif = settings.getBool("lowGif", true);
 				Boolean lowImage = settings.getBool("lowImage", false);
+				Boolean autoGif = settings.getBool("autoGif", true);
 				
 				if (fileType == 0) {
 					if (lowImage) {
-						imageUrl = attachment.c() + "format=jpeg&width=500&height=500";
+						imageUrl = attachment.c() + "format=jpeg&width=500&height=500&";
 					} else {
-						imageUrl = attachment.c() + "format=jpeg";
+						imageUrl = attachment.c() + "format=jpeg&";
 					}
 					
 					MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);
@@ -388,15 +396,20 @@ public class MosaicFork extends Plugin {
 					
 					if (imageUrl.toLowerCase().contains(".gif")) {
 						if (aniMode) {
-							imageUrl = attachment.c() + "animated=true&format=webp";
+							imageUrl = imageUrl + "animated=true&format=webp&";
+						}
+						
+						//logger.info("why this is not work:" + storeUserSettings.getIsAutoPlayGifsEnabled());
+						if (!autoGif) {
+							imageUrl = imageUrl + "format=jpeg&";
 						}
 						
 						if (lowGif) {
-							imageUrl = imageUrl + "&width=200&height=200";
+							imageUrl = imageUrl + "width=200&height=200&";
 						}
 					} else {
 						if (lowImage) {
-							imageUrl = imageUrl + "width=500&height=500";
+							imageUrl = imageUrl + "width=500&height=500&";
 						}
 					}
 
