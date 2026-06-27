@@ -1,10 +1,15 @@
-version = "1.1.8" // Plugin version. Increment this to trigger an update
+version = "1.1.9" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.1.9
+        * Some Optimized
+        * Add setting for animated Webp(instead of Gif), low quality
+        * If you have lag due to gifs, turn on low quality gifs!
+
         # 1.1.8
         * Add setting for width, height, padding
 
