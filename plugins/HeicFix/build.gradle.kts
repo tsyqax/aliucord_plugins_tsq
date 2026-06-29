@@ -1,12 +1,16 @@
-version = "1.0.1" // Plugin version. Increment this to trigger an update
+version = "1.1.0" // Plugin version. Increment this to trigger an update
 description = "Fix to send heic image" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
-        NOTE: For using this, turn on "Image Compress"
-        NOTE: If biiiig caches exists due to this, just restart app
+        NOTE: If big caches exists due to this, just restart app
+
+        # 1.1.0
+        * Refector code by referencing HeicImageConvertor of mantikafasi
+        * Support non-compress send
+        * Support Andorid 9 below maybe
 
         # 1.0.1
         * Change check for heic (maybe lighter)
@@ -16,7 +20,6 @@ aliucord {
 
         # 0.0.1
         * Added Heic to JPG logic
-		* only work with image_compress = True on setting
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
