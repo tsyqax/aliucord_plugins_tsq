@@ -1,83 +1,49 @@
 package com.tsq.plugins;
 
+import android.content.ContentResolver;
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+
+import android.os.Build;
 import android.os.Bundle;
+import android.net.Uri;
 import android.view.View;
-import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+
 import com.aliucord.Logger;
 import com.aliucord.Utils;
+import com.aliucord.patcher.*;
+
+import com.aliucord.api.SettingsAPI;
+import com.aliucord.fragments.SettingsPage;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
-import com.aliucord.patcher.*;
-import com.aliucord.settings.*;
-import com.discord.utilities.rest.RestAPI;
-import com.discord.stores.StoreStream;
-import com.discord.stores.SelectedChannelAnalyticsLocation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.fragment.app.Fragment;
-import java.util.List;
 
-import androidx.annotation.NonNull; 
-import java.nio.charset.StandardCharsets; 
-import okhttp3.MediaType; 
-import okhttp3.RequestBody;
-import okhttp3.Request;
-import okhttp3.MultipartBody;
+import com.discord.utilities.rest.AttachmentRequestBody;
+import com.discord.utilities.rest.SendUtils;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-
-import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions;
-import com.discord.widgets.channels.list.WidgetChannelsListItemThreadActions;
-import com.discord.widgets.channels.settings.WidgetTextChannelSettings;
-import com.discord.widgets.channels.settings.WidgetThreadSettings;
-import com.discord.widgets.share.WidgetIncomingShare;
-import com.discord.widgets.user.search.WidgetGlobalSearchModel;
-import com.discord.utilities.permissions.PermissionUtils;
-import com.aliucord.api.SettingsAPI;
-
-import android.graphics.drawable.Drawable;
-import androidx.core.content.ContextCompat;
-import java.util.HashMap;
-import com.aliucord.views.Button;
-import com.discord.api.channel.Channel;
-import com.discord.utilities.rest.RestAPI;
-import com.discord.restapi.PayloadJSON;
-import com.aliucord.views.TextInput;
-import com.aliucord.utils.ReflectUtils;
-import com.aliucord.utils.ChannelUtils;
-import com.aliucord.utils.MDUtils;
-
-import android.widget.LinearLayout;
-import com.discord.api.permission.Permission;
-import com.aliucord.fragments.SettingsPage;
-import com.aliucord.fragments.FragmentProxy;
-import androidx.fragment.app.DialogFragment;
-import com.aliucord.widgets.BottomSheet;
-import com.aliucord.fragments.ConfirmDialog;
-import com.aliucord.api.CommandsAPI;
-import androidx.core.widget.NestedScrollView;
-import com.discord.api.commands.ApplicationCommandType;
-import java.util.Arrays;
-import java.util.Collections;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import com.discord.utilities.images.MGImages;
-import android.content.ContentResolver;
-import com.discord.media_picker.MediaPicker;
-import com.discord.dialogs.ImageUploadDialog;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import okio.BufferedSink;
 import com.lytefast.flexinput.model.Attachment;
-import android.net.Uri;
-import com.discord.widgets.chat.MessageManager;
-import kotlin.jvm.functions.Function0;
-import kotlin.jvm.functions.Function1;
-import kotlin.jvm.functions.Function2;
-
 
 
 @AliucordPlugin(requiresRestart = false)
@@ -85,110 +51,124 @@ import kotlin.jvm.functions.Function2;
 public class HeicFix extends Plugin {
 	public static SettingsAPI staticSettings;
 	public static final Logger logger = new Logger("HeicFix");
-	private boolean isTarget2 = false;
-	
+	private Field attachmentField;
+
     @Override
-    public void start(@NonNull Context context) throws Throwable { 
+    public void start(@NonNull Context context) throws Throwable {
+		attachmentField = AttachmentRequestBody.class.getDeclaredField("attachment");
+        attachmentField.setAccessible(true);
+		
 		try {
 			File cacheDir = context.getCacheDir();
-			File[] garbage = cacheDir.listFiles((dir, name) -> name.startsWith("heic_fix_"));
+			File[] garbage = cacheDir.listFiles((dir, name) -> name.startsWith("heicFix_"));
 			int count = 0;
 			
 			for (File f : garbage) {
-				if (f.getName().startsWith("heic_fix_")) {
-			    	if (f.delete()) {
-						count++;
-					}
+				if (f.getName().startsWith("heicFix_")) {
+			    	if (f.delete()) { count++; }
 				}
-			
+			}
 			logger.info("Removed " + count + " cache images");
 			
-			}
 		} catch (Exception e) {
 			logger.error("Error", e);
 		}
-		
-		
-		/* patcher.patch(MessageManager.class.getDeclaredMethod("sendMessage", String.class, List.class, MessageManager.AttachmentsRequest.class, Long.class, List.class, boolean.class, Function2.class, Function2.class, Function1.class),
-		new Hook(cf -> {
-			logger.info(">>> sendMessage Hooked! <<<");
-			try {
-				File cacheDir = context.getCacheDir();
-				File[] garbage = cacheDir.listFiles((dir, name) -> name.startsWith("heic_fix_"));
+			
+		Method getPart = SendUtils.class.getDeclaredMethod("getPart", Attachment.class, ContentResolver.class, String.class);
+		patcher.patch(getPart, new PreHook(param -> {
+			Attachment<?> attachment = (Attachment<?>) param.args[0];
+			if (attachment == null || !(attachment.getDisplayName().toLowerCase().endsWith(".heic") || attachment.getDisplayName().toLowerCase().endsWith(".heif"))) return;
 				
-				//if (!isTarget2) return;
+			String newDisplayName = getJpgName(attachment); 
+				
+			File tempJpg = convertHeicToJpgFile(context, attachment); 
+			if (tempJpg != null) {
+				param.args[0] = new Attachment<>(attachment.getId(), Uri.fromFile(tempJpg), newDisplayName, attachment.getData(), attachment.getSpoiler());
+			}
 
-				int count = 0;
-				for (File f : garbage) {
-					if (f.getName().startsWith("heic_fix_")) {
-						if (f.delete()) {
-							logger.info("success: " + f.getName());
-							count++;
-						} else {
-							logger.warn("denied: " + f.getName());
-						}
-					}
+            param.args[2] = newDisplayName;
+		}));
+		
+		
+		// Referenced mantikafasi's HeicImageConvertor plugin
+		Method writeTo = AttachmentRequestBody.class.getDeclaredMethod("writeTo", BufferedSink.class);
+		
+		patcher.patch(writeTo, new Hook(param -> {
+			try {
+				AttachmentRequestBody body = (AttachmentRequestBody) param.thisObject;
+				Uri fileUri = getAttachment(body).getUri(); 
+					
+				if (fileUri != null && fileUri.toString().contains("heicFix_")) {
+					File tempFile = new File(fileUri.getPath());
+					tempFile.delete();
 				}
-				logger.info("All " + count + "'s file tried");
-				
 			} catch (Exception e) {
-				logger.error("Error", e);
+				logger.error("ERR01", e);
+			}
+		}));
+    }
+	
+	private Attachment<?> getAttachment(AttachmentRequestBody body) throws IllegalAccessException {
+        return (Attachment<?>) attachmentField.get(body);
+    }
+	
+	private String getJpgName(Attachment<?> attachment) {
+		if (attachment == null || attachment.getDisplayName() == null) {
+			return "image.jpg";
+		}
+		
+		String displayName = attachment.getDisplayName();
+		String baseName = displayName.replaceAll("(?i)\\.(heic|heif)$", "");
+		
+		if (baseName.isEmpty()) {
+			baseName = "image";
+		}
+		
+		return baseName + ".jpg";
+	}
+	
+	private boolean compressAttachmentToStream(Context context, Attachment<?> attachment, OutputStream targetStream) {
+		if (attachment == null || attachment.getUri() == null || targetStream == null) return false;
+
+		try {
+			var contentResolver = context.getContentResolver();
+			try (InputStream is = contentResolver.openInputStream(attachment.getUri())) {
+				if (is == null) return false;
+				
+				Bitmap bitmap = BitmapFactory.decodeStream(is);
+				if (bitmap == null) return false;
+
+				try {
+					return bitmap.compress(Bitmap.CompressFormat.JPEG, 90, targetStream);
+				} finally {
+					bitmap.recycle();
+				}
+			}
+		} catch (Exception e) {
+			logger.error("ERR03", e);
+			return false;
+		}
+	}
+	
+	private File convertHeicToJpgFile(Context context, Attachment<?> attachment) {
+		try {
+			File tempFile = File.createTempFile("heicFix_", ".jpg", context.getCacheDir());
+			
+			try (var out = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+				if (compressAttachmentToStream(context, attachment, out)) {
+					return tempFile;
+				}
 			}
 			
-			isTarget2 = false;
-		})); */
-		// for alpha at now
-		
-		
-		patcher.patch(Attachment.class.getDeclaredConstructor(long.class, Uri.class, String.class, Object.class, boolean.class), 
-			new PreHook(cf -> {
-				try {
-
-					boolean isTarget = false;	
-					Uri uri = (Uri) cf.args[1];
-					String fileName = (String) cf.args[2];
-
-					if (uri == null || fileName == null || 
-						!(fileName.toLowerCase().endsWith(".heic") || uri.toString().toLowerCase().endsWith(".heic"))) {
-						return; 
-					}
-
-					StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-					
-					String className =  stackTrace[9].getClassName();
-					if (!className.contains("compressImageAttachments")) {
-						return;
-					}
-
-					var contentResolver = context.getContentResolver();
-
-					try (java.io.InputStream is = contentResolver.openInputStream(uri)) {
-						if (is != null) {
-							android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeStream(is);
-
-							if (bitmap != null) {
-								File tempFile = File.createTempFile("heic_fix_", ".jpg", context.getCacheDir());
-								try (FileOutputStream out = new FileOutputStream(tempFile)) {
-									bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out);
-								}
-								
-								cf.args[1] = Uri.fromFile(tempFile);
-								cf.args[2] = fileName.substring(0, fileName.lastIndexOf('.')) + ".jpg";
-								
-								bitmap.recycle();
-								logger.info("HEIC to JPG: " + tempFile.getName());
-								
-								//tempFile.delete();
-							}
-						}
-					}
-				} catch (Exception e) {
-					logger.error("HEIC conversion failed: ", e);
-				}
-			})
-		);
-    }
-
+			if (tempFile.exists()) tempFile.delete(); // If failed
+			return null;
+			
+		} catch (Exception e) {
+			logger.error("ERR04", e);
+			return null;
+		}
+	}
+	
     @Override
     public void stop(@NonNull Context context) {
         patcher.unpatchAll();
