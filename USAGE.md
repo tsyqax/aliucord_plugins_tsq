@@ -24,7 +24,6 @@
 - You don't have to do anything.
 
 ### HeicFix
-- Remind 'Compress Image' is on, otherwise this will not working.
 - If image cache is so big, just restart app  
 (this remove caches on start)
 
