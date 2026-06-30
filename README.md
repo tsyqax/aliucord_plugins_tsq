@@ -31,9 +31,6 @@ And... It is really bad to just make something and not release it.
 ## HOW TO USE?
 Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)**
 
-### HeicFix NOTE
-1. When you looked big cache due to this, just restart app, then it will clear old cache.
-
 ---
 ## If you?
 ### Translatable (Draft): Do you have Idea?
