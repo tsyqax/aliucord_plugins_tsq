@@ -1,4 +1,4 @@
-version = "1.1.0" // Plugin version. Increment this to trigger an update
+version = "1.1.1" // Plugin version. Increment this to trigger an update
 description = "Fix to send heic image" // Plugin description that will be shown to user
 
 aliucord {
@@ -6,9 +6,11 @@ aliucord {
     changelog.set(
         """
         NOTE: If big caches exists due to this, just restart app
+        # 1.1.1
+        * Better cache clean logic
 
         # 1.1.0
-        * Refector code by referencing HeicImageConvertor of mantikafasi
+        * Refector code with referencing HeicImageConvertor of mantikafasi
         * Support non-compress send
         * Support Andorid 9 below maybe
 
