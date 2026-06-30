@@ -118,7 +118,15 @@ public class HeicFix extends Plugin {
 			try (InputStream is = contentResolver.openInputStream(attachment.getUri())) {
 				if (is == null) return false;
 				
-				Bitmap bitmap = BitmapFactory.decodeStream(is);
+				Bitmap bitmap = null;
+				
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+					bitmap = BitmapFactory.decodeStream(is);
+				} else {
+					// Referenced mantikafasi's HeicImageConvertor
+					ImageDecoder.Source source = ImageDecoder.createSource(context.getContentResolver(), attachment.getUri());
+					bitmap = ImageDecoder.decodeBitmap(source, (decoder, info, src) -> decoder.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE));
+				}
 				if (bitmap == null) return false;
 
 				try {
