@@ -26,6 +26,7 @@ And... It is really bad to just make something and not release it.
 - [MoreProfile](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/MoreProfile.zip): MoreProfile 1.0.10 version. This is not the code I wrote.
 - [AlternativePluginDownloader](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/AlternativePluginDownloader.zip): Just Add button plugin install when not support's channel
 - [HttpDebuger](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/HttpDebuger.zip): For debug, if you need, use it?
+- [QRCodeLoginFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/QRCodeLoginFork.zip): Add password auth to QRCodeLogin. I will keep it until the original author reflects it.
 
 ---
 ## HOW TO USE?
@@ -41,16 +42,6 @@ I just think of translatable plugin (providing translated texts for app and plug
 But I don't know about how to implement that and other detail ideas (at least now).  
 So, If you have Idea, please provide that [here](https://github.com/tsyqax/aliucord_plugins_tsq/issues/5) :>
   
-
-### Giveup: QRscanFix, ~~someone to do?~~
---> I decided to wait official PRs.  
-But if offical PRs is so slow, I will try to make QRscanFix.
-
-~~I would like someone to fix the QR code login issue using QRscanFix.~~  
-I frequently used QR code login when I went out home. (I would like to fix this in advance :<)  
-Find Code with [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/giveup/QRscanFix.java) in giveup folder.  
-Detail: [THIS](https://github.com/tsyqax/aliucord_plugins_tsq/issues/3)  
-
 
 ---
 ## Says
