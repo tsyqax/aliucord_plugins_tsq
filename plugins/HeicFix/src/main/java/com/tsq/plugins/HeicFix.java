@@ -44,6 +44,8 @@ import java.util.Map;
 
 import okio.BufferedSink;
 import com.lytefast.flexinput.model.Attachment;
+import rx.Observable;
+import rx.functions.Action1;
 
 
 @AliucordPlugin(requiresRestart = false)
@@ -64,9 +66,7 @@ public class HeicFix extends Plugin {
 			int count = 0;
 			
 			for (File f : garbage) {
-				if (f.getName().startsWith("heicFix_")) {
-			    	if (f.delete()) { count++; }
-				}
+				if (f.delete()) { count++; }
 			}
 			logger.info("Removed " + count + " cache images");
 			
@@ -84,27 +84,10 @@ public class HeicFix extends Plugin {
 			File tempJpg = convertHeicToJpgFile(context, attachment); 
 			if (tempJpg != null) {
 				param.args[0] = new Attachment<>(attachment.getId(), Uri.fromFile(tempJpg), newDisplayName, attachment.getData(), attachment.getSpoiler());
+				tempJpg.deleteOnExit();
 			}
 
             param.args[2] = newDisplayName;
-		}));
-		
-		
-		// Referenced mantikafasi's HeicImageConvertor plugin
-		Method writeTo = AttachmentRequestBody.class.getDeclaredMethod("writeTo", BufferedSink.class);
-		
-		patcher.patch(writeTo, new Hook(param -> {
-			try {
-				AttachmentRequestBody body = (AttachmentRequestBody) param.thisObject;
-				Uri fileUri = getAttachment(body).getUri(); 
-					
-				if (fileUri != null && fileUri.toString().contains("heicFix_")) {
-					File tempFile = new File(fileUri.getPath());
-					tempFile.delete();
-				}
-			} catch (Exception e) {
-				logger.error("ERR01", e);
-			}
 		}));
     }
 	
