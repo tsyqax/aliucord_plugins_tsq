@@ -3,68 +3,79 @@ package com.tsq.plugins;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.TextInputLayout;
+
+import com.aliucord.Http;
 import com.aliucord.Logger;
 import com.aliucord.Utils;
-import com.aliucord.Http;
 import com.aliucord.annotations.AliucordPlugin;
+import com.aliucord.api.SettingsAPI;
 import com.aliucord.entities.Plugin;
+import com.aliucord.fragments.SettingsPage;
 import com.aliucord.patcher.*;
 import com.aliucord.utils.DimenUtils;
+import com.aliucord.utils.MDUtils;
 import com.aliucord.views.Button;
 import com.aliucord.views.DangerButton;
 import com.aliucord.views.Divider;
+import com.aliucord.views.TextInput;
 import com.aliucord.widgets.BottomSheet;
 import com.aliucord.wrappers.ChannelWrapper;
 
 import com.discord.api.channel.Channel;
 import com.discord.api.channel.ForumTag;
+import com.discord.api.permission.Permission;
 import com.discord.app.AppBottomSheet;
+import com.discord.databinding.WidgetChatListAdapterItemThreadDraftFormBinding;
 import com.discord.stores.StoreStream;
 import com.discord.stores.StoreThreadDraft;
-import com.discord.utilities.rest.RestAPI;
-import com.discord.widgets.chat.MessageManager;
-import com.discord.widgets.forums.ForumPostCreateManager;
-import com.discord.widgets.channels.list.WidgetChannelsListItemThreadActions;
-import com.aliucord.fragments.SettingsPage;
-import com.aliucord.views.TextInput;
-import com.discord.api.permission.Permission;
 import com.discord.utilities.permissions.PermissionUtils;
-import com.aliucord.api.SettingsAPI;
-import android.graphics.drawable.Drawable;
-import androidx.core.content.ContextCompat;
+import com.discord.utilities.rest.RestAPI;
+import com.discord.widgets.channels.list.WidgetChannelsListItemThreadActions;
+import com.discord.widgets.chat.MessageManager;
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemThreadDraftForm;
+import com.discord.widgets.chat.list.entries.ChatListEntry;
+import com.discord.widgets.chat.list.entries.ThreadDraftFormEntry;
+import com.discord.widgets.forums.ForumPostCreateManager;
 import com.discord.widgets.share.WidgetIncomingShare;
+
+import com.lytefast.flexinput.R;
+import d0.t.n;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Properties;
+import java.util.Set;
 
-import d0.t.n;
 import kotlin.jvm.functions.Function2;
+import kotlin.Unit;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Observable;
-import com.lytefast.flexinput.R;
+import rx.Subscription;
 
 @AliucordPlugin
 public class ForumTagFix extends Plugin {
@@ -76,6 +87,7 @@ public class ForumTagFix extends Plugin {
 	private boolean isSendingManually = false;
 	private String bonmun;
 	private String name;
+	private int lastTagCount = -1;
 
 	public ForumTagFix() { 
 		settingsTab = new SettingsTab(Settings.class, SettingsTab.Type.PAGE);
@@ -247,7 +259,7 @@ public class ForumTagFix extends Plugin {
 				
 				lay.removeView(lay.findViewById(viewId1));
                 if (lay.findViewById(viewId1) == null) {
-                    TextView tw = new TextView(lay.getContext(), null, 0, com.lytefast.flexinput.R.i.UiKit_Settings_Item_Icon);
+                    TextView tw = new TextView(lay.getContext(), null, 0, R.i.UiKit_Settings_Item_Icon);
                     tw.setId(viewId1);
                     tw.setText(changeTagText);
 					
@@ -316,7 +328,7 @@ public class ForumTagFix extends Plugin {
             })
 		);
 		
-		/* try {
+		try {
 			// use 'public final String d()' 
 			java.lang.reflect.Method stringMethod = okhttp3.ResponseBody.class.getDeclaredMethod("d");
 
@@ -334,7 +346,69 @@ public class ForumTagFix extends Plugin {
 			logger.error("Failed to patch ResponseBody.d()", e);
 		} catch (Throwable e) {
 			logger.error(e);
-		} */
+		}
+		
+		
+		
+		patcher.patch(
+			WidgetChatListAdapterItemThreadDraftForm.class.getDeclaredMethod("onConfigure", int.class, ChatListEntry.class), 
+			new Hook(param -> {
+				WidgetChatListAdapterItemThreadDraftForm thiz = (WidgetChatListAdapterItemThreadDraftForm) param.thisObject;
+				
+				try {
+					ChatListEntry dataEntry = (ChatListEntry) param.args[1];
+					if (!(dataEntry instanceof ThreadDraftFormEntry)) return;
+					
+					ThreadDraftFormEntry formEntry = (ThreadDraftFormEntry) dataEntry;
+					var rawChannel = formEntry.getParentChannel(); 
+					
+					if (rawChannel == null) return;
+					
+					ChannelWrapper wrapper3 = new ChannelWrapper(rawChannel);
+					
+					Integer chType = wrapper3.getType();
+					if (chType == null || (chType != 15 && chType != 16)) return;
+					
+					var bindingField = thiz.getClass().getDeclaredField("binding");
+					bindingField.setAccessible(true);
+					WidgetChatListAdapterItemThreadDraftFormBinding binding = (WidgetChatListAdapterItemThreadDraftFormBinding) bindingField.get(thiz);
+					
+					View itemView = thiz.itemView;
+					if (itemView instanceof ViewGroup) {
+						ViewGroup rootLayout = (ViewGroup) itemView;
+
+						String viewTag = "forumTagFix_plugin_indicator";
+						TextView indicatorView = (TextView) rootLayout.findViewWithTag(viewTag);
+						
+						var availableTags = wrapper3.getAvailableTags();
+						int tagCount = (availableTags != null) ? availableTags.size() : 0;
+						String guideText = "\n**" + tagCount + "** tags found!";
+						
+						if (tagCount > 0) {
+							guideText += "\nTag selector will display after click send button";
+						}
+						
+						if (indicatorView != null && tagCount == lastTagCount) {
+							return;
+						}
+							
+						if (indicatorView == null) {
+							indicatorView = new TextView(itemView.getContext());
+							indicatorView.setTag(viewTag);
+							indicatorView.setText(MDUtils.render(guideText));
+							
+							rootLayout.addView(indicatorView);
+						} else {
+							indicatorView.setText(MDUtils.render(guideText));
+						}
+					}
+				} catch (Exception e) {
+					logger.error("Error new Noti", e);
+				}
+			})
+		);
+
+		
 	}
 
 
