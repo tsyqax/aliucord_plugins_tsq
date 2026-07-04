@@ -55,6 +55,12 @@ However, I refer to them as "Forks" of the originals out of courtesy and respect
 11. MosaicFork -> Remove vidoes/images from Attachments and add custom entry. And Grid with GridLayout().
 12. ServerNicknameFix -> Remove bio field when bio is empty (this means user may not nitro user).
 
+### How is HeicFix different from the HeicImageConvertor plugin?
+HeicImageConvertor processes HEIC conversion in memory.  
+HeicFix loads the data into memory briefly and then caches it to a file for processing.  
+Although the two logics may seem similar, if you need to save memory,  
+I think HeicFix might be helpful (even if the effect is small).
+
 ### Is it Backport?
 ※ modified = not same exactly original  
 ※ simplified = small than original
