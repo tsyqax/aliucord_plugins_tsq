@@ -60,6 +60,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -204,7 +205,8 @@ public class MosaicFork extends Plugin {
 				}
 			}
 
-			if (images.size() > 1) {				
+			if (images.size() > 1) {
+				Collections.reverse(images); 
 				originalList.add(0, new MosaicEntry(images, msg));
 			}
 
