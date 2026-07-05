@@ -1,10 +1,15 @@
-version = "1.1.11" // Plugin version. Increment this to trigger an update
+version = "1.2.0" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.0
+        * Fix flash bug of static image (not gif, im sad)
+        * Make Spoiler logic better before than
+        * Some Optimized
+
         # 1.1.11
         * Fix image order with Collections.reverse()
 
