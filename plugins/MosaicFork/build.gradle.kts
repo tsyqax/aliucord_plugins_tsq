@@ -1,10 +1,13 @@
-version = "1.1.10" // Plugin version. Increment this to trigger an update
+version = "1.1.11" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.1.11
+        * Fix image order with Collections.reverse()
+
         # 1.1.10
         * Add setting for toggle of auto playing gif
         * Why this not work: getIsAutoPlayGifsEnabled()
