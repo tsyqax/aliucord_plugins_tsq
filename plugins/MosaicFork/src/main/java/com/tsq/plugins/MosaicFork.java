@@ -245,7 +245,7 @@ public class MosaicFork extends Plugin {
 		public MosaicEntry(List<MessageAttachment> images, Message msg) {
 			super();
 			this.images = images;
-			this.uniqueKey = UUID.randomUUID().toString();
+			this.uniqueKey = String.valueOf(msg.getId()); 
 			this.msg = msg;
 		}
 
@@ -272,6 +272,7 @@ public class MosaicFork extends Plugin {
 	public class MosaicViewHolder extends MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEntry> {
 		private final GridLayout gridLayout;
 		//private final List<SimpleDraweeView> cachedImageViews = new ArrayList<>(); //for reuse
+		private final HashSet<Integer> isOpened = new HashSet<>();
 
 		public MosaicViewHolder(GridLayout gridLayout, WidgetChatListAdapter adapter) {
 			super(gridLayout, adapter);
@@ -343,16 +344,14 @@ public class MosaicFork extends Plugin {
 					gridLayout.addView(container);
 				}
 
-				final FrameLayout finalContainer = container;
-
 				GridLayout.Spec rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
 				GridLayout.Spec colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f);
 				GridLayout.LayoutParams params = new GridLayout.LayoutParams(rowSpec, colSpec);
 				params.setMargins(6, 6, 6, 6);
-				
+					
 				params.width = 0;
 				params.height = targetHeight; 
-				finalContainer.setLayoutParams(params);
+				container.setLayoutParams(params);
 
 				MessageAttachment attachment = images.get(i);
 				int fileType = attachment.e().ordinal();
@@ -389,7 +388,7 @@ public class MosaicFork extends Plugin {
 						FrameLayout.LayoutParams btnParams = new FrameLayout.LayoutParams(btnSize, btnSize);
 						btnParams.gravity = Gravity.CENTER;
 
-						finalContainer.addView(playButton, btnParams);
+						container.addView(playButton, btnParams);
 					}
 				} else {
 					if (container.getChildCount() > 1 && !(container.getChildAt(1) instanceof TextView)) {
@@ -424,35 +423,43 @@ public class MosaicFork extends Plugin {
 					hasSpoilerView = true;
 				}
 				
-				if ((shouldSpoilered || attachment.h()) && !"OPENED".equals(finalContainer.getTag())) {
+				if ((shouldSpoilered || attachment.h())) {
 					if (!hasSpoilerView) {
-						TextView spoilerOverlay = new TextView(gridLayout.getContext());
-						spoilerOverlay.setText("SPOILER");
-						spoilerOverlay.setTextColor(android.graphics.Color.WHITE);
-						spoilerOverlay.setGravity(android.view.Gravity.CENTER);
-						spoilerOverlay.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-						spoilerOverlay.setTextSize(13);
+						if (!isOpened.contains(i)) {							
+							TextView spoilerOverlay = new TextView(gridLayout.getContext());
+							spoilerOverlay.setText("SPOILER");
+							spoilerOverlay.setTextColor(android.graphics.Color.WHITE);
+							spoilerOverlay.setGravity(android.view.Gravity.CENTER);
+							spoilerOverlay.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+							spoilerOverlay.setTextSize(13);
 
-						spoilerOverlay.setBackgroundColor(android.graphics.Color.parseColor("#FF2F3136"));
+							spoilerOverlay.setBackgroundColor(android.graphics.Color.parseColor("#FF2F3136"));
 
-						spoilerOverlay.setOutlineProvider(new android.view.ViewOutlineProvider() {
-							@Override
-							public void getOutline(View view, Outline outline) {
-								outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), 8);
-							}
-						});
-						spoilerOverlay.setClipToOutline(true);
+							spoilerOverlay.setOutlineProvider(new android.view.ViewOutlineProvider() {
+								@Override
+								public void getOutline(View view, Outline outline) {
+									outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), 8);
+								}
+							});
+							spoilerOverlay.setClipToOutline(true);
+							
+							final int finalidx = i;
 
-						spoilerOverlay.setOnClickListener(v -> {
-							finalContainer.setTag("OPENED");
-							finalContainer.removeView(spoilerOverlay);
-						});
+							spoilerOverlay.setOnClickListener(v -> {
+								View overlay = v; 
+								if (overlay.getParent() instanceof FrameLayout) {
+									FrameLayout parent = (FrameLayout) overlay.getParent();
+									parent.removeView(overlay);
+								}
+								isOpened.add(finalidx);
+							});
 
-						finalContainer.addView(spoilerOverlay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+							container.addView(spoilerOverlay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+						}
 					}
 				} else {
 					if (hasSpoilerView) {
-						finalContainer.removeViewAt(finalContainer.getChildCount() - 1);
+						container.removeViewAt(container.getChildCount() - 1);
 					}
 				}
 				
