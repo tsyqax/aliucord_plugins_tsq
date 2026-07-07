@@ -7,6 +7,8 @@ aliucord {
         """
         # 1.0.0
         * IPR!
+        * Add ThreadDEL (Add button to delete)
+        * Add ForumLine (Add gray line to first forum message)
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
