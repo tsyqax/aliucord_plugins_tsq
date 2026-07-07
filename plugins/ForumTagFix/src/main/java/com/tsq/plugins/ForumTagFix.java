@@ -327,29 +327,7 @@ public class ForumTagFix extends Plugin {
                 }
             })
 		);
-		
-		try {
-			// use 'public final String d()' 
-			java.lang.reflect.Method stringMethod = okhttp3.ResponseBody.class.getDeclaredMethod("d");
 
-			patcher.patch(stringMethod, new com.aliucord.patcher.Hook(cf -> {
-				String content = (String) cf.getResult();
-
-				
-				if (content != null ) {
-					logger.info("─── [FOUND SERVER RESPONSE] ───");
-					logger.info(content);
-					logger.info("───────────────────────────────");
-				}
-			}));
-		} catch (NoSuchMethodException e) {
-			logger.error("Failed to patch ResponseBody.d()", e);
-		} catch (Throwable e) {
-			logger.error(e);
-		}
-		
-		
-		
 		patcher.patch(
 			WidgetChatListAdapterItemThreadDraftForm.class.getDeclaredMethod("onConfigure", int.class, ChatListEntry.class), 
 			new Hook(param -> {
