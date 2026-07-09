@@ -357,7 +357,7 @@ public class UItweaks extends Plugin {
 						WidgetChatListAdapter chatAdapter = (WidgetChatListAdapter) adapterField.get(thiz);
 
 						if (recyclerView != null && chatAdapter != null) {
-							int tagKey = android.R.id.text1;
+							int tagKey = 0x7FF232F;
 
 							if (recyclerView.getTag(tagKey) == null) {
 								
