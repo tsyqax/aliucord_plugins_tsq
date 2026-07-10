@@ -76,6 +76,7 @@ import android.graphics.drawable.ColorDrawable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -83,6 +84,7 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.LinkedHashMap;
@@ -196,36 +198,12 @@ public class FixOnboardingFork extends Plugin {
 							new Thread(new Runnable() {
 								@Override
 								public void run() {
-									try {
-										String resText = Http.Request.newDiscordRequest(String.format("/guilds/%s/onboarding", guildId), "GET").execute().text();
-										List<JSONObject> questions = parseQuestions(resText);
-
-										if (questions.isEmpty()) {
-											Utils.showToast("There are no Onboarding.");
-											return;
-										}
-										new Handler(Looper.getMainLooper()).post(() -> {
-											showChainDialog(getSafeActivity(ctx), questions, 0, guildId, userId);
-										});
-										
-									} catch (Exception e) {
-										logger.error("Error", e);
-										String err = e.getMessage();
-										String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
-										Properties p = new Properties();
-										String msg;
-										try {
-											p.load(new java.io.StringReader("m=" + rawMsg));
-											msg = p.getProperty("m");
-										} catch (Exception ignored) {
-											msg = err;
-										}
-										Utils.showToast(msg);
-									}
+									startOnboarding(getSafeActivity(ctx), guildId, userId);
 								}
 							}).start();
 						});
 					}
+				} catch (ClassCastException e) {
 				} catch (Exception e) {
 					logger.error("ERR01", e);
 				}
@@ -246,32 +224,7 @@ public class FixOnboardingFork extends Plugin {
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
-							try {
-								String resText = Http.Request.newDiscordRequest(String.format("/guilds/%s/onboarding", guildId), "GET").execute().text();
-								List<JSONObject> questions = parseQuestions(resText);
-
-								 if (questions.isEmpty()) {
-									Utils.showToast("There are no Onboarding.");
-									return;
-								}
-								new Handler(Looper.getMainLooper()).post(() -> {
-									showChainDialog(getSafeActivity(ctx.getContext()), questions, 0, guildId, userId);
-								});
-								
-							} catch (Exception e) {
-								logger.error("Error", e);
-								String err = e.getMessage();
-								String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
-								Properties p = new Properties();
-								String msg;
-								try {
-									p.load(new java.io.StringReader("m=" + rawMsg));
-									msg = p.getProperty("m");
-								} catch (Exception ignored) {
-									msg = err;
-								}
-								Utils.showToast(msg);
-							}
+							startOnboarding(getSafeActivity(ctx.getContext()), guildId, userId);
 						}
 					}).start();
 					
@@ -311,38 +264,44 @@ public class FixOnboardingFork extends Plugin {
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
-							try {
-								String resText = Http.Request.newDiscordRequest(String.format("/guilds/%s/onboarding", guildId), "GET").execute().text();
-								List<JSONObject> questions = parseQuestions(resText);
-
-								if (questions.isEmpty()) {
-									Utils.showToast("There are no Onboarding.");
-									return;
-								}
-								new Handler(Looper.getMainLooper()).post(() -> {
-									showChainDialog(Utils.getAppActivity(), questions, 0, guildId, userId);
-								});
-							
-							} catch (Exception e) {
-								logger.error("Error", e);
-								String err = e.getMessage();
-								String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
-								Properties p = new Properties();
-								String msg;
-								try {
-									p.load(new java.io.StringReader("m=" + rawMsg));
-									msg = p.getProperty("m");
-								} catch (Exception ignored) {
-									msg = err;
-								}
-								Utils.showToast(msg);
-							}
+							startOnboarding(Utils.getAppActivity(), guildId, userId);
 						}
 					}).start();
 				}));
 			} catch (Exception e) {
 				logger.error("ERR03", e);
 			}
+		}
+	}
+	
+	public void startOnboarding(Activity activity, String guildId, String userId) {
+		try {
+			String resText = Http.Request.newDiscordRequest(String.format("/guilds/%s/onboarding", guildId), "GET").execute().text();
+			List<JSONObject> questions = parseQuestions(resText);
+			//boolean pending = parsePending(resText);
+			boolean pending = false;
+
+			if (questions.isEmpty()) {
+				Utils.showToast("There are no Onboarding.");
+				return;
+			}
+			new Handler(Looper.getMainLooper()).post(() -> {
+				showChainDialog(activity, questions, 0, guildId, userId, pending);
+			});
+			
+		} catch (Exception e) {
+			logger.error("Error", e);
+			String err = e.getMessage();
+			String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
+			Properties p = new Properties();
+			String msg;
+			try {
+				p.load(new java.io.StringReader("m=" + rawMsg));
+				msg = p.getProperty("m");
+			} catch (Exception ignored) {
+				msg = err;
+			}
+			Utils.showToast(msg);
 		}
 	}
 	
@@ -393,10 +352,29 @@ public class FixOnboardingFork extends Plugin {
 		return questionList;
 	}
 	
+	public boolean parsePending(String jsonString) {
+		try {
+			JSONObject root = new JSONObject(jsonString);
+			JSONArray prompts = root.optJSONArray("responses");
+			logger.info(jsonString);
+			logger.info(prompts.toString());
+			
+			if (prompts == null || prompts.length() == 0) {
+				return true;
+			}
+			return false;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
 	
 	public void addAnswer(String promptId, List<String> allOptionIdsOfPrompt, String chosenOptionId) {
-        long currentTime = System.currentTimeMillis(); //seenTime
         this.selectedResponses.add(chosenOptionId); //answer
+    }
+	
+	public void addSeenTime(String promptId, List<String> allOptionIdsOfPrompt) {
+        long currentTime = System.currentTimeMillis(); //seenTime
         this.promptsSeen.put(promptId, currentTime); 
 
         for (String optionId : allOptionIdsOfPrompt) {
@@ -435,7 +413,7 @@ public class FixOnboardingFork extends Plugin {
 		return payload;
 	}
 
-	private void showChainDialog(Context context, List<JSONObject> questions, int index, String guildId, String userId) {
+	private void showChainDialog(Context context, List<JSONObject> questions, int index, String guildId, String userId, boolean pending) {
 		if (index >= questions.size()) { // Questions Ended
 			JSONObject finalPayload = buildPayloadLast(guildId, userId);
 			
@@ -455,19 +433,28 @@ public class FixOnboardingFork extends Plugin {
 						String resText = req.executeWithBody(finalPayload.toString()).text();
 						Utils.showToast("Done!");
 					} catch (Exception e) {
-						String err = e.getMessage();
-						
-						String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
-						Properties p = new Properties();
-						String msg;
 						try {
-							p.load(new java.io.StringReader("m=" + rawMsg));
-							msg = p.getProperty("m");
-						} catch (Exception ignored) {
-							msg = err;
+							Http.Request req = Http.Request.newDiscordRequest(String.format("/guilds/%s/onboarding-responses", guildId), "PUT");
+							req.setHeader("Content-Type", "application/json");
+							String resText = req.executeWithBody(finalPayload.toString()).text();
+							Utils.showToast("Done!");
+						} catch (Exception ig) {
+							logger.error("PUT_ERR", ig);
+							
+							String err = e.getMessage();
+							
+							String rawMsg = err.contains("\"message\": \"") ? err.split("\"message\": \"")[1].split("\"")[0] : err;
+							Properties p = new Properties();
+							String msg;
+							try {
+								p.load(new java.io.StringReader("m=" + rawMsg));
+								msg = p.getProperty("m");
+							} catch (Exception ignored) {
+								msg = err;
+							}
+							Utils.showToast(msg);
+							logger.error("ERR", e);
 						}
-						Utils.showToast(msg);
-						logger.error("ERR", e);
 					}
 				}
 			}).start();
@@ -491,8 +478,8 @@ public class FixOnboardingFork extends Plugin {
 				allOptionIds.add(opt.getString("id"));
 			}
 			
-			userSelection = 0; //initialize
-			userRealSelection = allOptionIds.get(0); //initialize
+			userSelection = -1; //initialize
+			//userRealSelection = allOptionIds.get(-1); //initialize
 			String dialogTitle = "[" + (index + 1) + "/" + questions.size() + "]";
 
 			if (required) {
@@ -506,7 +493,7 @@ public class FixOnboardingFork extends Plugin {
 			//allTitle += dialogTitle;
 			//dialogTitle += "DEBUG:" + Arrays.toString(optionTitles);
 
-			OnboardingPage onpage = new OnboardingPage(questions, promptId, allTitle, dialogTitle, required, onlyOne, options, guildId, userId, allOptionIds, index);
+			OnboardingPage onpage = new OnboardingPage(questions, promptId, allTitle, dialogTitle, required, onlyOne, options, guildId, userId, allOptionIds, index, pending);
 			
 			Utils.openPageWithProxy(context, onpage);
 
@@ -528,8 +515,9 @@ public class FixOnboardingFork extends Plugin {
 		private String userId;
 		private List<String> allOptionIds;
 		private int idx;
+		private boolean pending;
 		
-		public OnboardingPage(List<JSONObject> questions, String promptId, String allTitle, String dialogTitle, boolean required, boolean onlyOne, JSONArray options, String guildId, String userId, List<String> allOptionIds, int idx) {
+		public OnboardingPage(List<JSONObject> questions, String promptId, String allTitle, String dialogTitle, boolean required, boolean onlyOne, JSONArray options, String guildId, String userId, List<String> allOptionIds, int idx, boolean pending) {
 			this.questions = questions;
 			this.promptId = promptId;
 			this.allTitle = allTitle;
@@ -541,6 +529,7 @@ public class FixOnboardingFork extends Plugin {
 			this.userId = userId;
 			this.allOptionIds = allOptionIds;
 			this.idx = idx;
+			this.pending = pending;
 		}
 		
 		private void closePage() {
@@ -703,7 +692,9 @@ public class FixOnboardingFork extends Plugin {
 			confirm.setOnClickListener(v -> {
 				List<String> chosenOptionIds = new ArrayList<>();
 				if (onlyOne) {
-					chosenOptionIds.add(userRealSelection);
+					if (userSelection != -1) {
+						chosenOptionIds.add(userRealSelection);
+					}
 				} else {
 					for (int i = 0; i < multiSelectionFlags.length; i++) {
 						if (multiSelectionFlags[i]) {
@@ -721,8 +712,10 @@ public class FixOnboardingFork extends Plugin {
 					addAnswer(promptId, allOptionIds, chosenId);
 				}
 				
+				addSeenTime(promptId, allOptionIds);
+				
 				closePage();
-				showChainDialog(context, questions, idx + 1, guildId, userId);
+				showChainDialog(context, questions, idx + 1, guildId, userId, pending);
 			});
 			layout.addView(confirm);
 			
