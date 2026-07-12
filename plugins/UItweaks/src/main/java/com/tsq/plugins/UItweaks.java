@@ -1,93 +1,96 @@
 package com.tsq.plugins;
 
+// Android
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
-import com.aliucord.Logger;
-import com.aliucord.Utils;
-import com.aliucord.annotations.AliucordPlugin;
-import com.aliucord.entities.Plugin;
-import com.aliucord.patcher.*;
-import com.aliucord.settings.*;
-import com.discord.utilities.rest.RestAPI;
-import com.discord.stores.StoreStream;
-import com.discord.stores.SelectedChannelAnalyticsLocation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.fragment.app.Fragment;
-import java.util.List;
-
-import androidx.annotation.NonNull; 
-import java.nio.charset.StandardCharsets; 
-import okhttp3.MediaType; 
-import okhttp3.RequestBody;
-import okhttp3.Request;
-import okhttp3.MultipartBody;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-
-import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions;
-import com.discord.widgets.channels.list.WidgetChannelsListItemThreadActions;
-import com.discord.widgets.channels.settings.WidgetTextChannelSettings;
-import com.discord.widgets.channels.settings.WidgetThreadSettings;
-import com.discord.widgets.share.WidgetIncomingShare;
-import com.discord.widgets.user.search.WidgetGlobalSearchModel;
-import com.discord.utilities.permissions.PermissionUtils;
-import com.aliucord.api.SettingsAPI;
-import com.discord.views.CheckedSetting;
-
-import android.graphics.drawable.Drawable;
-import androidx.core.content.ContextCompat;
-import java.util.HashMap;
-import com.aliucord.views.Button;
-import com.discord.api.channel.Channel;
-import com.discord.utilities.rest.RestAPI;
-import com.aliucord.views.TextInput;
-import com.aliucord.utils.ReflectUtils;
-import com.aliucord.utils.ChannelUtils;
-import com.aliucord.utils.MDUtils;
-
-import android.widget.LinearLayout;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import com.discord.api.permission.Permission;
-import com.aliucord.fragments.SettingsPage;
-import com.aliucord.fragments.FragmentProxy;
-import androidx.fragment.app.DialogFragment;
-import com.aliucord.widgets.BottomSheet;
-import com.aliucord.fragments.ConfirmDialog;
-import com.aliucord.api.CommandsAPI;
-import androidx.core.widget.NestedScrollView;
-import com.discord.api.commands.ApplicationCommandType;
-
-import java.util.Arrays;
-import java.util.Collections;
-
-import android.view.ViewGroup;
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage;
-import com.discord.widgets.chat.list.entries.ChatListEntry;
-import com.discord.widgets.chat.list.WidgetChatList;
-import com.discord.widgets.chat.list.adapter.WidgetChatListAdapter;
-import com.aliucord.utils.DimenUtils;
-import com.aliucord.views.Divider;
-import com.discord.widgets.chat.list.entries.MessageEntry;
-import java.util.function.Supplier;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
-
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+// Java
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.function.Supplier;
+
+// OkHttp
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
+// Discord
+import com.discord.api.channel.Channel;
+import com.discord.api.commands.ApplicationCommandType;
+import com.discord.api.permission.Permission;
+import com.discord.databinding.WidgetChannelsListItemChannelBinding;
+import com.discord.models.guild.Guild;
+import com.discord.stores.SelectedChannelAnalyticsLocation;
+import com.discord.stores.StoreStream;
+import com.discord.utilities.permissions.PermissionUtils;
+import com.discord.utilities.rest.RestAPI;
+import com.discord.views.CheckedSetting;
+import com.discord.widgets.channels.list.WidgetChannelsListAdapter;
+import com.discord.widgets.channels.list.WidgetChannelsListItemChannelActions;
+import com.discord.widgets.channels.list.WidgetChannelsListItemThreadActions;
+import com.discord.widgets.channels.list.items.ChannelListItem;
+import com.discord.widgets.channels.list.items.ChannelListItemTextChannel;
+import com.discord.widgets.channels.settings.WidgetTextChannelSettings;
+import com.discord.widgets.channels.settings.WidgetThreadSettings;
+import com.discord.widgets.chat.list.WidgetChatList;
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapter;
+import com.discord.widgets.chat.list.adapter.WidgetChatListAdapterItemMessage;
+import com.discord.widgets.chat.list.entries.ChatListEntry;
+import com.discord.widgets.chat.list.entries.MessageEntry;
+import com.discord.widgets.share.WidgetIncomingShare;
+import com.discord.widgets.user.search.WidgetGlobalSearchModel;
 import com.lytefast.flexinput.R;
+
+// Aliucord
+import com.aliucord.Logger;
+import com.aliucord.Utils;
+import com.aliucord.annotations.AliucordPlugin;
+import com.aliucord.api.CommandsAPI;
+import com.aliucord.api.SettingsAPI;
+import com.aliucord.entities.Plugin;
+import com.aliucord.fragments.ConfirmDialog;
+import com.aliucord.fragments.FragmentProxy;
+import com.aliucord.fragments.SettingsPage;
+import com.aliucord.patcher.*;
+import com.aliucord.settings.*;
+import com.aliucord.utils.ChannelUtils;
+import com.aliucord.utils.DimenUtils;
+import com.aliucord.utils.MDUtils;
+import com.aliucord.utils.ReflectUtils;
+import com.aliucord.views.Button;
+import com.aliucord.views.Divider;
+import com.aliucord.views.TextInput;
+import com.aliucord.widgets.BottomSheet;
+import com.aliucord.wrappers.ChannelWrapper;
 
 
 @AliucordPlugin(requiresRestart = true)
@@ -99,6 +102,7 @@ public class UItweaks extends Plugin {
 	
 	public UItweaks() { 
 		settingsTab = new SettingsTab(PSettings.class, SettingsTab.Type.PAGE).withArgs(settings);
+		needsResources = true;
 	}
 	
 	// ----- settings start -----
@@ -131,6 +135,13 @@ public class UItweaks extends Plugin {
 				settings.setBool("forumLine", Boolean);
 				Utils.promptRestart();
 			});
+			
+			CheckedSetting ruleChIcon = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Make rules channel icon","");
+			ruleChIcon.setChecked(settings.getBool("ruleChIcon", true));
+			ruleChIcon.setOnCheckedListener(Boolean -> {
+				settings.setBool("ruleChIcon", Boolean);
+				Utils.promptRestart();
+			});
 
 			var threadInput = new TextInput(context, "Thread Delete Label", String.valueOf(settings.getString("thread_label", "Delete Thread")));
 			var channelInput = new TextInput(context, "Channel Delete Label", String.valueOf(settings.getString("channel_label", "Delete Channel")));
@@ -149,6 +160,7 @@ public class UItweaks extends Plugin {
 			
 			layout.addView(threadDEL);
 			layout.addView(forumLine);
+			layout.addView(ruleChIcon);
 			
 			if (settings.getBool("threadDEL", true)) {
 				layout.addView(threadInput);
@@ -165,6 +177,7 @@ public class UItweaks extends Plugin {
     public void start(@NonNull Context context) throws Throwable { //h
 		Boolean theradDEL = settings.getBool("threadDEL", true);
 		Boolean forumLine = settings.getBool("forumLine", true);
+		Boolean ruleChIcon = settings.getBool("ruleChIcon", true);
 		
 		if (theradDEL) {
 			String ThreadDelText = settings.getString("thread_label", "Delete Thread");
@@ -262,7 +275,6 @@ public class UItweaks extends Plugin {
 					var actions = (WidgetChannelsListItemChannelActions) param.thisObject;
 					var scrollView = (NestedScrollView) actions.getView();
 					var lay = (LinearLayout) scrollView.getChildAt(0);
-					
 					
 					long channelId = StoreStream.getChannelsSelected().getId();
 					long permissions = StoreStream.getPermissions().getPermissionsByChannel().get(channelId);
@@ -432,7 +444,43 @@ public class UItweaks extends Plugin {
 			} catch (Exception e) {
 				logger.error("Failed to patch WidgetChatList", e);
 			}
+		}
+		
+		// part of BetterChannelIcons by wingio
+		if (ruleChIcon) {
+			patcher.patch(WidgetChannelsListAdapter.ItemChannelText.class, "onConfigure", new Class<?>[]{int.class, ChannelListItem.class}, new Hook(callFrame -> {
+				try {
+					ChannelListItem channelListItem = (ChannelListItem) callFrame.args[1];
+					ChannelListItemTextChannel channelItem = (ChannelListItemTextChannel) channelListItem;
+					Channel apiChannel = channelItem.getChannel();
+					ChannelWrapper channel = new ChannelWrapper(apiChannel);
 
+					long channelId = channel.getId();
+					long guildId = channel.getGuildId();
+
+					Guild guild = StoreStream.getGuilds().getGuilds().get(guildId);
+					
+					if (guild != null && guild.getRulesChannelId() != null) {
+						if (guild.getRulesChannelId() == channelId) {
+							
+							WidgetChannelsListAdapter.ItemChannelText _this = (WidgetChannelsListAdapter.ItemChannelText) callFrame.thisObject;
+							WidgetChannelsListItemChannelBinding binding = (WidgetChannelsListItemChannelBinding) ReflectUtils.getField(_this, "binding");
+							ImageView channelIcon = (ImageView) binding.getRoot().findViewById(com.aliucord.Utils.getResId("channels_item_channel_hash", "id"));
+							
+							int customIconId = resources.getIdentifier("ic_rules_24dp", "drawable", "com.tsq.plugins");
+                            
+							if (customIconId != 0) {
+								Drawable vectorDrawable = androidx.core.content.res.ResourcesCompat.getDrawable(resources, customIconId, null);
+								if (vectorDrawable != null) {
+									channelIcon.setImageDrawable(vectorDrawable);
+								}
+							}
+						}
+					}
+				} catch (Throwable e) {
+					logger.error("ruleChIcon", e);
+				}
+			}));
 		}
 
     }
