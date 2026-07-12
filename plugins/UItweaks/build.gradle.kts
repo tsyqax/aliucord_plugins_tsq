@@ -1,10 +1,13 @@
-version = "1.0.1" // Plugin version. Increment this to trigger an update
+version = "1.0.2" // Plugin version. Increment this to trigger an update
 description = "Add better UI something" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.0.2
+        * Add RuleChIcon
+
         # 1.0.1
         * Fixed some bug
 
