@@ -1,5 +1,5 @@
 version = "1.1.9" // Plugin version. Increment this to trigger an update
-description = "Pet someone" // Plugin description that will be shown to user
+description = "Pet someone 2" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
