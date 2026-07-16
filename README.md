@@ -19,6 +19,7 @@ And... It is really bad to just make something and not release it.
 - [MosaicFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MosaicFork.zip): Make images to grid images.
 - [ServerNicknameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ServerNicknameFix.zip): Fix changing server nickname from profile menu.
 - [UItweaks](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/UItweaks.zip): Add effort to make better ui.
+- [petpetFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/petpetFork.zip): Pet someone 2 without api.
 
 ## Deprecated (only some part of work correctly)
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
