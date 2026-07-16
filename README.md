@@ -35,14 +35,6 @@ Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)
 
 ---
 ## If you?
-### petpetFork (maybe): Is this okay?
-[DOWNLOAD](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/petpetFork.zip)  
-
-I found petpet API, but I'm not sure if it's good or if people will like it.  
-So I'm leaving it as a temporary test.  
-If you think it's okay, please submit a PR to the [original creator's repository.](https://github.com/Wolfkid200444/hot-plugins/tree/main/PetPet)    
-I only changed a single line in the code.  
-
 ### AvatarDeco (Giveup): Could you continue?
 I don't like this whhhhhhhhhhhhhhhhhhhhhhhhhhhhy  
 My brain is mmmmmmmmmmmmmmmmmmmmmmmmmmmmmelting  
