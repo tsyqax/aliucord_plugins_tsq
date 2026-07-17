@@ -1,59 +1,34 @@
 package com.tsq.plugins;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Bundle;
 
 import com.aliucord.Logger;
-import com.aliucord.Utils;
-import com.aliucord.Http;
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.LinkedHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
 
-import d0.t.n;
-import kotlin.jvm.functions.Function2;
-import okhttp3.Headers;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
+import com.discord.stores.StoreStream;
+
 import okhttp3.RequestBody;
-import rx.Observable;
-import com.lytefast.flexinput.R;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 @AliucordPlugin
 public class ServerNicknameFix extends Plugin {
 	private final Logger logger = new Logger("ServerNicknameFix");
-	private String userInput;
-	private String extractedTicket;
-	private boolean reInvoked;
-	private boolean isQRsent;
 
 	@Override
 	public void start(Context context) throws NoSuchMethodException {
 		try {
+			
 			Method buildMethod = okhttp3.Request.a.class.getDeclaredMethod("a");
-
+			
 			patcher.patch(buildMethod, new Hook(cf -> {
+				boolean isCanChange = StoreStream.getUsers().getMe().getPremiumTier().ordinal() == 4;
+				if (isCanChange) {
+					return;
+				}				
 				okhttp3.Request request = (okhttp3.Request) cf.getResult();
 				if (request == null) return;
 				f0.w url = request.b;
