@@ -67,21 +67,3 @@ HeicImageConvertor processes HEIC conversion in memory.
 HeicFix loads the data into memory briefly and then caches it to a file for processing.  
 Although the two logics may seem similar, if you need to save memory,  
 I think HeicFix might be helpful (even if the effect is small).
-
-### Is it Backport?
-※ modified = not same exactly original  
-※ simplified = small than original
-
-#### Yes
-- FriendFix
-- ThreadCMD
-- ForumTagFix (modified)
-- threadDEL
-- MediaChannelFix
-- HeicFix
-- CopyBackTick
-- FilenameFix (simplified)
-- ~~EmojiRank (modified)~~
-- FixOnboardingFix (modified, simplified)
-- MosaicFork
-- ServerNicknameFix
