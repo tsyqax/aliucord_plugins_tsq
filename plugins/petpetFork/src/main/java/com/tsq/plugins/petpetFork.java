@@ -21,6 +21,7 @@ import com.aliucord.api.SettingsAPI;
 import com.aliucord.fragments.SettingsPage;
 import com.aliucord.views.TextInput;
 import com.aliucord.views.Button;
+import com.aliucord.views.DangerButton;
 
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.api.CommandsAPI;
@@ -100,8 +101,41 @@ public class petpetFork extends Plugin {
 				settings.setInt("pet_delay", delayVal);
 				settings.setInt("pet_repeat", repeatVal);
 				settings.setString("pet_bg", bgVal); 
+				Utils.showToast(context, "SaveSave is done!");
 			});
+			
+			DangerButton reset_button = new DangerButton(context);
+			reset_button.setText("Reset to Default");
 
+			reset_button.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(android.view.View v) {
+					settings.setInt("pet_res", 128);
+					settings.setFloat("pet_w_factor", 0.73f);
+					settings.setFloat("pet_w_j", 0.02f);
+					settings.setFloat("pet_h_factor", 0.73f);
+					settings.setFloat("pet_h_j", 0.072f);
+					settings.setFloat("pet_ox", 0.14f);
+					settings.setFloat("pet_oy", 0.09f);
+					settings.setInt("pet_delay", 40);
+					settings.setInt("pet_repeat", 0);
+					settings.setString("pet_bg", "TRANSPARENT");
+
+					res_input.getEditText().setText("128");
+					w_factor_input.getEditText().setText("0.73");
+					w_j_input.getEditText().setText("0.02");
+					h_factor_input.getEditText().setText("0.73");
+					h_j_input.getEditText().setText("0.072");
+					ox_input.getEditText().setText("0.14");
+					oy_input.getEditText().setText("0.09");
+					delay_input.getEditText().setText("40");
+					bg_input.getEditText().setText("TRANSPARENT");
+					repeat_input.getEditText().setText("0");
+					
+					Utils.showToast(context, "ResetReset is done!");
+				}
+			});
+			
 			layout.addView(res_input);
 			layout.addView(w_factor_input);
 			layout.addView(w_j_input);
@@ -113,6 +147,7 @@ public class petpetFork extends Plugin {
 			layout.addView(repeat_input);
 			layout.addView(bg_input);
 			layout.addView(saveButton);
+			layout.addView(reset_button);
 		}
 	}
 	// ----- settings end -----
