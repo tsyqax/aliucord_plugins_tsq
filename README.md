@@ -20,6 +20,7 @@ And... It is really bad to just make something and not release it.
 - [ServerNicknameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ServerNicknameFix.zip): Fix changing server nickname from profile menu.
 - [UItweaks](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/UItweaks.zip): Add effort to make better ui.
 - [petpetFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/petpetFork.zip): Pet someone 2 without api.
+- [ChatLagFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ChatLagFix.zip): Try to remove Typing lag.
 
 ## Deprecated (only some part of work correctly)
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
@@ -55,12 +56,13 @@ However, I refer to them as "Forks" of the originals out of courtesy and respect
 
 ### Why they Working
 1. FriendFix -> Hook the UI to pass 12345 if there is nothing after #. Then, hook to replace 12345 with the string "null".
-3. ForumTagFix -> Hook Multipart into the Build to insert the tag list as payload_json.
-5. MediaChannelFix -> When getting the channel type, hook it so that if it is 16, it becomes 15.
-8. CopyBackTick -> Hook and add ClickSpan to SpannableStringBuilder.
-10. FixOnboardingFix -> GET on /guilds/%s/onboarding and POST on /guilds/%s/onboarding-responses with newDiscordRequest();
-11. MosaicFork -> Remove vidoes/images from Attachments and add custom entry. And Grid with GridLayout().
-12. ServerNicknameFix -> Remove bio field when bio is empty (this means user may not nitro user).
+2. ForumTagFix -> Hook Multipart into the Build to insert the tag list as payload_json.
+3. MediaChannelFix -> When getting the channel type, hook it so that if it is 16, it becomes 15.
+4. CopyBackTick -> Hook and add ClickSpan to SpannableStringBuilder.
+5. FixOnboardingFix -> GET on /guilds/%s/onboarding and POST on /guilds/%s/onboarding-responses with newDiscordRequest();
+6. MosaicFork -> Remove vidoes/images from Attachments and add custom entry. And Grid with GridLayout().
+7. ServerNicknameFix -> Remove bio field when bio is empty (this means user may not nitro user).
+8. ChatLagFix -> Block addTextChangedListener and delayed post
 
 ### How is HeicFix different from the HeicImageConvertor plugin?
 HeicImageConvertor processes HEIC conversion in memory.  
