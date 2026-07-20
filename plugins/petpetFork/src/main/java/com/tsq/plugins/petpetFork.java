@@ -153,6 +153,36 @@ public class petpetFork extends Plugin {
                 }
             }
         );
+		
+		commands.registerCommand(
+            "peturl",
+            "petpet for URL",
+            Arrays.asList(
+				Utils.createCommandOption(
+					ApplicationCommandType.STRING, 
+					"url", 
+					"The url to pet", 
+					null, 
+					true,
+					false
+				)
+			),
+            ctx -> {
+				try {
+					String target = ctx.getRequiredString("url");
+					
+					File file = makeGifFile(target, context);
+					
+					ctx.addAttachment(Uri.fromFile(file).toString(), "petpet.gif");
+					return new CommandsAPI.CommandResult("");
+				} catch (Throwable t) {
+					logger.error("Thread creation failed: ", t);
+                    return new CommandsAPI.CommandResult("Error: " + t.getMessage() , null, false);
+					
+                }
+            }
+        );
+		
     }
 	
 	private Bitmap[] splitSpriteToFrames(Context context) {
@@ -236,7 +266,12 @@ public class petpetFork extends Plugin {
 
 	
 	private File makeGifFile(String avatarUrl, Context context) throws Throwable {
-		Http.Response res = new Http.Request(avatarUrl.replace(".webp", ".png")).execute();
+		String finalUrl = avatarUrl;
+		if (avatarUrl.toLowerCase().endsWith(".webp")) {
+			finalUrl = avatarUrl.replace(".webp", ".png");
+		}
+		
+		Http.Response res = new Http.Request(finalUrl).execute();
 		Bitmap avatarBitmap = BitmapFactory.decodeStream(res.stream());
 		res.stream().close();
 
