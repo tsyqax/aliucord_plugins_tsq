@@ -1,10 +1,13 @@
-version = "1.2.0" // Plugin version. Increment this to trigger an update
+version = "1.2.1" // Plugin version. Increment this to trigger an update
 description = "Pet someone 2" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.1
+        * /peturl [url] 
+
         # 1.2.0
         * Added settings for resolution, width/height factors, offsets, frame delay, loop count, background color, and so on.
 
