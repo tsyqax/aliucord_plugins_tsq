@@ -72,7 +72,7 @@ public class petpetFork extends Plugin {
 			var h_j_input = new TextInput(context, "Height J-Timeline Weight (default: 0.072)", String.valueOf(settings.getFloat("pet_h_j", 0.072f)));
 			var ox_input = new TextInput(context, "Offset X Margin (default: 0.14)", String.valueOf(settings.getFloat("pet_ox", 0.14f)));
 			var oy_input = new TextInput(context, "Offset Y Margin (default: 0.09)", String.valueOf(settings.getFloat("pet_oy", 0.09f)));
-			var delay_input = new TextInput(context, "Frame Delay ms (default: 50)", String.valueOf(settings.getInt("pet_delay", 50)));
+			var delay_input = new TextInput(context, "Frame Delay ms (default: 50, min: 20)", String.valueOf(settings.getInt("pet_delay", 50)));
 			var repeat_input = new TextInput(context, "Loop Count (0 for Infinite)", String.valueOf(settings.getInt("pet_repeat", 0)));
 			var bg_input = new TextInput(context, "Background Color (Hex or TRANSPARENT)", settings.getString("pet_bg", "TRANSPARENT"));
 
@@ -249,7 +249,7 @@ public class petpetFork extends Plugin {
 		int userRepeat = settings.getInt("pet_repeat", 0);
 
 		int userDelay = settings.getInt("pet_delay", 40); 
-		if (userDelay < 10) userDelay = 10;
+		if (userDelay < 20) userDelay = 20;
 		
 		String bgColor = settings.getString("pet_bg", "TRANSPARENT");
 
