@@ -1,12 +1,15 @@
-version = "0.0.1" // Plugin version. Increment this to trigger an update
+version = "0.0.2" // Plugin version. Increment this to trigger an update
 description = "Fixes friend request for new users" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 0.0.2
+        * Rewrited to Kotlin
+
         # 0.0.1
-        * Initial plugin release!
+        * IPR!
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
