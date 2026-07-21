@@ -1,10 +1,13 @@
-version = "1.2.3" // Plugin version. Increment this to trigger an update
+version = "1.2.4" // Plugin version. Increment this to trigger an update
 description = "Fix issues with Tags on ForumChannel" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.4
+        * Rewrited to Kotlin!
+
         # 1.2.3
         * Remove debug code
 
