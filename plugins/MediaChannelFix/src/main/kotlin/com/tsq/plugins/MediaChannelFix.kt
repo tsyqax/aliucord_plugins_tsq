@@ -1,4 +1,4 @@
-package com.tsq.plugins;
+package com.tsq.plugins
 
 import android.content.Context
 import com.aliucord.annotations.AliucordPlugin
