@@ -1,12 +1,15 @@
-version = "0.0.1" // Plugin version. Increment this to trigger an update
+version = "0.0.2" // Plugin version. Increment this to trigger an update
 description = "Add /thread command" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
-        # 1.0.0
-        * Initial plugin release!
+        # 0.0.2
+        * Rewrited to Kotlin!
+
+        # 0.0.1
+        * IPR!
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
