@@ -121,7 +121,7 @@ public class ChatLagFix extends Plugin {
 							private final Handler handler = new Handler(Looper.getMainLooper());
 							private Runnable pendingRunnable = null;
 							private boolean stoped = false;
-
+							
 							@Override
 							public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 								if (s == null || s.length() < chat) {
@@ -149,6 +149,16 @@ public class ChatLagFix extends Plugin {
 							public void afterTextChanged(Editable s) {
 								if (s == null) return;
 								final int textLength = s.length();
+								
+								if (textLength == 0 && stoped) {
+									stoped = false;
+									if (pendingRunnable != null) {
+										handler.removeCallbacks(pendingRunnable);
+										pendingRunnable = null;
+									}
+									original.afterTextChanged(s);
+									return;
+								}
 
 								if (textLength < chat) {
 									original.afterTextChanged(s);
@@ -169,7 +179,6 @@ public class ChatLagFix extends Plugin {
 										original.beforeTextChanged(s, 0, textLength, textLength);
 										original.onTextChanged(s, 0, 0, textLength);
 										original.afterTextChanged(s);
-
 									}
 								};
 								
