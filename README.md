@@ -65,8 +65,16 @@ However, I refer to them as "Forks" of the originals out of courtesy and respect
 7. ServerNicknameFix -> Remove bio field when bio is empty (this means user may not nitro user).
 8. ChatLagFix -> Block addTextChangedListener and delayed post
 
-### How is HeicFix different from the HeicImageConvertor plugin?
+### How is HeicFix different from HeicImageConvertor plugin?
 HeicImageConvertor processes HEIC conversion in memory.  
 HeicFix loads the data into memory briefly and then caches it to a file for processing.  
 Although the two logics may seem similar, if you need to save memory,  
 I think HeicFix might be helpful (even if the effect is small).
+
+### How is petpetFork different from petpet plugin?
+The original petpet used an API and is now outdated.  
+PetpetFork appeared earlier than the recently introduced improved petpet,  
+and while the improved petpet uses an image synthesis method like petpetFork,  
+it has fewer configurable variables than petpetFork.  
+(Initially, petpetFork actually had fewer configurable options,  
+but I listened something from them and added a lot of configuration variables.)
