@@ -257,7 +257,7 @@ public class FixOnboardingFork extends Plugin {
 					
 					//Context ctx = StoreStream.getContext();
 					
-					if (guild.O() == true) { 
+					if (guild.O()) { 
 						return;
 					}
 					
