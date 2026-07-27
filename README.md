@@ -40,7 +40,7 @@ Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)
 ### AvatarDeco (Giveup): Could you continue?
 I don't like this whhhhhhhhhhhhhhhhhhhhhhhhhhhhy  
 My brain is mmmmmmmmmmmmmmmmmmmmmmmmmmmmmelting  
-So, If you have Idea, Do whatever you want with [this](https://github.com/tsyqax/aliucord_plugins_tsq/main/givup/AvatarDeco.java) :>
+So, If you have Idea, Do whatever you want with [this](https://github.com/tsyqax/aliucord_plugins_tsq/main/giveup/AvatarDeco.java) :>
 
 ### Translatable (Draft): Do you have Idea?
 I just think of translatable plugin (providing translated texts for app and plugin)  
