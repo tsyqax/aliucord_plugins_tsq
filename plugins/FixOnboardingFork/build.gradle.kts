@@ -1,10 +1,13 @@
-version = "1.2.0" // Plugin version. Increment this to trigger an update
+version = "1.2.1" // Plugin version. Increment this to trigger an update
 description = "Add Method to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.1
+        * Change better subtitle with guildId
+
         # 1.2.0
         * Finally fix auto mode, oh yea maybe?
         * If you still have bug, pls report to me!
