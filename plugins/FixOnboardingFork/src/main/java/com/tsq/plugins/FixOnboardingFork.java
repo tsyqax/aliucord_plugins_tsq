@@ -591,7 +591,7 @@ public class FixOnboardingFork extends Plugin {
 		public void onViewCreated(View view, Bundle bundle) {
 			super.onViewCreated(view, bundle);
 			setActionBarTitle(dialogTitle);
-			//setActionBarSubtitle(dialogTitle);
+			setActionBarSubtitle(guildId);
 
 			var context = view.getContext();
 			var layout = getLinearLayout();
