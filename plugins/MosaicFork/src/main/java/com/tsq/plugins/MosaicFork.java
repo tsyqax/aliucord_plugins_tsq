@@ -107,7 +107,7 @@ public class MosaicFork extends Plugin {
 
 			var width_input = new TextInput(context, "Width Ratio (0.0 ~ 1.0)", String.valueOf(settings.getFloat("width", 0.83f)));
 			var height_input = new TextInput(context, "Height DP (default: 145)", String.valueOf(settings.getInt("height", 145)));
-			var padding_input = new TextInput(context, "Height DP (default: 57)", String.valueOf(settings.getInt("padding", 57)));
+			var padding_input = new TextInput(context, "Padding DP (default: 57)", String.valueOf(settings.getInt("padding", 57)));
 			
 			CheckedSetting autoGif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Toggle auto play Gif","");
 			autoGif.setChecked(settings.getBool("autoGif", true));
@@ -172,7 +172,7 @@ public class MosaicFork extends Plugin {
 		realWidth = (int) (screenWidth * inputWidth);
 		targetHeight = (int) (targetHeightDP * density + 0.5f);
 		paddingLeft = (int) (paddingLeftDP * density + 0.5f);
-			
+		
 		Method createEmbedEntriesMethod = ChatListEntry.Companion.getClass().getDeclaredMethod("createEmbedEntries", Message.class, StoreMessageState.State.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, Channel.class, GuildMember.class, Map.class, Map.class);
 		//  Message, StoreMessageState.State, boolean, boolean, boolean, boolean, boolean, Channel, GuildMember, Map, Map
 		patcher.patch(createEmbedEntriesMethod, new Hook(param -> {
@@ -385,7 +385,6 @@ public class MosaicFork extends Plugin {
 				MessageAttachment attachment = images.get(i);
 				int fileType = attachment.e().ordinal();
 				//int targetWidth = screenWidth / 2;
-				int targetWidth = (int) (screenWidth * (spanSize / 6.0f)); 
 				String imageUrl = attachment.c(); 
 				Boolean aniMode = settings.getBool("ani_webp", false);
 				Boolean lowGif = settings.getBool("lowGif", true);
@@ -399,7 +398,7 @@ public class MosaicFork extends Plugin {
 						imageUrl = attachment.c() + "format=jpeg&";
 					}
 					
-					MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);
+					MGImages.setImage(imageView, imageUrl);
 
 					if (container.getChildCount() == 1) {
 						ImageView playButton = new ImageView(gridLayout.getContext());
@@ -444,7 +443,7 @@ public class MosaicFork extends Plugin {
 						}
 					}
 
-					MGImages.setImage(imageView, imageUrl, targetWidth, targetHeight);  //log-resolution preview
+					MGImages.setImage(imageView, imageUrl);  //log-resolution preview
 				}
 				
 				boolean hasSpoilerView = false;
