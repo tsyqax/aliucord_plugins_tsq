@@ -1,10 +1,13 @@
-version = "0.0.3" // Plugin version. Increment this to trigger an update
+version = "0.0.4" // Plugin version. Increment this to trigger an update
 description = "Fix issue when change server nickname on profile" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 0.0.4
+        * Rewrite to Kotlin!
+
         # 0.0.3
         * Adapt Premium Tier?
         * Removed unused code
