@@ -1,10 +1,14 @@
-version = "1.2.1" // Plugin version. Increment this to trigger an update
-description = "make image to grid gird" // Plugin description that will be shown to user
+version = "1.2.2" // Plugin version. Increment this to trigger an update
+description = "Make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.2
+        * Fix setting text of padding
+        * delete targetWidth (maybe optimization)
+
         # 1.2.1
         * Fix width (like MessageWidthFix)
         * targetWidth Optimized
