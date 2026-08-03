@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.widget.GridLayout;
 import android.util.DisplayMetrics;
 import android.graphics.Outline;
@@ -221,11 +222,24 @@ public class MosaicFork extends Plugin {
 				
 			if (viewType == MOSAIC_VIEW_TYPE) {
 				GridLayout gridLayout = new GridLayout(parent.getContext());
-				gridLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+				
+				ConstraintLayout rootWrapper = new ConstraintLayout(parent.getContext());
+				rootWrapper.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+				
+				gridLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)); // before: MATCH_PARENT
 				gridLayout.setPadding(paddingLeft, 0, 0, 0); 
-					
-				MosaicViewHolder mosaicViewHolder = new MosaicViewHolder(gridLayout, adapter);
-					
+				
+				ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				params.horizontalBias = 0.0f;
+				params.constrainedWidth = true;
+				params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+				params.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
+				
+				rootWrapper.addView(gridLayout, params);
+				
+				//MosaicViewHolder mosaicViewHolder = new MosaicViewHolder(gridLayout, adapter);
+				MosaicViewHolder mosaicViewHolder = new MosaicViewHolder(rootWrapper, gridLayout, adapter);
+    
 				param.setResult(mosaicViewHolder); 
 			}
 		}));
@@ -273,6 +287,7 @@ public class MosaicFork extends Plugin {
 		private final GridLayout gridLayout;
 		//private final List<SimpleDraweeView> cachedImageViews = new ArrayList<>(); //for reuse
 		private final HashSet<Integer> isOpened = new HashSet<>();
+		private WidgetChatListAdapter.EventHandler evhandler;
 
 		public MosaicViewHolder(GridLayout gridLayout, WidgetChatListAdapter adapter) {
 			super(gridLayout, adapter);
@@ -282,6 +297,20 @@ public class MosaicFork extends Plugin {
 			gridParams.width = realWidth;
 				
 			gridLayout.setLayoutParams(gridParams);
+			
+			this.evhandler = this.adapter.getEventHandler(); 
+		}
+		
+		public MosaicViewHolder(View itemView, GridLayout gridLayout, WidgetChatListAdapter adapter) {
+			super(itemView, adapter);
+			this.gridLayout = gridLayout;
+			
+			ViewGroup.LayoutParams gridParams = gridLayout.getLayoutParams();
+			gridParams.width = realWidth;
+				
+			gridLayout.setLayoutParams(gridParams);
+			
+			this.evhandler = this.adapter.getEventHandler(); 
 		}
 
 		public GridLayout getGridLayout() {
@@ -328,7 +357,7 @@ public class MosaicFork extends Plugin {
 				if (i < currentChildCount) {
 					container = (FrameLayout) gridLayout.getChildAt(i);
 					imageView = (SimpleDraweeView) container.getChildAt(0);
-					imageView.setImageURI((String) null); 
+					//imageView.setImageURI((String) null); 
 				} else {
 					container = new FrameLayout(gridLayout.getContext());
 					imageView = new SimpleDraweeView(gridLayout.getContext());
@@ -355,7 +384,8 @@ public class MosaicFork extends Plugin {
 
 				MessageAttachment attachment = images.get(i);
 				int fileType = attachment.e().ordinal();
-				int targetWidth = screenWidth / 2;
+				//int targetWidth = screenWidth / 2;
+				int targetWidth = (int) (screenWidth * (spanSize / 6.0f)); 
 				String imageUrl = attachment.c(); 
 				Boolean aniMode = settings.getBool("ani_webp", false);
 				Boolean lowGif = settings.getBool("lowGif", true);
@@ -481,6 +511,19 @@ public class MosaicFork extends Plugin {
 					catch (Exception e) {
 						e.printStackTrace();
 					}
+				});
+			}
+			
+			WidgetChatListAdapter.EventHandler handler = this.evhandler;
+
+			if (handler != null) {
+				this.itemView.setOnClickListener(v -> {
+					handler.onMessageClicked(msg, false);
+				});
+
+				this.itemView.setOnLongClickListener(v -> {
+					handler.onMessageLongClicked(msg, "", false);
+					return true;
 				});
 			}
 		}
