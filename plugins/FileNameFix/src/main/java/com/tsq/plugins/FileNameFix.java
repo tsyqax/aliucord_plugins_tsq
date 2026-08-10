@@ -62,7 +62,7 @@ public class FileNameFix extends Plugin {
 					param.args[0] = name;
 				}
 				
-				logger.info("before: " + nameField + "|| after: " + param.args[0]);
+				logger.info("before: " + nameField + " || after: " + param.args[0]);
 				
 			} catch (Exception e) {
 				logger.error(">>> FileUpload Hook Runtime Error", e);
