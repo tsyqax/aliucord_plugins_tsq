@@ -78,3 +78,10 @@ and while the improved petpet uses an image synthesis method like petpetFork,
 it has fewer configurable variables than petpetFork.  
 (Initially, petpetFork actually had fewer configurable options,  
 but I listened something from them and added a lot of configuration variables.)
+
+### How is ImageCodec different from HeicFix/HeicImageConvertor plugin?
+HeicImageConvertor/HeicFix processes only .heic/.heif format.  
+But ImageCodec aims to support as many image extensions as possible.  
+(Ex/ heic/heif, bmp, jfif, apng, etc.)  
+So, in fact, ImageCodec is practically the same as having HeicFix built-in.  
+It was also made based on HeicFix.
