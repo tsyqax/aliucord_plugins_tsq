@@ -1,11 +1,11 @@
-version = "1.0.0" // Plugin version. Increment this to trigger an update
+version = "0.0.1" // Plugin version. Increment this to trigger an update
 description = "Prevent image to be file" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
-        # 1.0.0
+        # 0.0.1
         * IPR!
 		* Added: heic, heif, hif, bmp, avif, dib
 		* Added: jfif, jfi, jpe, pjpeg, pjpg
@@ -21,7 +21,7 @@ aliucord {
 
     // Excludes this plugin from publishing and global plugin repositories.
     // Set this to false if the plugin is unfinished
-    deploy.set(false)
+    deploy.set(true)
 
     // Builds and deploys this plugin but excludes it from global plugin repositories.
     // Set this if the plugin has reached EOL but a last update should still occur.
