@@ -45,8 +45,8 @@ public class FileNameFix extends Plugin {
 				String ext = (lastDotIndex == -1) ? "" : original.substring(lastDotIndex + 1);
 				
 				name = original;
-				String cleanName = UUID.randomUUID().toString().substring(0, 8);
-				param.setResult(cleanName + (ext.isEmpty() ? "" : "." + ext));
+				//String cleanName = UUID.randomUUID().toString().substring(0, 8);
+				//param.setResult(cleanName + (ext.isEmpty() ? "" : "." + ext));
 		}));
 		
 		patcher.patch(fuConstructor, new PreHook(param -> {
