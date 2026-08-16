@@ -1,4 +1,4 @@
-package com.tsq.plugins;
+package com.tsq.plugins
 
 import android.content.Context
 import android.graphics.Typeface
@@ -22,7 +22,6 @@ import com.lytefast.flexinput.R
 import java.util.HashSet
 import java.util.List
 import java.util.Set
-
 
 // many parameter is major constructor
 class TagPickerSheet(private val tags: MutableList<ForumTag>, private val selectedTagIds: MutableList<Long>, private var apl_tags: MutableList<Long>?, private val onComplete: Runnable) : BottomSheet() {
