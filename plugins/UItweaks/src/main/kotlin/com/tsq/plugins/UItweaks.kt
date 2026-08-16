@@ -47,7 +47,7 @@ class UItweaks: Plugin() {
 			forum_line.setChecked(settings.getBool("ForumLine", true))
 			forum_line.setOnCheckedListener({
 				settings.setBool("forumLine", it)
-				Utils.promptRestart();
+				Utils.promptRestart()
 			})
 			
 			val rule_ch_icon = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Make rules channel icon","")
