@@ -1,10 +1,22 @@
-version = "0.0.1" // Plugin version. Increment this to trigger an update
-description = "Fix Filename when should unicoded" // Plugin description that will be shown to user
+version = "0.0.5" // Plugin version. Increment this to trigger an update
+description = "Fix Filename when not ascii" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 0.0.5
+        * Rewrite to Kotlin!
+
+        # 0.0.4
+        * Delete cleanName
+
+        # 0.0.3
+        * Fix typo of log
+
+        # 0.0.2
+        * Fix name when uploading?
+
         # 0.0.1
         * IPR!
         """.trimIndent(),
