@@ -1,22 +1,13 @@
-package com.tsq.plugins;
+package com.tsq.plugins
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.Gravity
-import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 
 import com.aliucord.Http
 import com.aliucord.Logger
@@ -26,19 +17,12 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.patcher.*
-import com.aliucord.utils.DimenUtils
 import com.aliucord.utils.MDUtils
 import com.aliucord.views.Button
-import com.aliucord.views.DangerButton
-import com.aliucord.views.Divider
 import com.aliucord.views.TextInput
-import com.aliucord.widgets.BottomSheet
 import com.aliucord.wrappers.ChannelWrapper
 
-import com.discord.api.channel.Channel
-import com.discord.api.channel.ForumTag
 import com.discord.api.permission.Permission
-import com.discord.app.AppBottomSheet
 import com.discord.databinding.WidgetChatListAdapterItemThreadDraftFormBinding
 import com.discord.stores.StoreStream
 import com.discord.stores.StoreThreadDraft
@@ -52,21 +36,13 @@ import com.discord.widgets.chat.list.entries.ThreadDraftFormEntry
 import com.discord.widgets.forums.ForumPostCreateManager
 import com.discord.widgets.share.WidgetIncomingShare
 
-import java.lang.reflect.Field
-import java.lang.reflect.Method
 import java.util.ArrayList
 import java.util.HashMap
-import java.util.Iterator
-import java.util.List
-import java.util.Map
 import java.util.Properties
-import java.util.Set
 import java.io.StringReader
 
-import kotlin.jvm.functions.Function2
-import kotlin.Unit
-
-import com.google.android.material.textfield.TextInputLayout
+import kotlin.collections.List
+import kotlin.Function2
 import com.lytefast.flexinput.R
 import d0.t.n
 
@@ -77,7 +53,6 @@ import okhttp3.RequestBody
 
 import rx.Observable
 import rx.Subscription
-
 
 @AliucordPlugin
 class ForumTagFix: Plugin() {
@@ -152,7 +127,7 @@ class ForumTagFix: Plugin() {
 			val originalFlow = param.result as? Observable<*>
 			logger.info("ORINIGLA: " + originalFlow)
 			
-			val sheet = TagPickerSheet((availableTags ?: emptyList()).toMutableList(), selectedTagIds, Runnable {
+			val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {
 				try {
 					isReinvoked = true
 					createForumMethod.isAccessible = true
@@ -169,7 +144,7 @@ class ForumTagFix: Plugin() {
 		})		
 		
 		// [2] get value
-		val createThreadMethod = RestAPI::class.java.getDeclaredMethod("createThreadWithMessage", Long::class.javaPrimitiveType, String::class.java, String::class.java, List::class.java, List::class.java, Int::class.javaPrimitiveType, Integer::class.java, Array<MultipartBody.Part>::class.java)
+		val createThreadMethod = RestAPI::class.java.getDeclaredMethod("createThreadWithMessage", Long::class.javaPrimitiveType, String::class.java, String::class.java, List::class.java, List::class.java, Int::class.javaPrimitiveType, Int::class.javaObjectType, Array<MultipartBody.Part>::class.java)
 		patcher.patch(createThreadMethod, PreHook { param ->
 			if (!selectedTagIds.isNullOrEmpty()) {
 				//cf.args[3] = selectedTagIds;
@@ -225,7 +200,7 @@ class ForumTagFix: Plugin() {
 
 			val appliedTags = wrapper.appliedTags			
 			val availableTags = wrapper2.availableTags
-			val chType = wrapper2.type as Int
+			val chType = wrapper2.type
 			
 			if (chType != 15 && chType != 16) return@PreHook
 			
@@ -235,7 +210,7 @@ class ForumTagFix: Plugin() {
 				val tv = TextView(lay.context, null, 0, R.i.UiKit_Settings_Item_Icon)
 				tv.id = viewId1
 				tv.text = changeTagText
-				tv.setCompoundDrawablesRelativeWithIntrinsicBounds(changeIcon, null, null, null);
+				tv.setCompoundDrawablesRelativeWithIntrinsicBounds(changeIcon, null, null, null)
 				
 				val childrenCount = lay.childCount
 				var foundIndex = false
@@ -251,7 +226,7 @@ class ForumTagFix: Plugin() {
 					
 				if (!foundIndex) lay.addView(tv, 7)
 				
-				val sheet = TagPickerSheet((availableTags ?: emptyList()).toMutableList(), selectedTagIds, (appliedTags ?: emptyList()).toMutableList(), Runnable {
+				val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, appliedTags.toMutableList(), Runnable {
 					try {
 						logger.info("available: " + availableTags)
 						logger.info("applied: " + appliedTags)
@@ -303,14 +278,14 @@ class ForumTagFix: Plugin() {
 				val dataEntry = param.args[1] as ChatListEntry
 				if (dataEntry !is ThreadDraftFormEntry) return@Hook
 				
-				val formEntry = dataEntry as ThreadDraftFormEntry
+				val formEntry = dataEntry
 				val rawChannel = formEntry.parentChannel
 				
 				if (rawChannel == null) return@Hook
 				
 				val wrapper = ChannelWrapper(rawChannel)
 				
-				val chType = wrapper.type as? Int ?: 0
+				val chType = wrapper.type
 				if (chType != 15 && chType != 16) return@Hook
 				
 				var bindingField = form::class.java.getDeclaredField("binding")
@@ -320,14 +295,14 @@ class ForumTagFix: Plugin() {
 				val itemView = form.itemView
 				
 				if (itemView is ViewGroup) {
-					val root = itemView as ViewGroup
+					val root = itemView
 					
 					val viewTag = "forumTagFix_plugin_indicator"
 					var indicatorView = root.findViewWithTag(viewTag) as? TextView
 					
 					var availableTags = wrapper.availableTags
 					
-					val tagCount = availableTags?.size ?: 0
+					val tagCount = availableTags.size
 					
 					var guideText = "\n**" + tagCount + "** tags found!";
 						
