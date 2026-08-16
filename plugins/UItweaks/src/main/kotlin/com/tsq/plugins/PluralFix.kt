@@ -51,8 +51,6 @@ object PluralFix {
 			if (currentLocale.language == "ko") {
 				val originalStr = param.result?.toString()
 				
-				logger.info("original: " + originalStr)
-				
 				if (originalStr != null && originalStr.contains("이모티콘")) {
 					var fixedStr = originalStr
 					
