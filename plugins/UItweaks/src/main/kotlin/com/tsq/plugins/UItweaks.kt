@@ -57,7 +57,7 @@ class UItweaks: Plugin() {
 				Utils.promptRestart()
 			})
 			
-			val plural_fix = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Fix plurals when when isNoDistinctionLocale","")
+			val plural_fix = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Fix plurals when no distinct","")
 			plural_fix.setChecked(settings.getBool("PluralFix", true))
 			plural_fix.setOnCheckedListener({
 				settings.setBool("PluralFix", it)
