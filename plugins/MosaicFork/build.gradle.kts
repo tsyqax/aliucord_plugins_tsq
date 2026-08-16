@@ -1,10 +1,21 @@
-version = "1.2.0" // Plugin version. Increment this to trigger an update
+version = "1.2.3" // Plugin version. Increment this to trigger an update
 description = "make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.3
+        * Rewrite to Kotlin!
+
+        # 1.2.2
+        * Fix setting text of padding
+        * delete targetWidth (maybe optimization)
+
+        # 1.2.1
+        * Fix width (like MessageWidthFix)
+        * targetWidth Optimized
+
         # 1.2.0
         * Fix flash bug of static image (not gif, im sad)
         * Make Spoiler logic better before than
