@@ -1,11 +1,7 @@
 package com.tsq.plugins
 
 import android.content.Context
-import android.graphics.Color
-import android.os.Bundle
 import android.view.View
-import android.widget.TextView
-import androidx.annotation.NonNull
 
 import com.aliucord.Logger
 import com.aliucord.Utils
@@ -17,30 +13,20 @@ import com.discord.stores.StoreStream
 import com.discord.utilities.rest.RestAPI
 import com.discord.widgets.friends.WidgetFriendsAddById
 
-import java.lang.reflect.Constructor
-import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.nio.charset.StandardCharsets
-import java.util.ArrayList
-import java.util.HashMap
-import java.util.List
 
 import okhttp3.MediaType
 import okhttp3.Request
 import okhttp3.RequestBody
 
-
-@AliucordPlugin(requiresRestart = false)
-@SuppressWarnings("unused")
+@AliucordPlugin
 class FriendFix : Plugin() {
-    //	val logger: Logger = Logger("FriendFix")
 
     override fun start(context: Context) {
 
 		try {
 			// Request.Builder.build
-			val buildMethod = okhttp3.Request.a::class.java.getDeclaredMethod("a")
-
+			val buildMethod by lazy { okhttp3.Request.a::class.java.getDeclaredMethod("a") }
 			patcher.patch(buildMethod, Hook { param ->
 				val request = param.result as? okhttp3.Request
 				if (request == null) return@Hook
@@ -97,11 +83,8 @@ class FriendFix : Plugin() {
 
        // UI Patch
 		try {
-			val resultConstructor = WidgetFriendsAddById.Companion.UserNameDiscriminator::class.java.getDeclaredConstructor(String::class.java, Integer::class.java)
-			resultConstructor.isAccessible = true
-			
-			val extractMethod = WidgetFriendsAddById.Companion::class.java.getDeclaredMethod("extractUsernameAndDiscriminator", CharSequence::class.java)
-
+			val resultConstructor by lazy { WidgetFriendsAddById.Companion.UserNameDiscriminator::class.java.getDeclaredConstructor(String::class.java, Int::class.javaObjectType).apply { isAccessible = true } }
+			val extractMethod by lazy { WidgetFriendsAddById.Companion::class.java.getDeclaredMethod("extractUsernameAndDiscriminator", CharSequence::class.java) }
 			patcher.patch(extractMethod, InsteadHook { param -> 
 				val input = param.args[0].toString()
 				if (!input.contains("#")) {
