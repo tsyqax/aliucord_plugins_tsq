@@ -7,6 +7,7 @@ aliucord {
         """
         # 0.0.4
         * Rewrite to Kotlin!
+        * by lazy
 
         # 0.0.3
         * Adapt Premium Tier?
