@@ -30,8 +30,8 @@ class FileNameFix: Plugin() {
 	private var name2 = ""
 	
 	override fun start(context: Context) {
-		val dnMethod = Attachment::class.java.getDeclaredMethod("getDisplayName")
-		val fuConstructor = FileUpload::class.java.getDeclaredConstructor(String::class.java, Long::class.javaPrimitiveType, MultipartBody.Part::class.java, String::class.java, Observable::class.java)
+		val dnMethod by lazy { Attachment::class.java.getDeclaredMethod("getDisplayName") }
+		val fuConstructor by lazy { FileUpload::class.java.getDeclaredConstructor(String::class.java, Long::class.javaPrimitiveType, MultipartBody.Part::class.java, String::class.java, Observable::class.java) }
 		
 		patcher.patch(dnMethod, Hook { param -> 
 			val original = param.result as String
