@@ -50,8 +50,8 @@ object ThreadDEL {
 		bindingReflection.isAccessible = true
 		modelCommentField.isAccessible = true
 		
-		val thListMethod = WidgetChannelsListItemThreadActions::class.java.getDeclaredMethod("configureUI", WidgetChannelsListItemThreadActions.Model::class.java)
-		val chListMethod = WidgetChannelsListItemChannelActions::class.java.getDeclaredMethod("configureUI", WidgetChannelsListItemChannelActions.Model::class.java)
+		val thListMethod by lazy { WidgetChannelsListItemThreadActions::class.java.getDeclaredMethod("configureUI", WidgetChannelsListItemThreadActions.Model::class.java) }
+		val chListMethod by lazy { WidgetChannelsListItemChannelActions::class.java.getDeclaredMethod("configureUI", WidgetChannelsListItemChannelActions.Model::class.java) }
 		
 		// power delete
 		val createDeleteHook = { viewId: Int, buttonText: String, foundResId: Int, titleRes: Int ->
