@@ -6,7 +6,8 @@ aliucord {
     changelog.set(
         """
         # 1.0.1
-        * Rewrited to Kotlin!
+        * Rewrite to Kotlin!
+        * Make MediaChannel to display correct icon
 
         # 1.0.0
         * IPR!
