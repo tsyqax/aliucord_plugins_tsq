@@ -73,16 +73,18 @@ class petpetFork: Plugin() {
 				val bgVal = runCatching { val input = bg_input.editText.text.toString(); if (input.equals("TRANSPARENT", ignoreCase = true)) { "TRANSPARENT" } else { val fixedInput = if (input.startsWith("#")) input else "#$input"; Color.parseColor(fixedInput); fixedInput}}.getOrDefault("TRANSPARENT")
 				val repeatVal = runCatching { repeat_input.editText.text.toString().toInt().coerceAtLeast(0) }.getOrDefault(0)
 				
-				settings.setInt("pet_res", resVal)
-				settings.setFloat("pet_w_factor", wFactorVal)
-				settings.setFloat("pet_w_j", wJVal)
-				settings.setFloat("pet_h_factor", hFactorVal)
-				settings.setFloat("pet_h_j", hJVal)
-				settings.setFloat("pet_ox", oxVal)
-				settings.setFloat("pet_oy", oyVal)
-				settings.setInt("pet_delay", delayVal)
-				settings.setInt("pet_repeat", repeatVal)
-				settings.setString("pet_bg", bgVal) 
+				settings.apply {
+					setInt("pet_res", resVal)
+					setFloat("pet_w_factor", wFactorVal)
+					setFloat("pet_w_j", wJVal)
+					setFloat("pet_h_factor", hFactorVal)
+					setFloat("pet_h_j", hJVal)
+					setFloat("pet_ox", oxVal)
+					setFloat("pet_oy", oyVal)
+					setInt("pet_delay", delayVal)
+					setInt("pet_repeat", repeatVal)
+					setString("pet_bg", bgVal)
+				}
 				Utils.showToast("SaveSave is done!", false)
 			})
 			
@@ -90,17 +92,19 @@ class petpetFork: Plugin() {
 			reset_button.setText("Reset to Default")
 
 			reset_button.setOnClickListener { v ->
-				settings.setInt("pet_res", 128)
-				settings.setFloat("pet_w_factor", 0.73f)
-				settings.setFloat("pet_w_j", 0.02f)
-				settings.setFloat("pet_h_factor", 0.73f)
-				settings.setFloat("pet_h_j", 0.072f)
-				settings.setFloat("pet_ox", 0.14f)
-				settings.setFloat("pet_oy", 0.09f)
-				settings.setInt("pet_delay", 40)
-				settings.setInt("pet_repeat", 0)
-				settings.setString("pet_bg", "TRANSPARENT")
-
+				settings.apply {
+					setInt("pet_res", 128)
+					setFloat("pet_w_factor", 0.73f)
+					setFloat("pet_w_j", 0.02f)
+					setFloat("pet_h_factor", 0.73f)
+					setFloat("pet_h_j", 0.072f)
+					setFloat("pet_ox", 0.14f)
+					setFloat("pet_oy", 0.09f)
+					setInt("pet_delay", 40)
+					setInt("pet_repeat", 0)
+					setString("pet_bg", "TRANSPARENT")
+				}
+		
 				res_input.editText.setText("128")
 				w_factor_input.editText.setText("0.73")
 				w_j_input.editText.setText("0.02")
@@ -115,18 +119,20 @@ class petpetFork: Plugin() {
 				Utils.showToast("ResetReset is done!", false)
 			}
 			
-			layout.addView(res_input)
-			layout.addView(w_factor_input)
-			layout.addView(w_j_input)
-			layout.addView(h_factor_input)
-			layout.addView(h_j_input)
-			layout.addView(ox_input)
-			layout.addView(oy_input)
-			layout.addView(delay_input)
-			layout.addView(repeat_input)
-			layout.addView(bg_input)
-			layout.addView(saveButton)
-			layout.addView(reset_button)
+			layout.apply {
+				addView(res_input)
+				addView(w_factor_input)
+				addView(w_j_input)
+				addView(h_factor_input)
+				addView(h_j_input)
+				addView(ox_input)
+				addView(oy_input)
+				addView(delay_input)
+				addView(repeat_input)
+				addView(bg_input)
+				addView(saveButton)
+				addView(reset_button)
+			}
 		}
 	}
 	// ----- settings end -----
@@ -288,10 +294,12 @@ class petpetFork: Plugin() {
 		
 		if (userDelay < 20) userDelay = 20
 		
-		encoder.start(FileOutputStream(outputFile))
-		encoder.setDelay(userDelay) 
-		encoder.setRepeat(userRepeat)
-		encoder.setDispose(2)
+		encoder.apply {
+			start(FileOutputStream(outputFile))
+			setDelay(userDelay) 
+			setRepeat(userRepeat)
+			setDispose(2)
+		}
 		
 		if (bgColor.equals("TRANSPARENT", ignoreCase = true)) encoder.setTransparent(Color.TRANSPARENT)
 		for (i in 0 until 5) encoder.addFrame(completedFrames[i])
