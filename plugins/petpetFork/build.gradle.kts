@@ -5,6 +5,10 @@ aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.2
+        * Rewrite to Kotlin!
+        * by lazy
+
         # 1.2.1
         * /peturl [url] 
 
