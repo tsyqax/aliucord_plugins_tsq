@@ -22,7 +22,7 @@ import com.aliucord.utils.DimenUtils
 object ForumLine {
 	fun init(context: Context, patcher: PatcherAPI, logger: Logger) {
 		try {
-			val lineMethod = WidgetChatList::class.java.getDeclaredMethod("onViewBoundOrOnResume")
+			val lineMethod by lazy { WidgetChatList::class.java.getDeclaredMethod("onViewBoundOrOnResume") }
 
 			patcher.patch(lineMethod, Hook { param ->
 				try {
