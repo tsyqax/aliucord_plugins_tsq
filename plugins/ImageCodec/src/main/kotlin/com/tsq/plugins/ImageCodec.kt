@@ -24,18 +24,14 @@ import java.io.FileOutputStream
 import java.io.BufferedOutputStream
 import java.io.OutputStream
 
-import java.lang.reflect.Field
-
 import com.lytefast.flexinput.model.Attachment
 
 
 @AliucordPlugin(requiresRestart = false)
 class ImageCodec: Plugin() {
-	private lateinit var attachmentField: Field
-	
+	private val attachmentField by lazy { AttachmentRequestBody::class.java.getDeclaredField("attachment").apply { isAccessible = true }}
+
 	override fun start(context: Context) {
-		attachmentField = AttachmentRequestBody::class.java.getDeclaredField("attachment")
-        attachmentField.isAccessible = true
 		try {
 			val cacheDir = context.cacheDir
 			val garbage = cacheDir.listFiles { _, name -> name.startsWith("imgcdc_") }
@@ -53,7 +49,7 @@ class ImageCodec: Plugin() {
 			logger.error("Error", e)
 		}
 		
-		val getPart = SendUtils::class.java.getDeclaredMethod("getPart", Attachment::class.java, ContentResolver::class.java, String::class.java)
+		val getPart by lazy { SendUtils::class.java.getDeclaredMethod("getPart", Attachment::class.java, ContentResolver::class.java, String::class.java) }
 		patcher.patch(getPart, PreHook { param ->
 			val attachment = param.args[0] as? Attachment<*>
 			if (attachment == null) return@PreHook
