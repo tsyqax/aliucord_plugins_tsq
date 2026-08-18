@@ -16,7 +16,7 @@ import com.discord.simpleast.code.CodeNode
 @AliucordPlugin
 class CopyBackTick: Plugin() {
 	override fun start(context: Context) {
-		val renderMethod = CodeNode::class.java.getDeclaredMethod("render", SpannableStringBuilder::class.java, Object::class.java)
+		val renderMethod by lazy { CodeNode::class.java.getDeclaredMethod("render", SpannableStringBuilder::class.java, Any::class.java) }
 		patcher.patch(renderMethod, Hook { param ->
 			try {
 				val builder = param.args[0] as SpannableStringBuilder
