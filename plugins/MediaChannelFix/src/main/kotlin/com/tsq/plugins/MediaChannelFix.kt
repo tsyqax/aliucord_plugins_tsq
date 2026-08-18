@@ -22,7 +22,7 @@ class MediaChannelFix: Plugin() {
 	private val isMine = ThreadLocal.withInitial { false }
 	
 	override fun start(context: Context) {
-		val getTypeMethod = Channel::class.java.getDeclaredMethod("D")
+		val getTypeMethod by lazy { Channel::class.java.getDeclaredMethod("D") }
 		patcher.patch(getTypeMethod, Hook { param ->
 			val rawType = param.result as Int
 			if (rawType == 16) {
@@ -34,8 +34,7 @@ class MediaChannelFix: Plugin() {
 			}
 		})
 		
-		val onConfigureMethod = WidgetChannelsListAdapter.ItemChannelText::class.java.getDeclaredMethod("onConfigure", Int::class.javaPrimitiveType, ChannelListItem::class.java)	
-		
+		val onConfigureMethod by lazy { WidgetChannelsListAdapter.ItemChannelText::class.java.getDeclaredMethod("onConfigure", Int::class.javaPrimitiveType, ChannelListItem::class.java) }
 		patcher.patch(onConfigureMethod, Hook { param ->
 			try {
 				val channelItem = param.args[1] as ChannelListItemTextChannel
