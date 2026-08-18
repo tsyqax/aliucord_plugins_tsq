@@ -1,5 +1,5 @@
 version = "1.2.3" // Plugin version. Increment this to trigger an update
-description = "make image to grid gird" // Plugin description that will be shown to user
+description = "Make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
@@ -9,6 +9,7 @@ aliucord {
         * Rewrite to Kotlin!
         * by lazy
         * Optimize plugin checking, spoiler view, play btn
+
 
         # 1.2.2
         * Fix setting text of padding

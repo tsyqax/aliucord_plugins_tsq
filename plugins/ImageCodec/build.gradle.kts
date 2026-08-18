@@ -14,6 +14,7 @@ aliucord {
         * Added: heic, heif, hif, bmp, avif, dib
         * Added: jfif, jfi, jpe, pjpeg, pjpg
         * Added: apng
+
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page
