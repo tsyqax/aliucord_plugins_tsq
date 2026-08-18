@@ -7,6 +7,8 @@ aliucord {
         """
         # 1.2.3
         * Rewrite to Kotlin!
+        * by lazy
+        * Optimize plugin checking, spoiler view, play btn
 
         # 1.2.2
         * Fix setting text of padding
