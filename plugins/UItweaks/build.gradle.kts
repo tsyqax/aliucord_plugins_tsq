@@ -8,6 +8,7 @@ aliucord {
         # 1.0.3
         * Add PluralFix
         * Rewrite to Kotlin!
+        * by lazy
 
         # 1.0.2
         * Add RuleChIcon
