@@ -72,29 +72,33 @@ class MosaicFork: Plugin() {
 			val height_input = TextInput(context, "Height DP (default: 145)", settings.getInt("height", 145).toString())
 			val padding_input = TextInput(context, "Padding DP (default: 57)", settings.getInt("padding", 57).toString())
 			
-			val auto_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Toggle auto play Gif","")
-			auto_gif.setChecked(settings.getBool("autoGif", true))
-			auto_gif.setOnCheckedListener({
-				settings.setBool("autoGif", it)
-			})
+			val auto_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Toggle auto play Gif","").apply {
+				setChecked(settings.getBool("autoGif", true))
+				setOnCheckedListener({
+					settings.setBool("autoGif", it)
+				})
+			}
 			
-			val ani_webp = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Use Animated Webp instead of Gif","")
-			ani_webp.setChecked(settings.getBool("ani_webp", false))
-			ani_webp.setOnCheckedListener({
-				settings.setBool("ani_webp", it)
-			})
+			val ani_webp = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Use Animated Webp instead of Gif","").apply {
+				setChecked(settings.getBool("ani_webp", false))
+				setOnCheckedListener({
+					settings.setBool("ani_webp", it)
+				})
+			}
 			
-			val low_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Downgrade Gifs Preview Quality","")
-			low_gif.setChecked(settings.getBool("lowGif", true))
-			low_gif.setOnCheckedListener({
-				settings.setBool("lowGif", it)
-			})
+			val low_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Downgrade Gifs Preview Quality","").apply {
+				setChecked(settings.getBool("lowGif", true))
+				setOnCheckedListener({
+					settings.setBool("lowGif", it)
+				})
+			}
 			
-			val low_image = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Downgrade Images Preview Quality","")
-			low_image.setChecked(settings.getBool("lowImage", false))
-			low_image.setOnCheckedListener({
-				settings.setBool("lowImage", it)
-			})
+			val low_image = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Downgrade Images Preview Quality","").apply {
+				setChecked(settings.getBool("lowImage", false))
+				setOnCheckedListener({
+					settings.setBool("lowImage", it)
+				})
+			}
 			
 			var saveButton = Button(context)
 			saveButton.setText("Save")
@@ -110,14 +114,16 @@ class MosaicFork: Plugin() {
 				Utils.promptRestart()
 			})
 
-			layout.addView(width_input)
-			layout.addView(height_input)
-			layout.addView(padding_input)
-			layout.addView(auto_gif)
-			layout.addView(ani_webp)
-			layout.addView(low_gif)
-			layout.addView(low_image)
-			layout.addView(saveButton)
+			layout.apply {
+				addView(width_input)
+				addView(height_input)
+				addView(padding_input)
+				addView(auto_gif)
+				addView(ani_webp)
+				addView(low_gif)
+				addView(low_image)
+				addView(saveButton)
+			}
 		}
 	}
 	// ----- settings end -----
@@ -135,7 +141,7 @@ class MosaicFork: Plugin() {
 		targetHeight = (targetHeightDP * density + 0.5f).toInt()
 		paddingLeft = (paddingLeftDP * density + 0.5f).toInt()
 		
-		val createEmbedEntriesMethod = ChatListEntry.Companion::class.java.getDeclaredMethod("createEmbedEntries", Message::class.java, StoreMessageState.State::class.java, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Channel::class.java, GuildMember::class.java, Map::class.java, Map::class.java)
+		val createEmbedEntriesMethod by lazy { ChatListEntry.Companion::class.java.getDeclaredMethod("createEmbedEntries", Message::class.java, StoreMessageState.State::class.java, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Channel::class.java, GuildMember::class.java, Map::class.java, Map::class.java) }
 		//  Message, StoreMessageState.State, boolean, boolean, boolean, boolean, boolean, Channel, GuildMember, Map, Map
 		patcher.patch(createEmbedEntriesMethod, Hook { param ->
 			@Suppress("UNCHECKED_CAST")
@@ -176,33 +182,36 @@ class MosaicFork: Plugin() {
 			param.result = originalList
 		})
 		
-		val chatListAdapterMethod = WidgetChatListAdapter::class.java.getDeclaredMethod("onCreateViewHolder", ViewGroup::class.java, Int::class.javaPrimitiveType)
+		val chatListAdapterMethod by lazy { WidgetChatListAdapter::class.java.getDeclaredMethod("onCreateViewHolder", ViewGroup::class.java, Int::class.javaPrimitiveType) }
 		patcher.patch(chatListAdapterMethod, Hook { param ->
 			val viewType = param.args[1] as Int
 			val parent = param.args[0] as ViewGroup
 			val adapter = param.thisObject as WidgetChatListAdapter
 				
 			if (viewType == MOSAIC_VIEW_TYPE) {
-				val gridLayout = GridLayout(parent.context)
+				val gridLayout = GridLayout(parent.context).apply {
+					setLayoutParams(ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)) // before: MATCH_PARENT
+					setPadding(paddingLeft, 0, 0, 0) 
+				}
 				
 				val rootWrapper = ConstraintLayout(parent.context)
 				rootWrapper.setLayoutParams(RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
 				
-				gridLayout.setLayoutParams(ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)) // before: MATCH_PARENT
-				gridLayout.setPadding(paddingLeft, 0, 0, 0) 
-				
-				val params = ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-				params.horizontalBias = 0.0f
-				params.constrainedWidth = true
-				params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID
-				params.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID
+				val params = ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+					horizontalBias = 0.0f
+					constrainedWidth = true
+					leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID
+					rightToRight = ConstraintLayout.LayoutParams.PARENT_ID
+				}
 				
 				rootWrapper.addView(gridLayout, params)
 				
-				aniMode = settings.getBool("ani_webp", false)
-				lowGif = settings.getBool("lowGif", true)
-				lowImage = settings.getBool("lowImage", false)
-				autoGif = settings.getBool("autoGif", true)
+				settings.apply {
+					aniMode = getBool("ani_webp", false)
+					lowGif = getBool("lowGif", true)
+					lowImage = getBool("lowImage", false)
+					autoGif = getBool("autoGif", true)
+				}
 				
 				//MosaicViewHolder mosaicViewHolder = new MosaicViewHolder(gridLayout, adapter)
 				val mosaicViewHolder = MosaicViewHolder(rootWrapper, gridLayout, adapter)
