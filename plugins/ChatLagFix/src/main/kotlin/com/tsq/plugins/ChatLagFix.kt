@@ -45,33 +45,37 @@ public class ChatLagFix: Plugin() {
 			var chat = TextInput(context, "Chat Length to working", settings.getInt("chat", 1000).toString())
 			var delay = TextInput(context, "Listener Delay (default: 500)", settings.getInt("delay", 500).toString())
 
-			val power = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Only Fast mode","")
-			power.setChecked(settings.getBool("power", false))
-			power.setOnCheckedListener({
-				settings.setBool("power", it)
-				if (it) {
-					Utils.showToast("WARN: Mention and others may not be working!")
-					Utils.showToast("WARN: Some text can be diminished!")
-				}
-				Utils.promptRestart()
-			})
+			val power = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Only Fast mode","").apply {
+				setChecked(settings.getBool("power", false))
+				setOnCheckedListener({
+					settings.setBool("power", it)
+					if (it) {
+						Utils.showToast("WARN: Mention and others may not be working!")
+						Utils.showToast("WARN: Some text can be diminished!")
+					}
+					Utils.promptRestart()
+				})
+			}
 			
-			val saveButton = Button(context)
-			saveButton.setText("Save")
-			saveButton.setOnClickListener({
-				val chatVal = runCatching { chat.editText.text.toString().toInt() }.getOrDefault(1000)
-				val delayVal = runCatching { delay.editText.text.toString().toInt() }.getOrDefault(500)
+			val saveButton = Button(context).apply {
+				setText("Save")
+				setOnClickListener({
+					val chatVal = runCatching { chat.editText.text.toString().toInt() }.getOrDefault(1000)
+					val delayVal = runCatching { delay.editText.text.toString().toInt() }.getOrDefault(500)
 
-				settings.setInt("delay", delayVal)
-				settings.setInt("chat", chatVal)
+					settings.setInt("delay", delayVal)
+					settings.setInt("chat", chatVal)
 
-				Utils.promptRestart()
-			})
+					Utils.promptRestart()
+				})
+			}
 
-			layout.addView(delay)
-			layout.addView(chat)
-			layout.addView(power)
-			layout.addView(saveButton)
+			layout.apply {
+				addView(delay)
+				addView(chat)
+				addView(power)
+				addView(saveButton)
+			}
 		}
 	}
 	// ----- settings end -----
@@ -84,7 +88,7 @@ public class ChatLagFix: Plugin() {
 		val power = settings.getBool("power", false)
 		
 		try {
-			val addListenerMethod = TextView::class.java.getDeclaredMethod("addTextChangedListener", TextWatcher::class.java)
+			val addListenerMethod by lazy { TextView::class.java.getDeclaredMethod("addTextChangedListener", TextWatcher::class.java) }
 
 			patcher.patch(addListenerMethod, PreHook { param ->
 				if (param.thisObject is FlexEditText) {
@@ -158,7 +162,7 @@ public class ChatLagFix: Plugin() {
 		}
 
 		try {
-			val getTextMethod = WidgetChatInputEditText::class.java.getDeclaredMethod("getText")
+			val getTextMethod by lazy { WidgetChatInputEditText::class.java.getDeclaredMethod("getText") }
 
 			patcher.patch(getTextMethod, PreHook { param ->
 				val widgetInstance = param.thisObject as WidgetChatInputEditText
