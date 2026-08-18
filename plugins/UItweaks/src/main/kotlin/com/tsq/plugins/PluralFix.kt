@@ -16,14 +16,13 @@ import com.discord.i18n.RenderContext
 import com.discord.utilities.locale.LocaleManager
 import com.discord.views.ToolbarTitleLayout
 import java.util.Locale
-import java.lang.CharSequence
 
 object PluralFix {
 
 	fun init(context: Context, patcher: PatcherAPI, logger: Logger) {
 		val placeholderRegex = Regex("\\{[a-zA-Z]+\\}")
 		
-		val quantiStringMethod = b::class.java.getDeclaredMethod("f", CharSequence::class.java, Array<Any>::class.java, RenderContext::class.java)
+		val quantiStringMethod by lazy { b::class.java.getDeclaredMethod("f", CharSequence::class.java, Array<Any>::class.java, RenderContext::class.java) }
 		patcher.patch(quantiStringMethod, Hook { param ->
 			val isNoDistinctionLocale = PluralRules.forLocale(Locale.getDefault()).keywords.size == 1
 			
@@ -41,16 +40,16 @@ object PluralFix {
 			}
 		})
 		
-		val getTextMethod = Resources::class.java.getDeclaredMethod("getText", Int::class.javaPrimitiveType)
-		val getTextMethod2 = TypedArray::class.java.getDeclaredMethod("getText", Int::class.javaPrimitiveType)
-		val getTextMethod3 = TypedArray::class.java.getDeclaredMethod("getString", Int::class.javaPrimitiveType)
+		val getTextMethod by lazy { Resources::class.java.getDeclaredMethod("getText", Int::class.javaPrimitiveType) }
+		val getTextMethod2 by lazy { TypedArray::class.java.getDeclaredMethod("getText", Int::class.javaPrimitiveType) }
+		val getTextMethod3 by lazy { TypedArray::class.java.getDeclaredMethod("getString", Int::class.javaPrimitiveType) }
 		
         val emojiTextHook = Hook { param ->
 			val currentLocale = LocaleManager().getPrimaryLocale(context)
 			
 			if (currentLocale.language == "ko") {
 				val originalStr = param.result?.toString()
-				
+
 				if (originalStr != null && originalStr.contains("이모티콘")) {
 					var fixedStr = originalStr
 					
