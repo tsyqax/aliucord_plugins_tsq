@@ -49,6 +49,20 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 	
 	fun getGridLayout() = this.gridLayout
 	
+	private val shouldEnableSpoilerMethod by lazy {
+        PluginManager.plugins.get("BetterSpoiler")?.javaClass?.getDeclaredMethod("shouldEnableSpoiler", Message::class.java, Long::class.javaPrimitiveType)?.apply { isAccessible = true }
+    }
+	
+	private val swipeMediaLaunchMethod by lazy {
+		PluginManager.plugins.get("SwipeMediaViewer")?.javaClass?.getDeclaredMethod("launchGroup", Context::class.java, List::class.java, MessageAttachment::class.java)?.apply { isAccessible = true }
+	}
+	
+	private val sharedOutlineProvider = object : ViewOutlineProvider() {
+		override fun getOutline(view: View, outline: Outline) {
+			outline.setRoundRect(0, 0, view.width, view.height, 8f)
+		}
+	}
+
 	override fun onConfigure(position: Int, data: ChatListEntry) {
 		val mosaicEntry = data as? MosaicEntry ?: return
 		
@@ -66,9 +80,10 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 		val guildId = StoreStream.getGuildSelected().getSelectedGuildId()
 		var shouldSpoilered = false
 		
-		PluginManager.plugins.get("BetterSpoiler")?.let { bs ->
-			val method = bs.javaClass.getDeclaredMethod("shouldEnableSpoiler", Message::class.java, Long::class.javaPrimitiveType).apply { isAccessible = true }
-			shouldSpoilered = method.invoke(bs, msg, guildId) as Boolean
+		if (PluginManager.isPluginEnabled("BetterSpoiler")) {
+			shouldSpoilered = PluginManager.plugins.get("BetterSpoiler")?.let { bs ->
+				shouldEnableSpoilerMethod?.invoke(bs, msg, guildId) as? Boolean
+			} ?: false
 		}
 
 		for (i in 0 until total) {
@@ -78,33 +93,73 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 
 			if (i < currentChildCount) {
 				container = gridLayout.getChildAt(i) as FrameLayout
-				imageView = container.getChildAt(0) as SimpleDraweeView
+				imageView = container.findViewWithTag<SimpleDraweeView?>("IMAGE_VIEW")
 			} else {
-				container = FrameLayout(gridLayout.getContext())
-				imageView = SimpleDraweeView(gridLayout.getContext())
-				imageView.setScaleType(ImageView.ScaleType.CENTER_CROP)
-				imageView.setOutlineProvider(object : ViewOutlineProvider() {
-					override fun getOutline(view: View, outline: Outline) {
-						outline.setRoundRect(0, 0, view.width, view.height, 8f)
+				container = FrameLayout(gridLayout.context)
+				imageView = SimpleDraweeView(gridLayout.context).apply {
+					setScaleType(ImageView.ScaleType.CENTER_CROP)
+					setOutlineProvider(sharedOutlineProvider)
+					setClipToOutline(true)
+					tag = "IMAGE_VIEW"
+				}
+				
+				val playButton = ImageView(gridLayout.context).apply {
+					setImageResource(android.R.drawable.ic_media_play)
+					setColorFilter(Color.WHITE)					
+					val circleBg = GradientDrawable().apply {
+						setShape(GradientDrawable.OVAL)
+						setColor(Color.parseColor("#80000000"))
 					}
-				})
-				imageView.setClipToOutline(true)
+					setBackground(circleBg)
+					val padding = (8 * gridLayout.context.resources.displayMetrics.density).toInt()
+					setPadding(padding, padding, padding, padding)
+					visibility = View.GONE
+					tag = "PLAY_BTN"
+				}
+				
+				val btnSize = (52 * gridLayout.context.resources.displayMetrics.density).toInt()
+				val btnParams = FrameLayout.LayoutParams(btnSize, btnSize)
+				btnParams.gravity = Gravity.CENTER
+
+				val spoilerOverlay = TextView(gridLayout.context).apply {
+					text = "SPOILER"
+					setTextColor(Color.WHITE)
+					gravity = Gravity.CENTER
+					typeface = Typeface.DEFAULT_BOLD
+					textSize = 13f
+					setBackgroundColor(Color.parseColor("#FF2F3136"))
+					setOutlineProvider(sharedOutlineProvider)
+					setClipToOutline(true)
+					visibility = View.GONE
+					tag = "SPOILER_VIEW" 
+					setOnClickListener { v ->
+						v.visibility = View.GONE 
+						isOpened.add(i)
+					}
+				}
+				
 				container.addView(imageView, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+				container.addView(playButton, btnParams)
+				container.addView(spoilerOverlay, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+				
 				gridLayout.addView(container)
 			}
 
 			val rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1)
 			val colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f)
-			val params = GridLayout.LayoutParams(rowSpec, colSpec)
-			
-			params.setMargins(6, 6, 6, 6)
-			params.width = 0
-			params.height = MosaicFork.targetHeight 
+			val params = GridLayout.LayoutParams(rowSpec, colSpec).apply {
+				setMargins(6, 6, 6, 6)
+				width = 0
+				height = MosaicFork.targetHeight
+			}
 			container.setLayoutParams(params)
 
 			val attachment = images.get(i)
 			val fileType = attachment.e().ordinal
 			var imageUrl = attachment.c() as String
+			
+			val playBtn = container.findViewWithTag<ImageView>("PLAY_BTN")
+			val spoilerView = container.findViewWithTag<TextView>("SPOILER_VIEW")
 			
 			if (fileType == 0) {
 				if (MosaicFork.lowImage) {
@@ -114,29 +169,10 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 				}
 					
 				MGImages.setImage(imageView, imageUrl)
-		
-				if (container.getChildCount() == 1) {
-					val playButton = ImageView(gridLayout.getContext())
-					playButton.setImageResource(android.R.drawable.ic_media_play)
-					playButton.setColorFilter(Color.WHITE)
-					
-					val circleBg = GradientDrawable()
-					circleBg.setShape(GradientDrawable.OVAL)
-					circleBg.setColor(Color.parseColor("#80000000"))
-					playButton.setBackground(circleBg)
-					
-					val padding = (8 * gridLayout.getContext().getResources().getDisplayMetrics().density).toInt()
-					playButton.setPadding(padding, padding, padding, padding)
-					
-					val btnSize = (52 * gridLayout.getContext().getResources().getDisplayMetrics().density).toInt()
-					val btnParams = FrameLayout.LayoutParams(btnSize, btnSize)
-					btnParams.gravity = Gravity.CENTER
-
-					container.addView(playButton, btnParams)
-				}
+				playBtn?.visibility = View.VISIBLE
+				playBtn?.bringToFront()
+				
 			} else {
-				if (container.getChildCount() > 1 && container.getChildAt(1) !is TextView) container.removeViewAt(1) 
-					
 				if (imageUrl.lowercase().contains(".gif")) {
 					if (MosaicFork.aniMode) imageUrl = imageUrl + "animated=true&format=webp&" 
 					if (!MosaicFork.autoGif) imageUrl = imageUrl + "format=jpeg&" 
@@ -144,48 +180,25 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 				} else {
 					if (MosaicFork.lowImage) imageUrl = imageUrl + "width=500&height=500&"
 				}
-
+		
 				MGImages.setImage(imageView, imageUrl)
+				playBtn?.visibility = View.GONE
 			}
-				
-			var hasSpoilerView = false
-			
-			if (container.getChildCount() > 0 && container.getChildAt(container.getChildCount() - 1) is TextView) hasSpoilerView = true
-				
-			if ((shouldSpoilered || attachment.h())) {
-				if (!hasSpoilerView) {
-					if (!isOpened.contains(i)) {							
-						val spoilerOverlay = TextView(gridLayout.getContext())
-						spoilerOverlay.setText("SPOILER")
-						spoilerOverlay.setTextColor(Color.WHITE)
-						spoilerOverlay.setGravity(Gravity.CENTER)
-						spoilerOverlay.setTypeface(Typeface.DEFAULT_BOLD)
-						spoilerOverlay.setTextSize(13f)
-						spoilerOverlay.setBackgroundColor(Color.parseColor("#FF2F3136"))
-						spoilerOverlay.setOutlineProvider(object : ViewOutlineProvider() {
-							override fun getOutline(view: View, outline: Outline) {
-								outline.setRoundRect(0, 0, view.width, view.height, 8f)
-							}
-						})
-						spoilerOverlay.setClipToOutline(true)
 
-						spoilerOverlay.setOnClickListener { v ->
-							(v.parent as? FrameLayout)?.removeView(v)
-							isOpened.add(i)
-						}
-						container.addView(spoilerOverlay, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
-					}
+			if (shouldSpoilered || attachment.h()) {
+				if (!isOpened.contains(i)) {
+					spoilerView?.visibility = View.VISIBLE
+					spoilerView?.bringToFront()
 				}
 			} else {
-				if (hasSpoilerView) container.removeViewAt(container.getChildCount() - 1)
+				spoilerView?.visibility = View.GONE
 			}
 				
 			imageView.setOnClickListener { v ->
 				val smv = PluginManager.plugins.get("SwipeMediaViewer")
 				
-				if (smv != null) {
-					val method = smv.javaClass.getDeclaredMethod("launchGroup", Context::class.java, List::class.java, MessageAttachment::class.java).apply { isAccessible = true }
-					method.invoke(null, v.context, images, attachment)
+				if (smv != null && PluginManager.isPluginEnabled("SwipeMediaViewer")) {
+					swipeMediaLaunchMethod?.invoke(null, v.context, images, attachment)
 				} else {
 					Companion.launch(v.context, attachment) // WidgetMedia.Companion
 				}
@@ -204,6 +217,7 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 			}
 		}
 	}
+
 
 	private fun getSpanSize(total: Int, position: Int): Int {
 		if (total == 1) return 6
