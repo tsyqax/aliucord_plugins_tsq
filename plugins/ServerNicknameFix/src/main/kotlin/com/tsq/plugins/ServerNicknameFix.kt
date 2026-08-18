@@ -19,7 +19,7 @@ import okhttp3.Request
 class ServerNicknameFix: Plugin() {
 	override fun start(context: Context) {
 		try {
-			val buildMethod = Request.a::class.java.getDeclaredMethod("a")
+			val buildMethod by lazy { Request.a::class.java.getDeclaredMethod("a") }
 
 			patcher.patch(buildMethod, Hook { param ->
 				val isCanChange = StoreStream.getUsers().getMe().getPremiumTier().ordinal == 4
@@ -35,7 +35,7 @@ class ServerNicknameFix: Plugin() {
 					val body = request.e
 					if (body != null) {
 						try {
-							val dataField = body.javaClass.getDeclaredField("a")
+							val dataField by lazy { body.javaClass.getDeclaredField("a") }
 							dataField.isAccessible = true
 							val dataObj = dataField.get(body)
 							
