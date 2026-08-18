@@ -8,6 +8,7 @@ aliucord {
         # 1.0.1
         * Rewrite to Kotlin!
         * Make MediaChannel to display correct icon
+        * by lazy
 
         # 1.0.0
         * IPR!
