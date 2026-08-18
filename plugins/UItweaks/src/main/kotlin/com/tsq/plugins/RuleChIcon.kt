@@ -24,7 +24,7 @@ object RuleChIcon {
 	fun init(context: Context, patcher: PatcherAPI, logger: Logger, resources: Resources?) {
 	
 		// part of BetterChannelIcons by wingio
-		val onConfigureMethod = WidgetChannelsListAdapter.ItemChannelText::class.java.getDeclaredMethod("onConfigure", Int::class.javaPrimitiveType, ChannelListItem::class.java)	
+		val onConfigureMethod by lazy { WidgetChannelsListAdapter.ItemChannelText::class.java.getDeclaredMethod("onConfigure", Int::class.javaPrimitiveType, ChannelListItem::class.java)	}
 		
 		patcher.patch(onConfigureMethod, Hook { param ->
 			try {
@@ -49,7 +49,7 @@ object RuleChIcon {
 						if (customIconId != 0) {
 							val vectorDrawable = ResourcesCompat.getDrawable(resources!!, customIconId!!, null)
 							if (vectorDrawable != null) {
-								channelIcon.setImageDrawable(vectorDrawable)
+							channelIcon.setImageDrawable(vectorDrawable)
 							}
 						}
 					}
