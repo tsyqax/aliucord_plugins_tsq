@@ -105,8 +105,7 @@ class ForumTagFix: Plugin() {
 	override fun start(context: Context) {
 		val viewId1 = View.generateViewId()
 		
-		val bindingReflection = WidgetIncomingShare::class.java.getDeclaredMethod("getBinding")
-		bindingReflection.isAccessible = true
+		val bindingReflection by lazy { WidgetIncomingShare::class.java.getDeclaredMethod("getBinding").apply {isAccessible = true } }
 		
 		val changeIcon = ContextCompat.getDrawable(Utils.appActivity, R.e.ic_edit_24dp)!!.mutate()
 		Utils.tintToTheme(changeIcon)
@@ -114,7 +113,7 @@ class ForumTagFix: Plugin() {
 		val changeTagText = settings.getString("change_tag", "Change Tags")
 		
 		// [1] UI Trigger
-		val createForumMethod = ForumPostCreateManager::class.java.getDeclaredMethod("createForumPostWithMessage", Context::class.java, MessageManager::class.java, Long::class.javaPrimitiveType, Int::class.javaPrimitiveType, String::class.java, StoreThreadDraft.ThreadDraftState::class.java, MessageManager.AttachmentsRequest::class.java, Function2::class.java, Function2::class.java)
+		val createForumMethod by lazy { ForumPostCreateManager::class.java.getDeclaredMethod("createForumPostWithMessage", Context::class.java, MessageManager::class.java, Long::class.javaPrimitiveType, Int::class.javaPrimitiveType, String::class.java, StoreThreadDraft.ThreadDraftState::class.java, MessageManager.AttachmentsRequest::class.java, Function2::class.java, Function2::class.java) }
 		patcher.patch(createForumMethod, PreHook { param -> 
 			if (isReinvoked) return@PreHook
 			
@@ -144,7 +143,7 @@ class ForumTagFix: Plugin() {
 		})		
 		
 		// [2] get value
-		val createThreadMethod = RestAPI::class.java.getDeclaredMethod("createThreadWithMessage", Long::class.javaPrimitiveType, String::class.java, String::class.java, List::class.java, List::class.java, Int::class.javaPrimitiveType, Int::class.javaObjectType, Array<MultipartBody.Part>::class.java)
+		val createThreadMethod by lazy { RestAPI::class.java.getDeclaredMethod("createThreadWithMessage", Long::class.javaPrimitiveType, String::class.java, String::class.java, List::class.java, List::class.java, Int::class.javaPrimitiveType, Int::class.javaObjectType, Array<MultipartBody.Part>::class.java) }
 		patcher.patch(createThreadMethod, PreHook { param ->
 			if (!selectedTagIds.isNullOrEmpty()) {
 				//cf.args[3] = selectedTagIds;
