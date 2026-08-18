@@ -6,7 +6,8 @@ aliucord {
     changelog.set(
         """
         # 1.0.1
-        * Rewrited to Kotlin!
+        * Rewrite to Kotlin!
+        * by lazy
 
         # 1.0.0
         * IPR!
