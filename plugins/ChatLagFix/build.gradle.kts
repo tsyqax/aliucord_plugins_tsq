@@ -1,13 +1,16 @@
-version = "1.0.1" // Plugin version. Increment this to trigger an update
+version = "1.0.2" // Plugin version. Increment this to trigger an update
 description = "Try to fix lag when many text" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
-        # 1.0.1
+        # 1.0.2
         * Rewrite to Kotlin!
         * by lazy
+
+        # 1.0.1
+        * Fix bug when very fast trial to send
 
         # 1.0.0
         * IPR!
