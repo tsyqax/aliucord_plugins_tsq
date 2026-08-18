@@ -7,6 +7,7 @@ aliucord {
         """
         # 0.0.2
         * Rewrite to Kotlin!
+        * by lazy
         
         # 0.0.1
         * IPR!
