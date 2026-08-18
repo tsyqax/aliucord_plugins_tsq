@@ -9,7 +9,6 @@ aliucord {
         * Rewrite to Kotlin!
         * by lazy
 
-
         # 1.2.1
         * Change better subtitle with guildId
 
