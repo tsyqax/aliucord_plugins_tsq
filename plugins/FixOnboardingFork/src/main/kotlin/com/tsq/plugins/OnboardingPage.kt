@@ -151,7 +151,7 @@ class OnboardingPage(
 			}
 		}
 
-txtQuestionTitle = TextView(ctx).apply {
+        txtQuestionTitle = TextView(ctx).apply {
 			layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
 				topMargin = dp8
 			}
