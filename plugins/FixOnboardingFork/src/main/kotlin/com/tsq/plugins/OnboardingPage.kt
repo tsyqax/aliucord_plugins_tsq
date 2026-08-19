@@ -45,7 +45,7 @@ import com.lytefast.flexinput.R
 import java.net.URL
 import java.net.HttpURLConnection
 
-// Thanks to 'Loomis' for the better UI architecture support.
+// Thanks to 'Loomis' for the better UI
 class OnboardingPage(
 	private val fof: FixOnboardingFork, 
 	private val questions: MutableList<JSONObject>,
