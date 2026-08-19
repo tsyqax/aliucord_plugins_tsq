@@ -1,127 +1,38 @@
 package com.tsq.plugins
 
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
-import android.content.Intent
-
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-
 import android.util.TypedValue
-import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
-import android.widget.Toast
 
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.widget.NestedScrollView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
-
-import com.aliucord.Http
 import com.aliucord.Logger
-import com.aliucord.PluginManager
 import com.aliucord.Utils
-import com.aliucord.annotations.AliucordPlugin
-import com.aliucord.api.CommandsAPI
-import com.aliucord.api.SettingsAPI
-import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.patcher.*
-import com.aliucord.utils.DimenUtils
-import com.aliucord.utils.LazyMethod
 import com.aliucord.views.Button
 import com.aliucord.views.DangerButton
-import com.aliucord.views.Divider
-import com.aliucord.views.TextInput
-import com.aliucord.widgets.BottomSheet
-import com.aliucord.wrappers.ChannelWrapper
-import com.aliucord.wrappers.GuildWrapper
 
-import com.discord.api.channel.Channel
-import com.discord.api.channel.ForumTag
-import com.discord.api.commands.ApplicationCommandType
-import com.discord.api.guild.Guild
-import com.discord.api.guildjoinrequest.GuildJoinRequest
-import com.discord.api.permission.Permission
-import com.discord.app.AppBottomSheet
-import com.discord.databinding.WidgetGuildContextMenuBinding
-import com.discord.models.domain.ModelInvite
-import com.discord.restapi.RestAPIInterface
-import com.discord.restapi.RestAPIParams
-import com.discord.stores.StoreGuildJoinRequest
-import com.discord.stores.StoreGuilds
-import com.discord.stores.StoreStream
-import com.discord.stores.StoreThreadDraft
-import com.discord.utilities.permissions.PermissionUtils
-import com.discord.utilities.rest.RestAPI
-import com.discord.views.CheckedSetting
-import com.discord.widgets.chat.MessageManager
-import com.discord.widgets.forums.ForumPostCreateManager
-import com.discord.widgets.guilds.contextmenu.GuildContextMenuViewModel
-import com.discord.widgets.guilds.contextmenu.WidgetGuildContextMenu
-import com.discord.widgets.share.WidgetIncomingShare
-
-import rx.Observable
-import rx.functions.Action1
-
-import okhttp3.Headers
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
-import d0.t.n
-import kotlin.jvm.functions.Function2
 import kotlin.concurrent.thread
 import com.lytefast.flexinput.R
-import com.lytefast.flexinput.model.Attachment
 
-import java.io.InputStream
-import java.lang.reflect.Field
-import java.lang.reflect.Method
 import java.net.URL
-import java.net.URLEncoder
 import java.net.HttpURLConnection
-import java.nio.charset.StandardCharsets
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.Collections
-import java.util.HashMap
-import java.util.Iterator
-import java.util.LinkedHashMap
-import java.util.List
-import java.util.Map
-import java.util.Properties
-import java.util.Set
-import java.util.UUID
-import java.util.WeakHashMap
-import java.io.Serializable
 
-
-class OnboardingPage(
+class OnboardingPage_Old(
 	private val fof: FixOnboardingFork, 
 	private val questions: MutableList<JSONObject>,
 	private val promptId: String,          // question ID
