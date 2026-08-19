@@ -1,14 +1,19 @@
 package com.tsq.plugins
 
 import android.content.Context
+import android.util.TypedValue
 import android.graphics.Typeface
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 
 import com.aliucord.Utils
 import com.aliucord.utils.DimenUtils
@@ -19,11 +24,7 @@ import com.aliucord.widgets.BottomSheet
 import com.discord.api.channel.ForumTag
 import com.lytefast.flexinput.R
 
-import java.util.HashSet
-import java.util.List
-import java.util.Set
-
-// many parameter is major constructor
+// Thanks to 'Loomis' for the better UI
 class TagPickerSheet(private val tags: MutableList<ForumTag>, private val selectedTagIds: MutableList<Long>, private var apl_tags: MutableList<Long>?, private val onComplete: Runnable) : BottomSheet() {
 	
 	// minor
@@ -55,17 +56,18 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 			selectedSet = apl_tags!!.toMutableSet()
 		}
 		
-		val root = LinearLayout(context)
-		root.setOrientation(LinearLayout.VERTICAL)
-		root.setPadding(p, p, p, p)
-		root.setLayoutParams(LinearLayout.LayoutParams(-1, -1))
+		val root = LinearLayout(context).apply {
+			setOrientation(LinearLayout.VERTICAL)
+			setPadding(p, p, p, p)
+			setLayoutParams(LinearLayout.LayoutParams(-1, -1))
+		}
 
-		val title = TextView(context, null, 0, R.i.UiKit_Settings_Text)
-		title.text = "Secect Tags"
-		//title.TextSize = 18f
-		//title.setTextColor(Color.WHITE);
-		title.setTypeface(null, Typeface.BOLD)
-		title.setPadding(0, 0, 0, p)
+		val title = TextView(context, null, 0, R.i.UiKit_Settings_Text).apply {
+			text = "Select Tags"
+			setTextSize(TypedValue.COMPLEX_UNIT_PX, 1.2f * textSize)
+			setTypeface(null, Typeface.BOLD)
+			setPadding(0, 0, 0, p)
+		}
 		root.addView(title)
 
 		// RecyclerView
@@ -76,33 +78,67 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 		
 		rv.layoutManager  = LinearLayoutManager(context)
 		rv.adapter = adapter
+		(rv.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
 		
-		val confirm = Button(context)
-		confirm.text = "OK"
-		confirm.setOnClickListener  { v ->
-			selectedTagIds.clear()
-			selectedTagIds.addAll(selectedSet)
-			onComplete?.run()
-			closePage()
+		val buttonRow = LinearLayout(context).apply {
+			orientation = LinearLayout.HORIZONTAL
+			layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 		}
 		
-		val cancel = DangerButton(context)
-		cancel.text = "Cancel"
-		cancel.setOnClickListener  { v -> closePage() }
+		val btnParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f).apply {
+			rightMargin = DimenUtils.dpToPx(4)
+			leftMargin = DimenUtils.dpToPx(4)
+		}
+		
+		val cancel = DangerButton(context).apply {
+			text = "Cancel"
+			layoutParams = btnParams
+			setOnClickListener { closePage() }
+		}
 
+		val confirm = Button(context).apply {
+			text = "OK"
+			layoutParams = btnParams
+			setOnClickListener {
+				selectedTagIds.clear()
+				selectedTagIds.addAll(selectedSet)
+				onComplete.run()
+				closePage()
+			}
+		}
+		
+		buttonRow.addView(cancel)
+		buttonRow.addView(confirm)
+		
 		root.addView(rv, rvParams)
-		root.addView(confirm)
-		root.addView(cancel)
+		root.addView(buttonRow)
 
 		addView(root)
 	}
 	
 	private class TagAdapter(private val data: MutableList<ForumTag>, private val selected: MutableSet<Long>): RecyclerView.Adapter<TagAdapter.VH>() {
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-			val tv = TextView(parent.context, null, 0, R.i.UiKit_Settings_Text)
-			val p = DimenUtils.dpToPx(16)
-			tv.setPadding(p, p, p, p)
-			tv.layoutParams = RecyclerView.LayoutParams(-1, -2)
+			val context = parent.context
+			val ph = DimenUtils.dpToPx(16) 
+			val pv = DimenUtils.dpToPx(10) 
+
+			val tv = TextView(context, null, 0, R.i.UiKit_Settings_Text).apply {
+				setPadding(ph, pv, ph, pv)
+
+				layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+					bottomMargin = DimenUtils.dpToPx(8)
+				}
+				
+				val baseTextColor = currentTextColor
+				val defaultBorderColor = ColorUtils.setAlphaComponent(baseTextColor, 95)
+				
+				background = GradientDrawable().apply {
+					shape = GradientDrawable.RECTANGLE
+					setStroke(DimenUtils.dpToPx(1), defaultBorderColor)
+					setColor(Color.TRANSPARENT)
+					cornerRadius = DimenUtils.dpToPx(14).toFloat() 
+				}
+			}
 			return VH(tv)
 		}
 		
@@ -110,16 +146,23 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 			val tag = data[position]
 			val id = tag.c()
 			holder.tv.text = (if (tag.b() != null) tag.b() + " " else "") + tag.d()
-			holder.tv.setBackgroundColor(if (selected.contains(id)) 0x405865F2.toInt() else 0)
+			
+			val strokeDrawable = holder.tv.background as GradientDrawable
+			
+			if (selected.contains(id)) {
+				strokeDrawable.setColor(0x405865F2)
+			} else {
+				strokeDrawable.setColor(Color.TRANSPARENT)
+			}
 			
 			holder.tv.setOnClickListener { v ->
 				if (selected.contains(id)) {
-					(selected as? MutableSet<Long>)?.remove(id)
-					holder.tv.setBackgroundColor(0)
+					selected.remove(id)
+					strokeDrawable.setColor(Color.TRANSPARENT)
 				} else {
 					selected.add(id)
-					holder.tv.setBackgroundColor(0x405865F2.toInt())
 				}
+				notifyItemChanged(position)
 			}
 		}
 
