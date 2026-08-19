@@ -257,7 +257,8 @@ class FixOnboardingFork: Plugin() {
 	}
 	
 	fun addAnswer(promptId: String, allOptionIdsOfPrompt: MutableList<String>, chosenOptionId: String) {
-        selectedResponses.add(chosenOptionId) //answer
+		selectedResponses.removeAll(allOptionIdsOfPrompt) // for back
+		selectedResponses.add(chosenOptionId) //answer
     }
 	
 	fun addSeenTime(promptId: String, allOptionIdsOfPrompt: MutableList<String>) {
@@ -375,22 +376,23 @@ class FixOnboardingFork: Plugin() {
 			userSelection = -1 // initialize
 			// userRealSelection = allOptionIds[-1] // initialize
 			
-			var dialogTitle = "[${index + 1}/${questions.size}]"
+			try {
+				val onpage = OnboardingPage(this, questions, promptId, allTitle, required, onlyOne, options, guildId, userId, allOptionIds, index, pending)
+				Utils.openPageWithProxy(context, onpage)
+			} catch (e: Exception) {
+				var dialogTitle = "[${index + 1}/${questions.size}]"
 
-			if (required) {
-				dialogTitle += " · Required"
-				allTitle += " *"
+				if (required) {
+					dialogTitle += " · Required"
+					allTitle += " *"
+				}
+				if (!onlyOne) {
+					dialogTitle += " · Multiable"
+				}
+				
+				val onpage2 = OnboardingPage_Old(this, questions, promptId, allTitle, dialogTitle, required, onlyOne, options, guildId, userId, allOptionIds, index, pending)
+				Utils.openPageWithProxy(context, onpage2)
 			}
-			if (!onlyOne) {
-				dialogTitle += " · Multiable"
-			}
-			
-			// allTitle += dialogTitle
-			// dialogTitle += "DEBUG:${optionTitles.contentToString()}"
-
-			val onpage = OnboardingPage(this, questions, promptId, allTitle, dialogTitle, required, onlyOne, options, guildId, userId, allOptionIds, index, pending)
-			
-			Utils.openPageWithProxy(context, onpage)
 
 		} catch (e: Exception) {
 			Utils.showToast(e.message ?: "Unknown Error", false)
