@@ -1,10 +1,14 @@
-version = "1.2.1" // Plugin version. Increment this to trigger an update
+version = "1.2.2" // Plugin version. Increment this to trigger an update
 description = "Pet someone 2" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.2
+        * Rewrite to Kotlin!
+        * by lazy
+
         # 1.2.1
         * /peturl [url] 
 

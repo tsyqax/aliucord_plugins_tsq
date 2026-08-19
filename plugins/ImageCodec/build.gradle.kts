@@ -1,15 +1,20 @@
-version = "0.0.1" // Plugin version. Increment this to trigger an update
+version = "0.0.2" // Plugin version. Increment this to trigger an update
 description = "Prevent image to be file" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 0.0.2
+        * Rewrite to Kotlin!
+        * by lazy
+        
         # 0.0.1
         * IPR!
-		* Added: heic, heif, hif, bmp, avif, dib
-		* Added: jfif, jfi, jpe, pjpeg, pjpg
-		* Added: apng
+        * Added: heic, heif, hif, bmp, avif, dib
+        * Added: jfif, jfi, jpe, pjpeg, pjpg
+        * Added: apng
+
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page

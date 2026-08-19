@@ -1,12 +1,17 @@
-version = "1.0.0" // Plugin version. Increment this to trigger an update
+version = "1.0.1" // Plugin version. Increment this to trigger an update
 description = "Make MediaChannel to ForumChannel" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.0.1
+        * Rewrite to Kotlin!
+        * Make MediaChannel to display correct icon
+        * by lazy
+
         # 1.0.0
-        * Initial plugin release!
+        * IPR!
         """.trimIndent(),
     )
     // Image or Gif that will be shown at the top of your changelog page

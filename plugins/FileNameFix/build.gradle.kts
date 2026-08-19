@@ -1,10 +1,14 @@
-version = "0.0.4" // Plugin version. Increment this to trigger an update
+version = "0.0.5" // Plugin version. Increment this to trigger an update
 description = "Fix Filename when not ascii" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 0.0.5
+        * Rewrite to Kotlin!
+        * by lazy
+
         # 0.0.4
         * Delete cleanName
 
