@@ -8,6 +8,7 @@ aliucord {
         # 1.2.4
         * Rewrite to Kotlin!
         * by lazy
+        * Better tagPicker
 
         # 1.2.3
         * Remove debug code
