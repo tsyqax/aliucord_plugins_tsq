@@ -9,7 +9,6 @@ aliucord {
         * Rewrite to Kotlin!
         * by lazy
 
-
         # 1.0.1
         * Fix bug when very fast trial to send
 
