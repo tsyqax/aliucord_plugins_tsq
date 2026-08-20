@@ -6,27 +6,27 @@ And... It is really bad to just make something and not release it.
 - Some plugins may contain bugs; if so, please create an issue.
 
 ## LIST
-- [FriendFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FriendFix.zip): Fixes issue of sending request to new username style user.
+- [FriendFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FriendFix.zip): Fix issue when adding friend with new username style
 - [ThreadCMD](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadCMD.zip): Add /thread for making thread.
-- [ForumTagFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ForumTagFix.zip): Adds method for adding tags to post forum.
-- [MediaChannelFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MediaChannelFix.zip): Make MediaChannel to ForumChannel.
+- [ForumTagFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ForumTagFix.zip): Make able to edit or add tags to forum post.
+- [MediaChannelFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MediaChannelFix.zip): Prevent to be invisible MediaChannel.
 - [CopyBackTick](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/CopyBackTick.zip): Make copy to clipboard when you click backtick.
-- [FileNameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FileNameFix.zip): Fix filename when it should unicoded
-- [FixOnboardingFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FixOnboardingFork.zip): add /onboarding command and menu on guild menu to do onboarding.
-- [MosaicFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MosaicFork.zip): Make images to grid images.
-- [ServerNicknameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ServerNicknameFix.zip): Fix changing server nickname from profile menu.
-- [UItweaks](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/UItweaks.zip): Add effort to make better ui.
-- [petpetFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/petpetFork.zip): Pet someone 2 without api.
-- [ChatLagFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ChatLagFix.zip): Try to remove Typing lag.
-- [ImageCodec](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ImageCodec.zip): Prevent image to be file.
+- [FileNameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FileNameFix.zip): Fix filename with unicode name when sending
+- [FixOnboardingFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FixOnboardingFork.zip): add methods(cmd, guild menu, auto mode) to do onboarding.
+- [MosaicFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/MosaicFork.zip): Make multiple images to grid.
+- [ServerNicknameFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ServerNicknameFix.zip): Fix changing server nickname from server profile.
+- [UItweaks](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/UItweaks.zip): Add effort to make better ui, and includes some patches
+- [petpetFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/petpetFork.zip): Pet someone with many settings and without api.
+- [ChatLagFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ChatLagFix.zip): Try to remove Typing lag by making to wait listeners
+- [ImageCodec](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ImageCodec.zip): Convert unsupported images to JPG or another ext when sending.
 
 ## Deprecated / Integrated
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
-- [ThreadDEL](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadDEL.zip): Add button to delete channel or thread on channel_list. --> UItweaks
-- [HeicFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Make heic to jpg when you send image. --> ImageCodec
+- [ThreadDEL](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadDEL.zip): Make easier to delete channel/thread by adding button on list menu --> UItweaks
+- [HeicFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Convert heic to jpg when you send image. --> ImageCodec
 
 ## For Personal (not for formal purposes)
-- [MoreProfile](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/MoreProfile.zip): MoreProfile 1.0.10 (can change display name). Not my code.
+- [MoreProfile](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/MoreProfile.zip): 1.0.10 version which can change display name. Not my code.
 - ~~[AlternativePluginDownloader](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/AlternativePluginDownloader.zip): Just Add button plugin install for all channel~~
 - [HttpDebuger](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/HttpDebuger.zip): For debug, if you need, use it?
 - ~~[QRCodeLoginFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/QRCodeLoginFork.zip): Add password auth to QRCodeLogin.~~
