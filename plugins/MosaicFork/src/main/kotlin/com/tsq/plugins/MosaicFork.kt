@@ -189,10 +189,9 @@ class MosaicFork: Plugin() {
 			val adapter = param.thisObject as WidgetChatListAdapter
 				
 			if (viewType == MOSAIC_VIEW_TYPE) {
-				val gridLayout = GridLayout(parent.context).apply {
-					setLayoutParams(ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)) // before: MATCH_PARENT
-					setPadding(paddingLeft, 0, 0, 0) 
-				}
+				val gridLayout = GridLayout(parent.context)
+				gridLayout.setLayoutParams(ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)) // before: MATCH_PARENT
+				gridLayout.setPadding(paddingLeft, 0, 0, 0) 
 				
 				val rootWrapper = ConstraintLayout(parent.context)
 				rootWrapper.setLayoutParams(RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
