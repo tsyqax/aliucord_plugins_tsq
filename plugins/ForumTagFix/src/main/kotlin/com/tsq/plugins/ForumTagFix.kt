@@ -314,7 +314,7 @@ class ForumTagFix: Plugin() {
 					}
 					
 					if (indicatorView == null) {
-						indicatorView = TextView(itemView.context)
+						indicatorView = TextView(itemView.context, null, 0, R.i.UiKit_TextView_Subtext)
 						indicatorView.tag = viewTag
 						indicatorView.text = MDUtils.render(guideText)
 						
