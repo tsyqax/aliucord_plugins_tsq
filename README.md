@@ -24,6 +24,7 @@ And... It is really bad to just make something and not release it.
 - [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
 - [ThreadDEL](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadDEL.zip): Make easier to delete channel/thread by adding button on list menu --> UItweaks
 - [HeicFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Convert heic to jpg when you send image. --> ImageCodec
+- [ProfileDeco](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ProfileDeco.zip): Render profile decoration (beta, temp) --> UItweaks
 
 ## For Personal (not for formal purposes)
 - [MoreProfile](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/MoreProfile.zip): 1.0.10 version which can change display name. Not my code.
@@ -38,11 +39,6 @@ Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)
 
 ---
 ## If you?
-### AvatarDeco (Giveup): Could you continue?
-I don't like this whhhhhhhhhhhhhhhhhhhhhhhhhhhhy  
-My brain is mmmmmmmmmmmmmmmmmmmmmmmmmmmmmelting  
-So, If you have Idea, Do whatever you want with [this](https://github.com/tsyqax/aliucord_plugins_tsq/main/giveup/AvatarDeco.java) :>
-
 ### Translatable (Draft): Do you have Idea?
 I just think of translatable plugin (providing translated texts for app and plugin)  
 But I don't know about how to implement that and other detail ideas (at least now).  
