@@ -63,6 +63,13 @@ class UItweaks: Plugin() {
 				settings.setBool("PluralFix", it)
 				Utils.promptRestart()
 			})
+			
+			val profile_deco = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Add deco on profile (beta)","")
+			plural_fix.setChecked(settings.getBool("ProfileDeco", true))
+			plural_fix.setOnCheckedListener({
+				settings.setBool("ProfileDeco", it)
+				Utils.promptRestart()
+			})
 		
 			val threadInput = TextInput(context, "Thread Delete Label", settings.getString("thread_label", "Delete Thread"))
 			var channelInput = TextInput(context, "Channel Delete Label", settings.getString("channel_label", "Delete Channel"))
@@ -98,11 +105,13 @@ class UItweaks: Plugin() {
 		val forum_line_bool = settings.getBool("ForumLine", true)
 		val rule_ch_icon_bool = settings.getBool("RuleChIcon", true)
 		val plural_fix_bool = settings.getBool("PluralFix", true)
+		val profile_deco = settings.getBool("ProfileDeco", true)
 		
 		if (th_del_bool) ThreadDEL.init(context, patcher, logger, settings)
 		if (forum_line_bool) ForumLine.init(context, patcher, logger)
 		if (rule_ch_icon_bool) RuleChIcon.init(context, patcher, logger, resources)
 		if (plural_fix_bool) PluralFix.init(context, patcher, logger)
+		if (profile_deco) ProfileDeco.init(context, patcher, logger)
 	}
 	
     override fun stop(context: Context) {
