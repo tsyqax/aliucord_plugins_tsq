@@ -90,6 +90,7 @@ class UItweaks: Plugin() {
 			layout.addView(forum_line)
 			layout.addView(rule_ch_icon)
 			layout.addView(plural_fix)
+            layout.addView(profile_deco)
 			
 			if (settings.getBool("threadDEL", true)) {
 				layout.addView(threadInput)
