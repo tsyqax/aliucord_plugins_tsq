@@ -65,8 +65,8 @@ class UItweaks: Plugin() {
 			})
 			
 			val profile_deco = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Add deco on profile (beta)","")
-			plural_fix.setChecked(settings.getBool("ProfileDeco", true))
-			plural_fix.setOnCheckedListener({
+			profile_deco.setChecked(settings.getBool("ProfileDeco", true))
+			profile_deco.setOnCheckedListener({
 				settings.setBool("ProfileDeco", it)
 				Utils.promptRestart()
 			})
