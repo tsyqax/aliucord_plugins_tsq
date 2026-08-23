@@ -26,7 +26,7 @@ And... It is really bad to just make something and not release it.
 - [HeicFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Convert heic to jpg when you send image. --> ImageCodec
 - [ProfileDeco](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ProfileDeco.zip): Render profile decoration (beta, temp) --> UItweaks
 
-## For Personal (not for formal purposes)
+## For Personal, not for formal
 - [MoreProfile](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/MoreProfile.zip): 1.0.10 version which can change display name. Not my code.
 - ~~[AlternativePluginDownloader](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/AlternativePluginDownloader.zip): Just Add button plugin install for all channel~~
 - [HttpDebuger](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/HttpDebuger.zip): For debug, if you need, use it?
