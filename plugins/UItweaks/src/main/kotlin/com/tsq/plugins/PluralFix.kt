@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.content.res.Resources
 import android.icu.text.PluralRules
+import android.text.SpannableStringBuilder
 
 import com.aliucord.Logger
 import com.aliucord.Utils
@@ -27,15 +28,21 @@ object PluralFix {
 			val isNoDistinctionLocale = PluralRules.forLocale(Locale.getDefault()).keywords.size == 1
 			
 			if (isNoDistinctionLocale) {
-				val resultStr = param.result?.toString()
-				
-				if (resultStr != null) {
+				val resultCharSequence = param.result as? CharSequence
+
+				if (resultCharSequence != null) {
 					val formatArgs = param.args[1] as? Array<*>
 					val quantityStr = formatArgs?.getOrNull(0)?.toString() ?: "1"
 
-					val fixedStr = placeholderRegex.replace(resultStr, quantityStr)
+					val builder = SpannableStringBuilder(resultCharSequence)
 
-					param.result = fixedStr
+					val matcher = placeholderRegex.toPattern().matcher(builder)
+					if (matcher.find()) {
+						val start = matcher.start()
+						val end = matcher.end()
+						builder.replace(start, end, quantityStr)
+					}
+					param.result = builder as CharSequence
 				}
 			}
 		})
