@@ -14,6 +14,7 @@ import com.discord.utilities.rest.RestAPI
 import com.discord.widgets.friends.WidgetFriendsAddById
 
 import java.lang.reflect.Method
+import de.robv.android.xposed.XposedBridge
 
 import okhttp3.MediaType
 import okhttp3.Request
@@ -85,24 +86,26 @@ class FriendFix : Plugin() {
 		try {
 			val resultConstructor by lazy { WidgetFriendsAddById.Companion.UserNameDiscriminator::class.java.getDeclaredConstructor(String::class.java, Int::class.javaObjectType).apply { isAccessible = true } }
 			val extractMethod by lazy { WidgetFriendsAddById.Companion::class.java.getDeclaredMethod("extractUsernameAndDiscriminator", CharSequence::class.java) }
-			patcher.patch(extractMethod, InsteadHook { param -> 
-				val input = param.args[0].toString()
+			patcher.patch(extractMethod, InsteadHook { param ->
+				val input = param.args?.getOrNull(0)?.toString() ?: ""
+				val pattern = Regex("^(.*)#(\\d{4})$")
+				
 				if (!input.contains("#")) {
 					try {
-						return@InsteadHook resultConstructor.newInstance(input, 12345) // null or "null"... maybe?
+						return@InsteadHook resultConstructor.newInstance(input, 12345)
 					} catch (e: Exception) {
 						logger.error("UI Patch failed", e)
+						return@InsteadHook null
 					}
 				}
 				
 				try {
-					val method = param.method as Method
-					method.isAccessible = true
-					return@InsteadHook method.invoke(param.thisObject, *param.args)
+					return@InsteadHook XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args)
 				} catch (e: Exception) {
 					return@InsteadHook null
 				}
 			})
+
 		} catch (e: Exception) {
 			logger.error("UI Setup failed", e)
 		}
