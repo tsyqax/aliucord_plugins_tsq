@@ -6,7 +6,7 @@ aliucord {
     changelog.set(
         """
         # 0.0.3
-        * Fix crash when id.endsWith("#)
+        * Fix crash when id.endsWith("#")
 
         # 0.0.2
         * Rewrite to Kotlin!
