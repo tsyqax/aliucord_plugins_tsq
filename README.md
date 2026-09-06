@@ -20,11 +20,13 @@ And... It is really bad to just make something and not release it.
 - [ChatLagFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ChatLagFix.zip): Try to remove Typing lag by making to wait listeners
 - [ImageCodec](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ImageCodec.zip): Convert unsupported images to JPG or another ext when sending.
 
-## Deprecated / Individual
-- [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
+## Individual / Single Ver.
 - [ThreadDEL](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadDEL.zip): Make easier to delete channel/thread by adding button on list menu --> UItweaks
 - [HeicFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/HeicFix.zip): Convert heic to jpg when you send image. --> ImageCodec
 - [ProfileDeco](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ProfileDeco.zip): Render profile decoration (beta, temp) --> UItweaks
+
+## Deprecated
+- [EmojiRank](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/EmojiRank.zip): Make recent category to guild top emojis.
 
 ## For Personal, not for formal
 - [MoreProfile](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/MoreProfile.zip): 1.0.10 version which can change display name. Not my code.
