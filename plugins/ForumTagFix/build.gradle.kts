@@ -1,10 +1,13 @@
-version = "1.2.5" // Plugin version. Increment this to trigger an update
+version = "1.2.6" // Plugin version. Increment this to trigger an update
 description = "Fix issues with Tags on ForumTag" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.2.6
+        * Fix setting maybe
+
         # 1.2.5
         * Change Indicator text color
 
