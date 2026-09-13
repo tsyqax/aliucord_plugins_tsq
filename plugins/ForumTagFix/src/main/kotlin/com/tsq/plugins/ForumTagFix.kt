@@ -67,7 +67,7 @@ class ForumTagFix: Plugin() {
 	
 	
 	init {
-		settingsTab = SettingsTab(PSettings::class.java, SettingsTab.Type.PAGE)
+		settingsTab = SettingsTab(PSettings::class.java, SettingsTab.Type.PAGE).withArgs(settings)
 	}
 	
 	// ----- settings start -----
