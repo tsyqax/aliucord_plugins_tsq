@@ -235,7 +235,7 @@ class OnboardingPage(
 		}
 		
 		val defaultTitleSize = txtQuestionTitle.textSize
-		txtQuestionTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTitleSize * 1.1f)
+		txtQuestionTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultTitleSize * 1.12f)
 		
 		btnBack.setOnClickListener {
 			closePage()
