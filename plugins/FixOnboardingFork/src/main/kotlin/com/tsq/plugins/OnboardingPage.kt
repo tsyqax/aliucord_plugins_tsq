@@ -148,7 +148,7 @@ class OnboardingPage(
 
 		val rootLayout = RelativeLayout(context).apply {
 			layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-			setPadding(dp16, 0, dp16, dp16)
+			setPadding(dp8, 0, dp8, dp8)
 		}
 		
 		val layoutHeader = LinearLayout(context).apply {
@@ -454,7 +454,7 @@ class OnboardingPage(
 			).apply {
 				topMargin = dp4
 			}
-			setTextAppearance(getColor(context, 0)) // ?
+			setTextAppearance(R.i.UiKit_TextView_Subtext) // ?
 			//setTextAppearance(ColorUtils.setAlphaComponent(getColor(context, 0), 179))
 			visibility = View.GONE
 		}
