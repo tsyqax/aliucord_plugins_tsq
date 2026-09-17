@@ -35,6 +35,9 @@ import com.aliucord.Logger
 import com.aliucord.Utils
 import com.aliucord.patcher.*
 import com.aliucord.views.Button
+import com.aliucord.api.SettingsAPI
+import com.aliucord.fragments.SettingsPage
+import com.discord.utilities.color.ColorCompat
 
 import org.json.JSONArray
 import org.json.JSONObject
@@ -57,9 +60,8 @@ class OnboardingPage(
 	private val guildId: String,
 	private val userId: String,
 	private val allOptionIds: MutableList<String>,
-	private val idx: Int,
-	private val pending: Boolean
-) : Fragment() {
+	private val idx: Int
+) : SettingsPage() {
 	
 	private lateinit var btnClose: ImageButton
 	private lateinit var txtProgress: TextView
@@ -68,6 +70,16 @@ class OnboardingPage(
 	private lateinit var btnNext: Button
 	private lateinit var optionsContainer: LinearLayout
 	
+	//val hexRegex = """^#([A-Fa-f0-9]{6})$""".toRegex()
+	
+	private fun getColor(ctx: Context, mode: Int): Int  {
+		if (mode == 0) {
+			return R.i.UiKit_Settings_Text
+		} else {
+			return ColorCompat.getThemedColor(ctx, R.b.colorBackgroundPrimary)
+		}
+	}
+
 	private fun closePage() {
 		Utils.mainThread.post {
 			val fragmentManager = fragmentManager
@@ -113,35 +125,33 @@ class OnboardingPage(
 		view.setImageBitmap(scaled)
 	}
 	
-	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-		val ctx = requireContext()
+	override fun onViewCreated(view: View, bundle: Bundle?) {
+		super.onViewCreated(view, bundle)
+
+		val parentLayout = getLinearLayout()
+		val context = view.context
+		parentLayout.setBackgroundColor(getColor(context, 1))
 
 		val ID_LAYOUT_HEADER = 1001
 		val ID_LAYOUT_BOTTOM_BAR = 1002
+		val ID_TXT_QUESTION_TITLE = 1003
 
-		val dp16 = dpToPx(ctx, 16)
-		val dp12 = dpToPx(ctx, 12)
-		val dp8 = dpToPx(ctx, 8)
+		val dp16 = dpToPx(context, 16)
+		val dp12 = dpToPx(context, 12)
+		val dp8 = dpToPx(context, 8)
 		
 		val getThemeAttr = { attrId: Int ->
 			val typedValue = TypedValue()
-			ctx.theme.resolveAttribute(attrId, typedValue, true)
+			context.theme.resolveAttribute(attrId, typedValue, true)
 			typedValue.resourceId
 		}
 
-		val rootLayout = RelativeLayout(ctx).apply {
+		val rootLayout = RelativeLayout(context).apply {
 			layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-			setPadding(dp16, dp16, dp16, dp16)
-			
-			val typedValue = TypedValue()
-			if (ctx.theme.resolveAttribute(R.b.colorBackgroundPrimary, typedValue, true)) {
-				setBackgroundColor(ctx.getColor(typedValue.resourceId))
-			} else {
-				setBackgroundColor(Color.TRANSPARENT)
-			}
+			setPadding(dp16, 0, dp16, dp16)
 		}
-
-		val layoutHeader = LinearLayout(ctx).apply {
+		
+		val layoutHeader = LinearLayout(context).apply {
 			id = ID_LAYOUT_HEADER
 			orientation = LinearLayout.VERTICAL
 			setPadding(0, 0, 0, dp8)
@@ -151,47 +161,17 @@ class OnboardingPage(
 			}
 		}
 
-        txtQuestionTitle = TextView(ctx).apply {
-			layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-				topMargin = dp8
-			}
-			setTextAppearance(R.i.UiKit_Settings_Text) 
-			setTypeface(null, Typeface.BOLD)  
-		}
-
-		txtProgress = TextView(ctx).apply {
-			layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-				setMarginStart(dp8)
-			}
-			setTextAppearance(R.i.UiKit_Settings_Text) 
-		}
-
-		val headerTopRow = LinearLayout(ctx).apply {
-			orientation = LinearLayout.HORIZONTAL
-			gravity = Gravity.CENTER_VERTICAL
+		txtQuestionTitle = TextView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+			setTextAppearance(getColor(context, 0))
+			setTypeface(null, Typeface.BOLD)
+			id = ID_TXT_QUESTION_TITLE
 		}
 		
-		btnClose = ImageButton(ctx).apply {
-			val btnSize = dpToPx(ctx, 28) 
-			layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-			setBackgroundColor(0)
-
-			setImageResource(R.e.ic_arrow_back_white_24dp)
-			scaleType = ImageView.ScaleType.FIT_CENTER
-			val inset = dpToPx(ctx, 2)
-			setPadding(inset, inset, inset, inset)
-
-			imageTintList = txtQuestionTitle.textColors
-		}
-		headerTopRow.addView(btnClose)
-		headerTopRow.addView(txtProgress)
-
-		layoutHeader.addView(headerTopRow)
 		layoutHeader.addView(txtQuestionTitle)
 		rootLayout.addView(layoutHeader)
 
-		val layoutBottomBar = RelativeLayout(ctx).apply {
+		val layoutBottomBar = RelativeLayout(context).apply {
 			id = ID_LAYOUT_BOTTOM_BAR
 			setPadding(0, dp12, 0, 0)
 			
@@ -200,7 +180,7 @@ class OnboardingPage(
 			}
 		}
 
-		btnBack = Button(ctx).apply {
+		btnBack = Button(context).apply {
 			text = "Back"
 			layoutParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
 				addRule(RelativeLayout.ALIGN_PARENT_START)
@@ -209,7 +189,7 @@ class OnboardingPage(
 		}
 		layoutBottomBar.addView(btnBack)
 
-		btnNext = Button(ctx).apply {
+		btnNext = Button(context).apply {
 			text = "Next"
 			layoutParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
 				addRule(RelativeLayout.ALIGN_PARENT_END)
@@ -219,7 +199,7 @@ class OnboardingPage(
 		layoutBottomBar.addView(btnNext)
 		rootLayout.addView(layoutBottomBar)
 
-		val scrollView = ScrollView(ctx).apply {
+		val scrollView = ScrollView(context).apply {
 			isFillViewport = true
 			isVerticalScrollBarEnabled = true
 
@@ -229,7 +209,7 @@ class OnboardingPage(
 			}
 		}
 
-		optionsContainer = LinearLayout(ctx).apply {
+		optionsContainer = LinearLayout(context).apply {
 			orientation = LinearLayout.VERTICAL
 			setPadding(0, dp8, 0, dp8)
 			layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
@@ -237,20 +217,14 @@ class OnboardingPage(
 		scrollView.addView(optionsContainer)
 		rootLayout.addView(scrollView)
 
-		return rootLayout
-	}
-
-	// sub: R.i.UiKit_TextView_Subtext
-	// main: R.i.UiKit_Settings_Text
-
-	override fun onViewCreated(view: View, bundle: Bundle?) {
-		super.onViewCreated(view, bundle)
-
-		val context = view.context
+		parentLayout.addView(rootLayout)
+		
+		// ----------------------------------------
 		
 		//btnClose.setImageResource(android.R.drawable.ic_menu_revert) 
 
-		txtProgress.text = "Step ${idx + 1} of ${questions.size}" //before: dIalogTitle, R.i.UiKit_Settings_Text
+		setActionBarTitle("Step ${idx + 1} of ${questions.size}") //before: dIalogTitle, R.i.UiKit_Settings_Text
+		setActionBarSubtitle(null)
 		txtQuestionTitle.text = allTitle
 		
 		if (required) { 
@@ -265,7 +239,7 @@ class OnboardingPage(
 		
 		btnBack.setOnClickListener {
 			closePage()
-			fof.showChainDialog(context, questions, idx - 1, guildId, userId, pending)
+			fof.showChainDialog(context, questions, idx - 1, guildId, userId)
 		}
 		
 		btnNext.setOnClickListener {
@@ -296,16 +270,16 @@ class OnboardingPage(
 			
 			fof.addSeenTime(promptId, allOptionIds)
 			closePage()
-			fof.showChainDialog(context, questions, idx + 1, guildId, userId, pending)
+			fof.showChainDialog(context, questions, idx + 1, guildId, userId)
 		}
-		
-		btnClose.setOnClickListener { closePage() }
-		
+
 		if (idx == 0) {
 			btnBack.visibility = View.INVISIBLE
 		} else {
 			btnBack.visibility = View.VISIBLE
 		}
+		
+		if (idx + 1 == questions.size) btnNext.text = "DONE"
 		
 		if (!onlyOne) fof.multiSelectionFlags = BooleanArray(options.length())
 
@@ -470,7 +444,7 @@ class OnboardingPage(
 				LinearLayout.LayoutParams.MATCH_PARENT, 
 				LinearLayout.LayoutParams.WRAP_CONTENT
 			)
-			setTextAppearance(R.i.UiKit_Settings_Text) 
+			setTextAppearance(getColor(context, 0))
 		}
 
 		val description = TextView(context).apply {
@@ -480,7 +454,8 @@ class OnboardingPage(
 			).apply {
 				topMargin = dp4
 			}
-			setTextAppearance(R.i.UiKit_TextView_Subtext)
+			setTextAppearance(getColor(context, 0)) // ?
+			//setTextAppearance(ColorUtils.setAlphaComponent(getColor(context, 0), 179))
 			visibility = View.GONE
 		}
 
