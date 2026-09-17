@@ -1,10 +1,13 @@
-version = "1.3.1" // Plugin version. Increment this to trigger an update
+version = "1.3.2" // Plugin version. Increment this to trigger an update
 description = "Add Method to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.3.2
+        * Some slightly change
+
         # 1.3.1
         * Fix bug when using background image with theme
         * UI uses SettingPage: I'm so stupid
