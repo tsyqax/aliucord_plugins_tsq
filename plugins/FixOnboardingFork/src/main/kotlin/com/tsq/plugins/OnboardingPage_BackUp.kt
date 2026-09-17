@@ -44,8 +44,7 @@ class OnboardingPage_Old(
 	private val guildId: String,
 	private val userId: String,
 	private val allOptionIds: MutableList<String>,
-	private val idx: Int,
-	private val pending: Boolean
+	private val idx: Int
 ) : SettingsPage() {
 	
 	private fun closePage() {
@@ -225,7 +224,7 @@ class OnboardingPage_Old(
 			fof.addSeenTime(promptId, allOptionIds)
 			
 			closePage()
-			fof.showChainDialog(context, questions, idx + 1, guildId, userId, pending)
+			fof.showChainDialog(context, questions, idx + 1, guildId, userId)
 		})
 		layout.addView(confirm)
 		
