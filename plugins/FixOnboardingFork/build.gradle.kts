@@ -1,10 +1,14 @@
-version = "1.3.0" // Plugin version. Increment this to trigger an update
+version = "1.3.1" // Plugin version. Increment this to trigger an update
 description = "Add Method to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.3.1
+        * Fix bug when using background image with theme
+        * UI uses SettingPage: I'm so stupid
+
         # 1.3.0
         * Rewrite to Kotlin!
         * by lazy
