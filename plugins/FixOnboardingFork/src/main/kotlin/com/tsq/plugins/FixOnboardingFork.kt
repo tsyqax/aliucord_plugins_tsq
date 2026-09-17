@@ -20,6 +20,8 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.patcher.*
+import com.aliucord.views.Button
+import com.aliucord.views.TextInput
 
 import com.discord.databinding.WidgetGuildContextMenuBinding
 import com.discord.models.domain.ModelInvite
@@ -34,6 +36,7 @@ import com.lytefast.flexinput.R
 import com.lytefast.flexinput.model.Attachment
 
 import kotlin.concurrent.thread
+import java.util.concurrent.CancellationException
 
 import rx.Observable
 import org.json.JSONArray
@@ -66,15 +69,27 @@ class FixOnboardingFork: Plugin() {
 
 			var context = view.context
 			var layout = getLinearLayout()
+			
+			/* var color_guide = TextView(context, null, 0, R.i.UiKit_TextView).apply {
+				text = "The color must be specified as a Hex code (e.g., #ffffff). Case sensitivity does not matter, and the default value is 'auto'. If an invalid color value is provided or 'auto' is selected, the color will be synchronized with the current theme."
+			} */
 
-			val auto = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Auto Onboarding","").apply {
+			val auto = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Auto Onboarding","Detects joining server and automatically launches the onboarding.").apply {
 				setChecked(settings.getBool("auto", true))
 				setOnCheckedListener({
 					settings.setBool("auto", it)
 				})
 			}
+			
+			val oldPage = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Old Style","Turn on if you want to do onboarding with old page style.").apply {
+				setChecked(settings.getBool("old", false))
+				setOnCheckedListener({
+					settings.setBool("old", it)
+				})
+			}
 
 			layout.addView(auto)
+			layout.addView(oldPage)
 		}
 	}
 	// ----- settings end -----
@@ -152,7 +167,7 @@ class FixOnboardingFork: Plugin() {
         )
 	
 		val autoMode = settings.getBool("auto", true)
-
+		
 		if (autoMode) {
 			try {
 				val realJoinMethod = RestAPI::class.java.getDeclaredMethod("postInviteCode", ModelInvite::class.java, String::class.java, RestAPIParams.InviteCode::class.java)
@@ -194,7 +209,7 @@ class FixOnboardingFork: Plugin() {
 			}
 			
 			Handler(Looper.getMainLooper()).post {
-				showChainDialog(activity, questions, 0, guildId, userId, pending)
+				showChainDialog(activity, questions, 0, guildId, userId)
 			}
 			
 		} catch (e: Exception) {
@@ -298,7 +313,7 @@ class FixOnboardingFork: Plugin() {
 		return payload
 	}
 
-	internal fun showChainDialog(context: Context, questions: MutableList<JSONObject>, index: Int, guildId: String, userId: String, pending: Boolean) {
+	internal fun showChainDialog(context: Context, questions: MutableList<JSONObject>, index: Int, guildId: String, userId: String) {
 		if (index >= questions.size) { // Questions Ended
 			val finalPayload = buildPayloadLast(guildId, userId)
 			
@@ -377,7 +392,12 @@ class FixOnboardingFork: Plugin() {
 			// userRealSelection = allOptionIds[-1] // initialize
 			
 			try {
-				val onpage = OnboardingPage(this, questions, promptId, allTitle, required, onlyOne, options, guildId, userId, allOptionIds, index, pending)
+				val oldMode = settings.getBool("old", true)
+				if (oldMode) {
+					throw CancellationException("oldMode")
+				}
+				
+				val onpage = OnboardingPage(this, questions, promptId, allTitle, required, onlyOne, options, guildId, userId, allOptionIds, index)
 				Utils.openPageWithProxy(context, onpage)
 			} catch (e: Exception) {
 				var dialogTitle = "[${index + 1}/${questions.size}]"
@@ -390,7 +410,7 @@ class FixOnboardingFork: Plugin() {
 					dialogTitle += " · Multiable"
 				}
 				
-				val onpage2 = OnboardingPage_Old(this, questions, promptId, allTitle, dialogTitle, required, onlyOne, options, guildId, userId, allOptionIds, index, pending)
+				val onpage2 = OnboardingPage_Old(this, questions, promptId, allTitle, dialogTitle, required, onlyOne, options, guildId, userId, allOptionIds, index)
 				Utils.openPageWithProxy(context, onpage2)
 			}
 
