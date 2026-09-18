@@ -54,7 +54,7 @@ The following features are currently known not to work, but this NEVER imply tha
 - Speaking, hearing human voices (sound is audible but unintelligible), turning on the camera, screen sharing, and viewing screen shares.
 
 If you UNDERSTAND all the above and still wish to use it, use the link below:  
-[LINK](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)
+[VoiceChatFix, do you understand above?](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)
 
 +) Note: If your version is not voice fixed version, then try to use Stage Channels.  
 You can speak by selecting "Continue without starting" > "Become a speaker."    
