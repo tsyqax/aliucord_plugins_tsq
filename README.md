@@ -39,27 +39,29 @@ And... It is really bad to just make something and not release it.
 
 
 ### For Demonstration Purposes: VoiceChatFix
-I brought this over because I wanted to see a "Connected" status in the voice channel—even if only intermittently—before an official voice patch is released.
+I brought this over because I wanted to see a "Connected" status in the voice channel before an official voice patch is released.
 
-I did not write this code myself (although I am listed as the plugin author, I am not claiming this as my own original plugin);  
-the core logic is essentially a rough port of older code from an Aliucord fork repository designed for VoiceChatFix.
+I DID NOT WRITE this code (although I'm marked as the plugin author in menifest/details, I'm NEVER claiming this as my plugin);  
+this is a rough port of code(213c67d) from an Aliucord fork repository for VoiceChatFix.
+(I extracted the core plugin code and modified it into a normal plugin.)
 
-There is absolutely no guarantee that this code will work (due to environmental issues, etc.),  
-though it has been confirmed that you can at least hear bot audio.
+There is absolutely NO guarantee that this code will work.  
 
-The following features are currently known not to work, though this NEVER imply that they are impossible to implement in an official patch:  
+Currently confirmed working features:
+- Joining voice channels, hearing bot audio
+
+The following features are currently known not to work, but this NEVER imply that they are impossible to implement in an official patch:  
 - Speaking, hearing human voices (sound is audible but unintelligible), turning on the camera, screen sharing, and viewing screen shares.
 
-If you wish to use it, please refer to the link below:  
+If you UNDERSTAND all the above and still wish to use it, use the link below:  
 [LINK](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)
 
-+) Note: If the voice channel version isn't working for you, please use Stage Channels.  
-You can speak by selecting "Continue without starting" > "Become a speaker."  
++) Note: If your version is not voice fixed version, then try to use Stage Channels.  
+You can speak by selecting "Continue without starting" > "Become a speaker."    
 This usage method is unrelated to this temporary plugin.  
 
 ※ I will remove this if any issues arise with the code.  
-※ 
-※ Please do not claim elsewhere that this code is my own plugin!
+※ DO NOT claim elsewhere that this code is my own plugin!
 
 ## HOW TO USE?
 Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)**
