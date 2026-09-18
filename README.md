@@ -42,12 +42,12 @@ And... It is really bad to just make something and not release it.
 I brought this over because I wanted to see a "Connected" status in the voice channel before an official voice patch is released.
 
 I DID NOT WRITE this code (although I'm marked as the plugin author in menifest/details, I'm NEVER claiming this as my plugin);  
-this is a rough port of code(213c67d) from an Aliucord fork repository for VoiceChatFix.
+this is a rough port of code(213c67d) from an Aliucord fork repository for VoiceChatFix.  
 (I extracted the core plugin code and modified it into a normal plugin.)
 
 There is absolutely NO guarantee that this code will work.  
 
-Currently confirmed working features:
+Currently confirmed working features:  
 - Joining voice channels, hearing bot audio
 
 The following features are currently known not to work, but this NEVER imply that they are impossible to implement in an official patch:  
