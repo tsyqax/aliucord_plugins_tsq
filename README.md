@@ -36,6 +36,31 @@ And... It is really bad to just make something and not release it.
 - [QRCodeLogin](https://github.com/secp192k1/Aliucord-Plugins/raw/21770595a84b0961253155f0806e17d0f97db609/QRCodeLogin.zip): From Original Repo before deleted. I didn't write this.
 - [AutoIdle](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/AutoIdle.zip): Remove Debug Log (silent ver), Not my code.
 - [TranslateForkFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/TranslateForkFork.zip): Fix something maybe, Not my full code.
+
+
+### For Demonstration Purposes: VoiceChatFix
+I brought this over because I wanted to see a "Connected" status in the voice channel—even if only intermittently—before an official voice patch is released.
+
+I did not write this code myself (although I am listed as the plugin author, I am not claiming this as my own original plugin);  
+the core logic is essentially a rough port of older code from an Aliucord fork repository designed for VoiceChatFix.
+
+There is absolutely no guarantee that this code will work (due to environmental issues, etc.),  
+though it has been confirmed that you can at least hear bot audio.
+
+The following features are currently known not to work, though this NEVER imply that they are impossible to implement in an official patch:  
+- Speaking, hearing human voices (sound is audible but unintelligible), turning on the camera, screen sharing, and viewing screen shares.
+
+If you wish to use it, please refer to the link below:  
+[LINK](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)
+
++) Note: If the voice channel version isn't working for you, please use Stage Channels.  
+You can speak by selecting "Continue without starting" > "Become a speaker."  
+This usage method is unrelated to this temporary plugin.  
+
+※ I will remove this if any issues arise with the code.  
+※ 
+※ Please do not claim elsewhere that this code is my own plugin!
+
 ## HOW TO USE?
 Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)**
 
