@@ -31,6 +31,7 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
     private val gridLayout: GridLayout
     private val isOpened = hashSetOf<Int>()
     private var evhandler: WidgetChatListAdapter.EventHandler? = null
+	private var realWidth: Int = 0;
 
     constructor(gridLayout: GridLayout, adapter: WidgetChatListAdapter) : super(gridLayout, adapter) {
         this.gridLayout = gridLayout
@@ -45,7 +46,7 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
     private fun initGrid() {
 		val dm = gridLayout.context.resources.displayMetrics
 		val screenWidth = dm.widthPixels 
-		val realWidth = (screenWidth * MosaicFork.inputWidth).toInt()
+		realWidth = (screenWidth * MosaicFork.inputWidth).toInt()
         gridLayout.layoutParams = gridLayout.layoutParams.apply { width = realWidth }
         this.evhandler = (this.adapter)?.eventHandler
     }
@@ -153,7 +154,17 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 			val params = GridLayout.LayoutParams(rowSpec, colSpec).apply {
 				setMargins(6, 6, 6, 6)
 				width = 0
-				height = if (MosaicFork.squareMode && (spanSize == 2 || spanSize == 4)) (MosaicFork.targetHeight * 2) / 3 else MosaicFork.targetHeight
+				height = if (MosaicFork.squareMode) {
+					when (spanSize) {
+						2 -> realWidth / 3
+						3 -> realWidth / 2
+						4 -> realWidth / 3
+						6 -> realWidth / 2
+						else -> MosaicFork.targetHeight
+					}
+				} else {
+					MosaicFork.targetHeight
+				}
 			}
 			container.setLayoutParams(params)
 
