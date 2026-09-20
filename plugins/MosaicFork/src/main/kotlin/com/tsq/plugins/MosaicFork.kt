@@ -39,8 +39,7 @@ import java.util.Collections
 class MosaicFork: Plugin() {
 	private val MOSAIC_VIEW_TYPE = 1234
 	companion object {
-        var realWidth = 0
-        var screenWidth = 0
+        var inputWidth = 0.0f
         var targetHeight = 0
         var paddingLeft = 0
         var targetHeightDP = 145
@@ -49,6 +48,7 @@ class MosaicFork: Plugin() {
 		var lowGif = true
 		var lowImage = true
 		var autoGif = true
+		var squareMode = false
     }
 	
 	private val storeUserSettings = StoreStream.getUserSettings()
@@ -68,35 +68,42 @@ class MosaicFork: Plugin() {
 			val context = view.context
 			val layout = getLinearLayout()
 
-			val width_input = TextInput(context, "Width Ratio (0.0 ~ 1.0)", settings.getFloat("width", 0.83f).toString())
-			val height_input = TextInput(context, "Height DP (default: 145)", settings.getInt("height", 145).toString())
-			val padding_input = TextInput(context, "Padding DP (default: 57)", settings.getInt("padding", 57).toString())
+			val width_input = TextInput(context, "Width Ratio (0.0 ~ 1.0, default: 0.93)", settings.getFloat("width", 0.93f).toString())
+			val height_input = TextInput(context, "Height DP (Int, default: 150)", settings.getInt("height", 150).toString())
+			val padding_input = TextInput(context, "Padding DP (Int, default: 57)", settings.getInt("padding", 57).toString())
 			
-			val auto_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Toggle auto play Gif","").apply {
+			val auto_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Auto play Gif","Operates independently of the app's native settings").apply {
 				setChecked(settings.getBool("autoGif", true))
 				setOnCheckedListener({
 					settings.setBool("autoGif", it)
 				})
 			}
 			
-			val ani_webp = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Use Animated Webp instead of Gif","").apply {
+			val ani_webp = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Animated Webp","Use animated WebP instead of GIFs").apply {
 				setChecked(settings.getBool("ani_webp", false))
 				setOnCheckedListener({
 					settings.setBool("ani_webp", it)
 				})
 			}
 			
-			val low_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Downgrade Gifs Preview Quality","").apply {
+			val low_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Low Gif Preview","Reduce the preview quality of static images").apply {
 				setChecked(settings.getBool("lowGif", true))
 				setOnCheckedListener({
 					settings.setBool("lowGif", it)
 				})
 			}
 			
-			val low_image = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Downgrade Images Preview Quality","").apply {
+			val low_image = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Low Image Preview","Downgrade images preview quality").apply {
 				setChecked(settings.getBool("lowImage", false))
 				setOnCheckedListener({
 					settings.setBool("lowImage", it)
+				})
+			}
+			
+			val square = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Square Mode","Turn on if you want make grid images square").apply {
+				setChecked(settings.getBool("square", false))
+				setOnCheckedListener({
+					settings.setBool("square", it)
 				})
 			}
 			
@@ -122,6 +129,7 @@ class MosaicFork: Plugin() {
 				addView(ani_webp)
 				addView(low_gif)
 				addView(low_image)
+				addView(square)
 				addView(saveButton)
 			}
 		}
@@ -129,15 +137,14 @@ class MosaicFork: Plugin() {
 	// ----- settings end -----
 
 	override fun start(context: Context) {
-		val dm = context.getResources().getDisplayMetrics()
-		val density = dm.density
-		screenWidth = dm.widthPixels 
-		
-		val inputWidth = settings.getFloat("width", 0.83f)
+		inputWidth = settings.getFloat("width", 0.83f)
 		targetHeightDP = settings.getInt("height", 145)
 		paddingLeftDP = settings.getInt("padding", 57)
 		
-		realWidth = (screenWidth * inputWidth).toInt()
+		val dm = context.getResources().getDisplayMetrics()
+		val density = dm.density
+		val screenWidth = dm.widthPixels 
+		//realWidth = (screenWidth * inputWidth).toInt()
 		targetHeight = (targetHeightDP * density + 0.5f).toInt()
 		paddingLeft = (paddingLeftDP * density + 0.5f).toInt()
 		
@@ -210,8 +217,9 @@ class MosaicFork: Plugin() {
 					lowGif = getBool("lowGif", true)
 					lowImage = getBool("lowImage", false)
 					autoGif = getBool("autoGif", true)
+					squareMode = getBool("square", false)
 				}
-				
+
 				//MosaicViewHolder mosaicViewHolder = new MosaicViewHolder(gridLayout, adapter)
 				val mosaicViewHolder = MosaicViewHolder(rootWrapper, gridLayout, adapter)
     
