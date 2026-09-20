@@ -43,7 +43,10 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
     }
 
     private fun initGrid() {
-        gridLayout.layoutParams = gridLayout.layoutParams.apply { width = MosaicFork.realWidth }
+		val dm = gridLayout.context.resources.displayMetrics
+		val screenWidth = dm.widthPixels 
+		val realWidth = (screenWidth * MosaicFork.inputWidth).toInt()
+        gridLayout.layoutParams = gridLayout.layoutParams.apply { width = realWidth }
         this.evhandler = (this.adapter)?.eventHandler
     }
 	
@@ -150,7 +153,7 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 			val params = GridLayout.LayoutParams(rowSpec, colSpec).apply {
 				setMargins(6, 6, 6, 6)
 				width = 0
-				height = MosaicFork.targetHeight
+				height = if (MosaicFork.squareMode && (spanSize == 2 || spanSize == 4)) (MosaicFork.targetHeight * 2) / 3 else MosaicFork.targetHeight
 			}
 			container.setLayoutParams(params)
 
@@ -221,25 +224,24 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 
 	private fun getSpanSize(total: Int, position: Int): Int {
 		if (total == 1) return 6
+
 		if (total == 2) return 3
 
-		if (total == 3) {
-			return if (position < 2) 3 else 6
-		}
+		if (total == 3) return if (position == 0) 6 else 3
 
-		if (total >= 4 && total <= 6) {
-			if (total == 4) return 3
-			if (total == 5) if (position < 3) return 2 else 3
-			if (total == 6) return 2
-		}
+		if (total == 4) return 3
 
-		if (total >= 7 && total <= 9) {
-			if (total == 7) if (position < 3) return 2 else 3
-			if (total == 8) if (position < 6) return 2 else 3
-			if (total == 9) return 2
-		}
+		if (total == 5) return if (position == 0) 4 else if (position == 1) 2 else 2
 
-		if (total == 10) return if (position < 9)  2 else 6
+		if (total == 6) return 2
+
+		if (total == 7) return if (position == 0) 6 else 2
+
+		if (total == 8) return if (position == 0) 4 else if (position == 1) 2 else 2
+
+		if (total == 9) return 2
+
+		if (total == 10) return if (position == 0) 6 else 2
 
 		return 6
 	}
