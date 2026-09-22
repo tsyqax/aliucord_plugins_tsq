@@ -38,7 +38,7 @@ And... It is really bad to just make something and not release it.
 - [TranslateForkFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/TranslateForkFork.zip): Fix something maybe, Not my full code.
 
 
-### For Demonstration Purposes: VoiceChatFix
+### For Atmosphere Purposes: VoiceChatFix
 I brought this over because I wanted to see a "Connected" status in the voice channel before an official voice patch is released.
 
 I DID NOT WRITE this code (although I'm marked as the plugin author in menifest/details, I'm NEVER claiming this as my plugin);  
