@@ -53,10 +53,6 @@ Currently confirmed working features (VoiceChatFix1):
 The following features are currently known not to work on VoiceChatFix1, but this NEVER imply that they are impossible to implement in an official patch:  
 - Speaking, hearing human voices (sound is audible but unintelligible), turning on the camera, screen sharing, and viewing screen shares.
 
-If you UNDERSTAND all the above and still wish to use it, use the link below:  
-[VoiceChatFix1](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)  
-[VoiceChatFix2](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix2.zip)
-
 +) Note: VoiceChatFix2(ebce3dfd) is version for testmonkey's version.  
 This working much better than VocieChatFix1.  
 Not working features on VoiceChatFix1 is working on VoiceChatFix2.  
@@ -68,6 +64,10 @@ then working is on VoiceChatFix1 even if you have VoiceChatFix2 which turns on.
 +) Note: If your version is not voice fixed version, then try to use Stage Channels.  
 You can speak by selecting "Continue without starting" > "Become a speaker."    
 This usage method is unrelated to this temporary plugin.  
+
+If you UNDERSTAND all the above and still wish to use it, use the link below:  
+[VoiceChatFix1](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)  
+[VoiceChatFix2](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix2.zip)
 
 ※ I will remove this if any issues arise with the code.  
 ※ DO NOT claim elsewhere that this code is my own plugin!
