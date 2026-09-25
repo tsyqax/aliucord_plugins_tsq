@@ -38,7 +38,7 @@ And... It is really bad to just make something and not release it.
 - [TranslateForkFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/TranslateForkFork.zip): Fix something maybe, Not my full code.
 
 
-### For Atmosphere Purposes: VoiceChatFix
+### For Atmosphere Purposes: VoiceChatFix1, VoiceChatFix2
 I brought this over because I wanted to see a "Connected" status in the voice channel before an official voice patch is released.
 
 I DID NOT WRITE this code (although I'm marked as the plugin author in menifest/details, I'm NEVER claiming this as my plugin);  
@@ -48,13 +48,19 @@ this is a rough port of code(213c67d) from an Aliucord fork repository for Voice
 There is absolutely NO guarantee that this code will work.  
 
 Currently confirmed working features:  
-- Joining voice channels, hearing bot audio
+- Joining voice channels, hearing bot audio(without any user)
 
 The following features are currently known not to work, but this NEVER imply that they are impossible to implement in an official patch:  
 - Speaking, hearing human voices (sound is audible but unintelligible), turning on the camera, screen sharing, and viewing screen shares.
 
 If you UNDERSTAND all the above and still wish to use it, use the link below:  
-[VoiceChatFix, do you understand above?](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)
+[VoiceChatFix1](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)
+[VoiceChatFix2](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix2.zip)
+
++) Note: VoiceChatFix2(ebce3dfd) is version for testmonkey's version.
+This working much better than VocieChatFix1.  
+Not working features on VoiceChatFix1 is working on VoiceChatFix2.
+But if your version is NORMAL, then VoiceChatFix2 is NOT working.
 
 +) Note: If your version is not voice fixed version, then try to use Stage Channels.  
 You can speak by selecting "Continue without starting" > "Become a speaker."    
@@ -73,7 +79,6 @@ I just think of translatable plugin (providing translated texts for app and plug
 But I don't know about how to implement that and other detail ideas (at least now).  
 So, If you have Idea, please provide that [here](https://github.com/tsyqax/aliucord_plugins_tsq/issues/5) :>
   
-
 ---
 ## Says
 ### What is Fork?
