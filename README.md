@@ -42,15 +42,15 @@ And... It is really bad to just make something and not release it.
 I brought this over because I wanted to see a "Connected" status in the voice channel before an official voice patch is released.
 
 I DID NOT WRITE this code (although I'm marked as the plugin author in menifest/details, I'm NEVER claiming this as my plugin);  
-this is a rough port of code(213c67d) from an Aliucord fork repository for VoiceChatFix.  
+this is a rough port of code(213c67d) from an Aliucord fork repository for VoiceChatFix1.  
 (I extracted the core plugin code and modified it into a normal plugin.)
 
 There is absolutely NO guarantee that this code will work.  
 
-Currently confirmed working features:  
+Currently confirmed working features (VoiceChatFix1):  
 - Joining voice channels, hearing bot audio(without any user)
 
-The following features are currently known not to work, but this NEVER imply that they are impossible to implement in an official patch:  
+The following features are currently known not to work, but this NEVER imply that they are impossible to implement in an official patch (VoiceChatFix1):  
 - Speaking, hearing human voices (sound is audible but unintelligible), turning on the camera, screen sharing, and viewing screen shares.
 
 If you UNDERSTAND all the above and still wish to use it, use the link below:  
@@ -61,6 +61,9 @@ If you UNDERSTAND all the above and still wish to use it, use the link below:
 This working much better than VocieChatFix1.  
 Not working features on VoiceChatFix1 is working on VoiceChatFix2.  
 But if your version is NORMAL, then VoiceChatFix2 is NOT working.
+
+And, if your version is testmonkey, and if you turn on VoiceChatFix1 and VoiceChatFix2,  
+then working is on VoiceChatFix1 even if you have VoiceChatFix2 which turns on.
 
 +) Note: If your version is not voice fixed version, then try to use Stage Channels.  
 You can speak by selecting "Continue without starting" > "Become a speaker."    
