@@ -50,7 +50,7 @@ There is absolutely NO guarantee that this code will work.
 Currently confirmed working features (VoiceChatFix1):  
 - Joining voice channels, hearing bot audio(without any user)
 
-The following features are currently known not to work, but this NEVER imply that they are impossible to implement in an official patch (VoiceChatFix1):  
+The following features are currently known not to work on VoiceChatFix1, but this NEVER imply that they are impossible to implement in an official patch:  
 - Speaking, hearing human voices (sound is audible but unintelligible), turning on the camera, screen sharing, and viewing screen shares.
 
 If you UNDERSTAND all the above and still wish to use it, use the link below:  
