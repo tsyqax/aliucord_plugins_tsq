@@ -5,6 +5,10 @@ And... It is really bad to just make something and not release it.
 ## NOTE
 - Some plugins may contain bugs; if so, please create an issue.
 
+## Now Focusing on...
+- ForumTagFix, FixOnboardingFork
+(This is may be not accurate)
+
 ## LIST
 - [FriendFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FriendFix.zip): Fix issue when adding friend with new username style
 - [ThreadCMD](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadCMD.zip): Add /thread for making thread.
