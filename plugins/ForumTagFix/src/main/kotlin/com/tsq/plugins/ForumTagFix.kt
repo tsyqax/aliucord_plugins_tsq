@@ -291,6 +291,7 @@ class ForumTagFix: Plugin() {
 					}
 					
 					selectedTagIds.clear()
+                    if (indicatorView != null) root.removeView(indicatorView)
 
 					// before: UiKit_TextView_Subtext
 					indicatorView = TextView(itemView.context, null, 0, R.i.UiKit_Settings_Text).apply { 
