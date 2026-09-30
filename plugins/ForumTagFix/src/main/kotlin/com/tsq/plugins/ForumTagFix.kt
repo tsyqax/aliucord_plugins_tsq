@@ -2,12 +2,14 @@ package com.tsq.plugins
 
 import android.content.Context
 import android.os.Bundle
+import android.graphics.Paint
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.FragmentActivity
 
 import com.aliucord.Http
 import com.aliucord.Logger
@@ -18,6 +20,7 @@ import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.patcher.*
 import com.aliucord.utils.MDUtils
+import com.aliucord.utils.DimenUtils
 import com.aliucord.views.Button
 import com.aliucord.views.TextInput
 import com.aliucord.wrappers.ChannelWrapper
@@ -63,8 +66,6 @@ class ForumTagFix: Plugin() {
 	private var isSendingManually: Boolean = false
 	private var sBonmun: String? = null
 	private var sName: String? = null
-	private var lastTagCount = -1
-	
 	
 	init {
 		settingsTab = SettingsTab(PSettings::class.java, SettingsTab.Type.PAGE).withArgs(settings)
@@ -82,21 +83,25 @@ class ForumTagFix: Plugin() {
 			
 			var threadInput = TextInput(ctx, "Tag Change Label", "Label in context menu")
 			threadInput.getEditText().setText(settings.getString("change_tag", "Change Tags"))
+			
+			var threadDisplay = TextInput(ctx, "Tag Select Label", "Label in thread writing view")
+			threadDisplay.getEditText().setText(settings.getString("select_tag", "Select Tags"))
 
 			var saveButton = Button(ctx)
 			saveButton.text = "Save Settings"
 			
 			saveButton.setOnClickListener{v ->
 				val threadVal = threadInput.getEditText().getText().toString().trim();
+				val threadVal2 = threadDisplay.getEditText().getText().toString().trim();
 
 				settings.setString("change_tag", if (threadVal.isEmpty()) "Change Tags" else threadVal)
+				settings.setString("select_tag", if (threadVal.isEmpty()) "Select Tags" else threadVal2)
 
 				Utils.promptRestart()
-				
-				close()
 			}
 
 			layout.addView(threadInput)
+			layout.addView(threadDisplay)
 			layout.addView(saveButton)
 		}
 	}
@@ -111,36 +116,11 @@ class ForumTagFix: Plugin() {
 		Utils.tintToTheme(changeIcon)
 
 		val changeTagText = settings.getString("change_tag", "Change Tags")
+		val selectTagText = settings.getString("select_tag", "Select Tags")
 		
 		// [1] UI Trigger
-		val createForumMethod by lazy { ForumPostCreateManager::class.java.getDeclaredMethod("createForumPostWithMessage", Context::class.java, MessageManager::class.java, Long::class.javaPrimitiveType, Int::class.javaPrimitiveType, String::class.java, StoreThreadDraft.ThreadDraftState::class.java, MessageManager.AttachmentsRequest::class.java, Function2::class.java, Function2::class.java) }
-		patcher.patch(createForumMethod, PreHook { param -> 
-			if (isReinvoked) return@PreHook
-			
-			val channelId = param.args[2] as Long
-			val wrapper = ChannelWrapper(StoreStream.getChannels().getChannel(channelId))
-		
-			val availableTags = wrapper.availableTags
-			if (availableTags.isNullOrEmpty()) return@PreHook
-			
-			val originalFlow = param.result as? Observable<*>
-			logger.info("ORINIGLA: " + originalFlow)
-			
-			val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {
-				try {
-					isReinvoked = true
-					createForumMethod.isAccessible = true
-					createForumMethod.invoke(param.thisObject, *param.args)
-				} catch (e: Exception) { 
-					logger.error("SheetLoad", e)
-				} finally {
-					isReinvoked = false
-				}
-			})
-
-			Utils.openPageWithProxy(param.args[0] as Context, sheet)
-			param.result = null 
-		})		
+		//val createForumMethod by lazy { ForumPostCreateManager::class.java.getDeclaredMethod("createForumPostWithMessage", Context::class.java, MessageManager::class.java, Long::class.javaPrimitiveType, Int::class.javaPrimitiveType, String::class.java, StoreThreadDraft.ThreadDraftState::class.java, MessageManager.AttachmentsRequest::class.java, Function2::class.java, Function2::class.java) }
+		//patcher.patch(createForumMethod, PreHook { param -> 
 		
 		// [2] get value
 		val createThreadMethod by lazy { RestAPI::class.java.getDeclaredMethod("createThreadWithMessage", Long::class.javaPrimitiveType, String::class.java, String::class.java, List::class.java, List::class.java, Int::class.javaPrimitiveType, Int::class.javaObjectType, Array<MultipartBody.Part>::class.java) }
@@ -179,7 +159,7 @@ class ForumTagFix: Plugin() {
 			} catch (e: Exception) {
 				logger.error("Multipart", e)
 			}
-		});
+		})
 		
 		//thread actions (for tags)
 		val chListMethod = WidgetChannelsListItemThreadActions::class.java.getDeclaredMethod("configureUI", WidgetChannelsListItemThreadActions.Model::class.java)
@@ -263,7 +243,16 @@ class ForumTagFix: Plugin() {
 				})
 					
 				tv.setOnClickListener { v ->
-					Utils.openPageWithProxy(lay.context, sheet)
+					try {
+						val activity = Utils.appActivity as? FragmentActivity
+						val fragmentManager = activity?.supportFragmentManager
+						
+						if (fragmentManager != null) {
+							sheet.show(fragmentManager, "forum_tag_picker_sheet")
+						}
+					} catch (e: Exception) {
+						logger.error("SheetShowError", e)
+					}
 				}
 			}
 		})
@@ -279,13 +268,10 @@ class ForumTagFix: Plugin() {
 				
 				val formEntry = dataEntry
 				val rawChannel = formEntry.parentChannel
-				
 				if (rawChannel == null) return@Hook
 				
 				val wrapper = ChannelWrapper(rawChannel)
-				
-				val chType = wrapper.type
-				if (chType != 15 && chType != 16) return@Hook
+				//if (wrapper.type != 15 && wrapper.type != 16) return@Hook
 				
 				var bindingField = form::class.java.getDeclaredField("binding")
 				bindingField.isAccessible = true
@@ -295,36 +281,48 @@ class ForumTagFix: Plugin() {
 				
 				if (itemView is ViewGroup) {
 					val root = itemView
-					
-					val viewTag = "forumTagFix_plugin_indicator"
+					val viewTag = "forumTagFix_indicator"
 					var indicatorView = root.findViewWithTag(viewTag) as? TextView
 					
-					var availableTags = wrapper.availableTags
+					val availableTags = wrapper.availableTags
 					
-					val tagCount = availableTags.size
-					
-					var guideText = "\n**" + tagCount + "** tags found!";
-						
-					if (tagCount > 0) {
-						guideText += "\nTag selector will display after click send button";
-					}
-						
-					if (indicatorView != null && tagCount == lastTagCount) {
+					if (availableTags.isNullOrEmpty()) {
+						if (indicatorView != null) root.removeView(indicatorView)
 						return@Hook
 					}
 					
+					selectedTagIds.clear()
+
 					if (indicatorView == null) {
-						indicatorView = TextView(itemView.context, null, 0, R.i.UiKit_TextView_Subtext)
-						indicatorView.tag = viewTag
-						indicatorView.text = MDUtils.render(guideText)
-						
+						// before: UiKit_TextView_Subtext
+						indicatorView = TextView(itemView.context, null, 0, R.i.UiKit_Settings_Text).apply { 
+							tag = viewTag
+							text = selectTagText
+							paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+							
+							setPadding(0, DimenUtils.dpToPx(8), 0, 0)
+							
+							isClickable = true
+							val outValue = android.util.TypedValue()
+
+							setOnClickListener {
+								
+								val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {})
+								
+								try {
+									val activity = itemView.context as? FragmentActivity
+									val fragmentManager = activity?.supportFragmentManager
+									
+									if (fragmentManager != null) {
+										sheet.show(fragmentManager, "forum_tag_picker_sheet")
+									}
+								} catch (e: Exception) {
+									logger.error("SheetShowError", e)
+								}
+							}
+						}
 						root.addView(indicatorView)
-					} else {
-						indicatorView.text = MDUtils.render(guideText)
 					}
-					
-					lastTagCount = tagCount
-					
 				}
 			} catch (e: Exception) {
 				logger.error("Indicator", e)
