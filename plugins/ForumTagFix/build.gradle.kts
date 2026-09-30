@@ -1,10 +1,13 @@
-version = "1.3.0" // Plugin version. Increment this to trigger an update
+version = "1.3.1" // Plugin version. Increment this to trigger an update
 description = "Fix issues with Tags on ForumTag" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.3.1
+        * Fix: no tagSheet renewal
+
         # 1.3.0
         * Make much better TagSelector
         * TagSelector is now compatible with themer
