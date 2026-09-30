@@ -5,10 +5,6 @@ And... It is really bad to just make something and not release it.
 ## NOTE
 - Some plugins may contain bugs; if so, please create an issue.
 
-## Now Focusing on...
-- ForumTagFix, FixOnboardingFork
-(This is may be not accurate)
-
 ## LIST
 - [FriendFix](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/FriendFix.zip): Fix issue when adding friend with new username style
 - [ThreadCMD](https://github.com/tsyqax/aliucord_plugins_tsq/raw/builds/ThreadCMD.zip): Add /thread for making thread.
@@ -88,6 +84,9 @@ So, If you have Idea, please provide that [here](https://github.com/tsyqax/aliuc
   
 ---
 ## Says
+### If you want...
+If you want to upload, refactor, modify, merge or improve my plugins, I'm okay and very happy if you mark me as contributors, collaborators, or original authors.
+
 ### What is Fork?
 It refers to the unofficial succession of plugins that solve the same problem. Maybe remaking?   
 Usually, the term "Fork" implies an improved version, but the forks I create have similar flows but often different logic.  
