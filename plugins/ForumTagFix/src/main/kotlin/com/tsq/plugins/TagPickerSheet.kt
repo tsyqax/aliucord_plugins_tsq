@@ -11,16 +11,18 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 
 import com.aliucord.Utils
 import com.aliucord.utils.DimenUtils
 import com.aliucord.views.Button
-import com.aliucord.views.DangerButton
 import com.aliucord.widgets.BottomSheet
 
+import com.google.android.flexbox.FlexboxLayout
+
+import com.discord.utilities.view.text.SimpleDraweeSpanTextView
 import com.discord.api.channel.ForumTag
 import com.lytefast.flexinput.R
 
@@ -29,18 +31,12 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 	
 	// minor
 	constructor(tags: MutableList<ForumTag>, selectedTagIds: MutableList<Long>, onComplete: Runnable) : this(tags, selectedTagIds, null, onComplete)
+	
 	private fun closePage() {
 		Utils.mainThread.post {
 			try {
 				dismiss()
 			} catch (ignore: Exception) {}
-			
-			// null = skip
-			activity?.run {
-				if (!isFinishing) {
-					finish()
-				}
-			}
 		}
 	}
 	
@@ -70,35 +66,45 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 		}
 		root.addView(title)
 
-		// RecyclerView
-		// NestedScrollView + LinearLayout
-		val rv = RecyclerView(context)
-		val adapter = TagAdapter(tags, selectedSet)
-		val rvParams = LinearLayout.LayoutParams(-1, 0, 1.0f)
-		
-		rv.layoutManager  = LinearLayoutManager(context)
-		rv.adapter = adapter
-		(rv.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
-		
-		val buttonRow = LinearLayout(context).apply {
-			orientation = LinearLayout.HORIZONTAL
-			layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-		}
-		
-		val btnParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f).apply {
-			rightMargin = DimenUtils.dpToPx(4)
-			leftMargin = DimenUtils.dpToPx(4)
-		}
-		
-		val cancel = DangerButton(context).apply {
-			text = "Cancel"
-			layoutParams = btnParams
-			setOnClickListener { closePage() }
+		val scrollView = object : NestedScrollView(context) {
+			override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+				val maxPx = DimenUtils.dpToPx(320)
+				val newHeightSpec = View.MeasureSpec.makeMeasureSpec(maxPx, View.MeasureSpec.AT_MOST)
+				super.onMeasure(widthMeasureSpec, newHeightSpec)
+			}
+		}.apply {
+			layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+				topMargin = DimenUtils.dpToPx(8)
+				weight = 1.0f 
+			}
 		}
 
+		val flexContainer = FlexboxLayout(context, null).apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+            setFlexDirection(0)
+            setFlexWrap(1)
+            
+            val margin10 = DimenUtils.dpToPx(10)
+            setPadding(margin10, 0, margin10, 0)
+        }
+
+        val adapter = TagAdapter(tags, selectedSet)
+        val count = adapter.itemCount
+        
+        for (i in 0 until count) {
+            val holder = adapter.onCreateViewHolder(flexContainer, adapter.getItemViewType(i))
+            adapter.onBindViewHolder(holder, i)
+            flexContainer.addView(holder.container)
+        }
+
+        scrollView.addView(flexContainer)
+		
 		val confirm = Button(context).apply {
 			text = "OK"
-			layoutParams = btnParams
+			layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+				topMargin = DimenUtils.dpToPx(8)
+			}
 			setOnClickListener {
 				selectedTagIds.clear()
 				selectedTagIds.addAll(selectedSet)
@@ -107,11 +113,8 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 			}
 		}
 		
-		buttonRow.addView(cancel)
-		buttonRow.addView(confirm)
-		
-		root.addView(rv, rvParams)
-		root.addView(buttonRow)
+		root.addView(scrollView)
+		root.addView(confirm)
 
 		addView(root)
 	}
@@ -119,54 +122,81 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 	private class TagAdapter(private val data: MutableList<ForumTag>, private val selected: MutableSet<Long>): RecyclerView.Adapter<TagAdapter.VH>() {
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
 			val context = parent.context
-			val ph = DimenUtils.dpToPx(16) 
-			val pv = DimenUtils.dpToPx(10) 
+			val ph8 = DimenUtils.dpToPx(8)
+			val pv2 = DimenUtils.dpToPx(2)
 
-			val tv = TextView(context, null, 0, R.i.UiKit_Settings_Text).apply {
-				setPadding(ph, pv, ph, pv)
+			val itemLayout = LinearLayout(context).apply {
+				orientation = LinearLayout.HORIZONTAL
+				setPadding(ph8, pv2, ph8, pv2)
 
-				layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+				layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+					rightMargin = DimenUtils.dpToPx(8)
 					bottomMargin = DimenUtils.dpToPx(8)
 				}
 				
-				val baseTextColor = currentTextColor
-				val defaultBorderColor = ColorUtils.setAlphaComponent(baseTextColor, 95)
-				
 				background = GradientDrawable().apply {
 					shape = GradientDrawable.RECTANGLE
-					setStroke(DimenUtils.dpToPx(1), defaultBorderColor)
-					setColor(Color.TRANSPARENT)
 					cornerRadius = DimenUtils.dpToPx(14).toFloat() 
 				}
 			}
-			return VH(tv)
+
+			val emojiView = SimpleDraweeSpanTextView(context).apply {
+				id = View.generateViewId()
+				layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+				visibility = View.GONE
+			}
+
+			val nameView = TextView(context, null, 0, R.i.UiKit_Settings_Text).apply {
+				id = View.generateViewId()
+				layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+				setPadding(DimenUtils.dpToPx(4), 0, 0, 0)
+				maxLines = 1
+			}
+
+			itemLayout.addView(emojiView)
+			itemLayout.addView(nameView)
+
+			return VH(itemLayout, emojiView, nameView)
 		}
 		
 		override fun onBindViewHolder(holder: VH, position: Int) {
 			val tag = data[position]
 			val id = tag.c()
-			holder.tv.text = (if (tag.b() != null) tag.b() + " " else "") + tag.d()
 			
-			val strokeDrawable = holder.tv.background as GradientDrawable
-			
-			if (selected.contains(id)) {
-				strokeDrawable.setColor(0x405865F2)
+			if (tag.b() != null) {
+				holder.emojiTv.text = tag.b().toString()
+				holder.emojiTv.visibility = View.VISIBLE
 			} else {
-				strokeDrawable.setColor(Color.TRANSPARENT)
+				holder.emojiTv.visibility = View.GONE
+			}
+
+			holder.nameTv.text = tag.d()
+
+			val strokeDrawable = holder.container.background as GradientDrawable
+			val baseTextColor = holder.nameTv.currentTextColor
+			
+			strokeDrawable.setColor(Color.TRANSPARENT)
+
+			if (selected.contains(id)) {
+				val thickness1_7dp = (DimenUtils.dpToPx(17) / 10f).toInt().coerceAtLeast(1)
+				strokeDrawable.setStroke(thickness1_7dp, 0xFF5865F2.toInt())
+			} else {
+				val thickness1dp = DimenUtils.dpToPx(1)
+				val defaultBorderColor = ColorUtils.setAlphaComponent(baseTextColor, 95)
+				strokeDrawable.setStroke(thickness1dp, defaultBorderColor)
 			}
 			
-			holder.tv.setOnClickListener { v ->
+			holder.container.setOnClickListener {
 				if (selected.contains(id)) {
 					selected.remove(id)
-					strokeDrawable.setColor(Color.TRANSPARENT)
 				} else {
 					selected.add(id)
 				}
-				notifyItemChanged(position)
+				onBindViewHolder(holder, position)
 			}
 		}
 
-		override fun getItemCount(): Int{
+		override fun getItemCount(): Int {
 			try {
 				return data.size
 			} catch (e: Exception) {
@@ -174,8 +204,6 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 			}
 		}
 		
-		class VH(v: View): RecyclerView.ViewHolder(v) {
-			val tv: TextView = v as TextView
-		}
+		class VH(val container: LinearLayout, val emojiTv: SimpleDraweeSpanTextView, val nameTv: TextView): RecyclerView.ViewHolder(container)
 	}
 }
