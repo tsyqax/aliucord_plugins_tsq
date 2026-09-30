@@ -26,7 +26,6 @@ class ServerNicknameFix: Plugin() {
 				if (isCanChange) return@Hook
 				
 				val request = param.result as? Request
-				
 				if (request == null) return@Hook
 				
 				val url = request.b
@@ -39,26 +38,30 @@ class ServerNicknameFix: Plugin() {
 							dataField.isAccessible = true
 							val dataObj = dataField.get(body)
 							
-							if (dataObj	is okio.ByteString) {
+							if (dataObj is okio.ByteString) {
 								val content = dataObj.q()
 								
 								if (content != null) {
-									val patched = content.replace("\"bio\":\"\"", "").replace("{,", "{").replace(",}", "}")
-									
-									// RequestBody.create(MediaType, String)
+									val patched = try {
+										val jsonObject = org.json.JSONObject(content)
+										if (jsonObject.has("bio") && jsonObject.getString("bio") == "") {
+											jsonObject.remove("bio")
+										}
+										jsonObject.toString()
+									} catch (e: Exception) {
+										content
+									}
+
 									val newBody = RequestBody.create(body.contentType(), patched)
-									
-									// 7. Request Creator (b, c, d, e, f)
 									val newRequest = Request(
-										url,           // b
-										request.c,     // method
-										request.d,     // headers
-										newBody,       // e
-										request.f      // tags
+										url,
+										request.c,
+										request.d,
+										newBody,
+										request.f
 									)
 									
 									param.result = newRequest
-									
 									logger.info("Static Patch Success: I like FriendFix!")
 								}
 							}
