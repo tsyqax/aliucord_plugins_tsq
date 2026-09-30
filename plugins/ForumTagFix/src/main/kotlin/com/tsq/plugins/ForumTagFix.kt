@@ -292,36 +292,34 @@ class ForumTagFix: Plugin() {
 					
 					selectedTagIds.clear()
 
-					if (indicatorView == null) {
-						// before: UiKit_TextView_Subtext
-						indicatorView = TextView(itemView.context, null, 0, R.i.UiKit_Settings_Text).apply { 
-							tag = viewTag
-							text = selectTagText
-							paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+					// before: UiKit_TextView_Subtext
+					indicatorView = TextView(itemView.context, null, 0, R.i.UiKit_Settings_Text).apply { 
+						tag = viewTag
+						text = selectTagText
+						paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
 							
-							setPadding(0, DimenUtils.dpToPx(8), 0, 0)
+						setPadding(0, DimenUtils.dpToPx(8), 0, 0)
 							
-							isClickable = true
-							val outValue = android.util.TypedValue()
+						isClickable = true
+						val outValue = android.util.TypedValue()
 
-							setOnClickListener {
+						setOnClickListener {
 								
-								val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {})
+							val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {})
 								
-								try {
-									val activity = itemView.context as? FragmentActivity
-									val fragmentManager = activity?.supportFragmentManager
+							try {
+								val activity = itemView.context as? FragmentActivity
+								val fragmentManager = activity?.supportFragmentManager
 									
-									if (fragmentManager != null) {
-										sheet.show(fragmentManager, "forum_tag_picker_sheet")
-									}
-								} catch (e: Exception) {
-									logger.error("SheetShowError", e)
+								if (fragmentManager != null) {
+									sheet.show(fragmentManager, "forum_tag_picker_sheet")
 								}
+							} catch (e: Exception) {
+								logger.error("SheetShowError", e)
 							}
 						}
-						root.addView(indicatorView)
-					}
+                    }
+					root.addView(indicatorView)
 				}
 			} catch (e: Exception) {
 				logger.error("Indicator", e)
