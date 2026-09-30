@@ -244,9 +244,7 @@ class ForumTagFix: Plugin() {
 					
 				tv.setOnClickListener { v ->
 					try {
-						val activity = Utils.appActivity as? FragmentActivity
-						val fragmentManager = activity?.supportFragmentManager
-						
+						val fragmentManager = actions.getParentFragmentManager()
 						if (fragmentManager != null) {
 							sheet.show(fragmentManager, "forum_tag_picker_sheet")
 						}
