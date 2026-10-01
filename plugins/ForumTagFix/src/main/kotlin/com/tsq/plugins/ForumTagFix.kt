@@ -299,37 +299,22 @@ class ForumTagFix: Plugin() {
 							
 							isClickable = true
 							val outValue = android.util.TypedValue()
-
-							setOnClickListener {
-								val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {})
-								
-								try {
-									val activity = itemView.context as? FragmentActivity
-									val fragmentManager = activity?.supportFragmentManager
-									
-									if (fragmentManager != null) {
-										sheet.show(fragmentManager, "forum_tag_picker_sheet")
-									}
-								} catch (e: Exception) {
-									logger.error("SheetShowError", e)
-								}
-							}
 						}
 						root.addView(indicatorView)
-					} else {
-						indicatorView.setOnClickListener {
-							val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {})
-								
-							try {
-								val activity = itemView.context as? FragmentActivity
-								val fragmentManager = activity?.supportFragmentManager
-									
-								if (fragmentManager != null) {
-									sheet.show(fragmentManager, "forum_tag_picker_sheet")
-								}
-							} catch (e: Exception) {
-								logger.error("SheetShowError", e)
+					}
+
+					indicatorView.setOnClickListener {
+						val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {})
+						
+						try {
+							val activity = itemView.context as? FragmentActivity
+							val fragmentManager = activity?.supportFragmentManager
+							
+							if (fragmentManager != null) {
+								sheet.show(fragmentManager, "forum_tag_picker_sheet")
 							}
+						} catch (e: Exception) {
+							logger.error("SheetShowError", e)
 						}
 					}
 				}
