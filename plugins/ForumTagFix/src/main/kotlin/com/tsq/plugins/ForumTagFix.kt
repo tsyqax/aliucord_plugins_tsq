@@ -19,7 +19,6 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.entities.Plugin
 import com.aliucord.fragments.SettingsPage
 import com.aliucord.patcher.*
-import com.aliucord.utils.MDUtils
 import com.aliucord.utils.DimenUtils
 import com.aliucord.views.Button
 import com.aliucord.views.TextInput
@@ -244,11 +243,8 @@ class ForumTagFix: Plugin() {
 					
 				tv.setOnClickListener { v ->
 					try {
-						val activity = Utils.appActivity as? FragmentActivity
-					    val fragmentManager = activity?.supportFragmentManager
-                        if (fragmentManager != null) {
-							sheet.show(fragmentManager, "forum_tag_picker_sheet")
-						}
+						val fragmentManager = actions.getParentFragmentManager()
+						sheet.show(fragmentManager, "forum_tag_picker_sheet")
 					} catch (e: Exception) {
 						logger.error("SheetShowError", e)
 					}
@@ -291,21 +287,37 @@ class ForumTagFix: Plugin() {
 					}
 					
 					selectedTagIds.clear()
-                    if (indicatorView != null) root.removeView(indicatorView)
 
-					// before: UiKit_TextView_Subtext
-					indicatorView = TextView(itemView.context, null, 0, R.i.UiKit_Settings_Text).apply { 
-						tag = viewTag
-						text = selectTagText
-						paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+					if (indicatorView == null) {
+						// before: UiKit_TextView_Subtext
+						indicatorView = TextView(itemView.context, null, 0, R.i.UiKit_Settings_Text).apply { 
+							tag = viewTag
+							text = selectTagText
+							paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
 							
-						setPadding(0, DimenUtils.dpToPx(8), 0, 0)
+							setPadding(0, DimenUtils.dpToPx(10), 0, 0)
 							
-						isClickable = true
-						val outValue = android.util.TypedValue()
+							isClickable = true
+							val outValue = android.util.TypedValue()
 
-						setOnClickListener {
+							setOnClickListener {
+								val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {})
 								
+								try {
+									val activity = itemView.context as? FragmentActivity
+									val fragmentManager = activity?.supportFragmentManager
+									
+									if (fragmentManager != null) {
+										sheet.show(fragmentManager, "forum_tag_picker_sheet")
+									}
+								} catch (e: Exception) {
+									logger.error("SheetShowError", e)
+								}
+							}
+						}
+						root.addView(indicatorView)
+					} else {
+						indicatorView.setOnClickListener {
 							val sheet = TagPickerSheet(availableTags.toMutableList(), selectedTagIds, Runnable {})
 								
 							try {
@@ -319,8 +331,7 @@ class ForumTagFix: Plugin() {
 								logger.error("SheetShowError", e)
 							}
 						}
-                    }
-					root.addView(indicatorView)
+					}
 				}
 			} catch (e: Exception) {
 				logger.error("Indicator", e)
