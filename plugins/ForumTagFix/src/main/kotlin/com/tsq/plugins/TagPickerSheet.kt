@@ -122,16 +122,17 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 	private class TagAdapter(private val data: MutableList<ForumTag>, private val selected: MutableSet<Long>): RecyclerView.Adapter<TagAdapter.VH>() {
 		override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
 			val context = parent.context
-			val ph8 = DimenUtils.dpToPx(8)
-			val pv2 = DimenUtils.dpToPx(2)
+			val dp2 = DimenUtils.dpToPx(2)
+			val dp8 = DimenUtils.dpToPx(8)
+			val dp4 = DimenUtils.dpToPx(4)
 
 			val itemLayout = LinearLayout(context).apply {
 				orientation = LinearLayout.HORIZONTAL
-				setPadding(ph8, pv2, ph8, pv2)
+				setPadding(dp8, dp4, dp8, dp4)
 
 				layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-					rightMargin = DimenUtils.dpToPx(8)
-					bottomMargin = DimenUtils.dpToPx(8)
+					rightMargin = dp8
+					bottomMargin = dp8
 				}
 				
 				background = GradientDrawable().apply {
@@ -140,40 +141,32 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 				}
 			}
 
-			val emojiView = SimpleDraweeSpanTextView(context).apply {
-				id = View.generateViewId()
-				layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-				visibility = View.GONE
-			}
-
 			val nameView = TextView(context, null, 0, R.i.UiKit_Settings_Text).apply {
 				id = View.generateViewId()
 				layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-				setPadding(DimenUtils.dpToPx(4), 0, 0, 0)
 				maxLines = 1
+				setPadding(dp2, 0, dp2, 0)
 			}
 
-			itemLayout.addView(emojiView)
 			itemLayout.addView(nameView)
 
-			return VH(itemLayout, emojiView, nameView)
+			return VH(itemLayout, nameView)
 		}
 		
 		override fun onBindViewHolder(holder: VH, position: Int) {
 			val tag = data[position]
 			val id = tag.c()
+			val dp4 = DimenUtils.dpToPx(4)
 			
 			if (tag.b() != null) {
-				holder.emojiTv.text = tag.b().toString()
-				holder.emojiTv.visibility = View.VISIBLE
+				holder.tv.text = tag.b() + " " + tag.d()
 			} else {
-				holder.emojiTv.visibility = View.GONE
+				holder.tv.text = tag.d()
+				holder.tv.setPadding(dp4, 0, dp4, 0)
 			}
-
-			holder.nameTv.text = tag.d()
-
+			
 			val strokeDrawable = holder.container.background as GradientDrawable
-			val baseTextColor = holder.nameTv.currentTextColor
+			val baseTextColor = holder.tv.currentTextColor
 			
 			strokeDrawable.setColor(Color.TRANSPARENT)
 
@@ -204,6 +197,6 @@ class TagPickerSheet(private val tags: MutableList<ForumTag>, private val select
 			}
 		}
 		
-		class VH(val container: LinearLayout, val emojiTv: SimpleDraweeSpanTextView, val nameTv: TextView): RecyclerView.ViewHolder(container)
+		class VH(val container: LinearLayout, val tv: TextView): RecyclerView.ViewHolder(container)
 	}
 }
