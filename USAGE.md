@@ -46,7 +46,7 @@
 - If you join a server but messages fail to send, it may be due to an onboarding issue. Please follow the steps below.
 - (Since 1.3.0) Enable the 'Old Style' option if you prefer the classic onboarding screen.
 
-<How to use Onboarding>
+\<How to use Onboarding>
 - Use the `/onboarding` command.
 - (Since 1.1.1) You can also start onboarding via the guild menu that appears when you long-press the guild icon.
 - (Since 1.1.3) If 'Auto Mode' is enabled, onboarding is automatically checked when joining a server.
@@ -56,7 +56,7 @@
 (It is actually implemented differently.)
 - Below are detailed explanations of the settings.
 
-<Settings>
+\<Settings>
 - (Since v1.1.8) Width Ratio: The width the grid occupies relative to the full screen.
 - (Since v1.1.8) Height DP: The height the grid occupies.
 - (Since v1.1.8) Padding DP: The distance of the grid from the left edge. - (Since 1.1.9) Animated WebP: An option to render as WebP instead of GIF.
