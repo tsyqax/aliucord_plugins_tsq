@@ -39,6 +39,7 @@ And... It is really bad to just make something and not release it.
 
 
 ### For Atmosphere Purposes: VoiceChatFix1, VoiceChatFix2
+#### If you using Aliukoi but want to use Updator, then Use VoiceChatFix2!!
 I brought this over because I wanted to see a "Connected" status in the voice channel before an official voice patch is released.
 
 I DID NOT WRITE this code (although I'm marked as the plugin author in menifest/details, I'm NEVER claiming this as my plugin);  
