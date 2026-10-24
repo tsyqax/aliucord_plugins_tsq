@@ -29,9 +29,11 @@ import com.facebook.drawee.view.SimpleDraweeView
 
 class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEntry> {
     private val gridLayout: GridLayout
-    private val isOpened = hashSetOf<Int>()
+    //private val isOpened = hashSetOf<Int>()
     private var evhandler: WidgetChatListAdapter.EventHandler? = null
 	private var realWidth: Int = 0;
+	private var playButtonSizePx: Int = 0
+    private var playButtonPaddingPx: Int = 0
 
     constructor(gridLayout: GridLayout, adapter: WidgetChatListAdapter) : super(gridLayout, adapter) {
         this.gridLayout = gridLayout
@@ -42,23 +44,31 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
         this.gridLayout = gridLayout
         initGrid()
     }
-
-    private fun initGrid() {
-		val dm = gridLayout.context.resources.displayMetrics
-		val screenWidth = dm.widthPixels 
-		realWidth = (screenWidth * MosaicFork.inputWidth).toInt()
-        gridLayout.layoutParams = gridLayout.layoutParams.apply { width = realWidth }
-        this.evhandler = (this.adapter)?.eventHandler
-    }
 	
+	private fun initGrid() {
+        val dm = gridLayout.context.resources.displayMetrics
+        playButtonSizePx = (52 * dm.density).toInt()
+        playButtonPaddingPx = (8 * dm.density).toInt()
+        updateGridSize()
+        evhandler = this.adapter?.eventHandler
+    }
+
 	fun getGridLayout() = this.gridLayout
 	
 	private val shouldEnableSpoilerMethod by lazy {
-        PluginManager.plugins.get("BetterSpoiler")?.javaClass?.getDeclaredMethod("shouldEnableSpoiler", Message::class.java, Long::class.javaPrimitiveType)?.apply { isAccessible = true }
-    }
-	
+		runCatching {
+			PluginManager.plugins.get("BetterSpoiler")?.javaClass
+				?.getDeclaredMethod("shouldEnableSpoiler", Message::class.java, Long::class.javaPrimitiveType)
+				?.apply { isAccessible = true }
+		}.getOrNull()
+	}
+
 	private val swipeMediaLaunchMethod by lazy {
-		PluginManager.plugins.get("SwipeMediaViewer")?.javaClass?.getDeclaredMethod("launchGroup", Context::class.java, List::class.java, MessageAttachment::class.java)?.apply { isAccessible = true }
+		runCatching {
+			PluginManager.plugins.get("SwipeMediaViewer")?.javaClass
+				?.getDeclaredMethod("launchGroup", Context::class.java, List::class.java, MessageAttachment::class.java)
+				?.apply { isAccessible = true }
+		}.getOrNull()
 	}
 	
 	private val sharedOutlineProvider = object : ViewOutlineProvider() {
@@ -67,13 +77,51 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 		}
 	}
 
+    private fun updateGridSize() {
+        val screenWidth = gridLayout.context.resources.displayMetrics.widthPixels
+        val targetWidth = (screenWidth * MosaicFork.inputWidth).toInt().coerceAtLeast(1)
+        realWidth = targetWidth
+		
+        gridLayout.layoutParams?.let { params ->
+            if (params.width != targetWidth) {
+				params.width = targetWidth
+                gridLayout.layoutParams = params
+            }
+        }
+    }
+	
+    private fun getTileHeights(total: Int): IntArray {
+		fun squareHeight(span: Int): Int = ((realWidth.toLong() * span / 6) - 12L).toInt().coerceAtLeast(1)
+
+		val tileHeights = IntArray(total) { i -> squareHeight(getSpanSize(total, i)) }
+
+		if (total > 1 && getSpanSize(total, 0) == 6) {
+			val halfWidthHeight = squareHeight(3) 
+			tileHeights[0] = minOf(tileHeights[0], halfWidthHeight)
+		}
+
+		return tileHeights
+	}
+	
+	private fun createTileLayoutParams(spanSize: Int, tileHeight: Int): GridLayout.LayoutParams {
+        val rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1)
+        val colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, spanSize.toFloat())
+
+        return GridLayout.LayoutParams(rowSpec, colSpec).apply {
+            setMargins(6, 6, 6, 6)
+            width = 0
+            height = tileHeight
+        }
+    }
+
 	override fun onConfigure(position: Int, data: ChatListEntry) {
 		val mosaicEntry = data as? MosaicEntry ?: return
 		
 		val images = mosaicEntry.images
 		val msg = mosaicEntry.msg
 		val total = images.size
-
+		
+		updateGridSize()
 		gridLayout.setColumnCount(6)
 
 		val currentChildCount = gridLayout.getChildCount()
@@ -82,13 +130,13 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 		if (currentChildCount > total) gridLayout.removeViews(total, currentChildCount - total)
 		
 		val guildId = StoreStream.getGuildSelected().getSelectedGuildId()
-		var shouldSpoilered = false
-		
-		if (PluginManager.isPluginEnabled("BetterSpoiler")) {
-			shouldSpoilered = PluginManager.plugins.get("BetterSpoiler")?.let { bs ->
-				shouldEnableSpoilerMethod?.invoke(bs, msg, guildId) as? Boolean
+		val shouldSpoilered = if (PluginManager.isPluginEnabled("BetterSpoiler")) {
+			PluginManager.plugins.get("BetterSpoiler")?.let { bs ->
+				runCatching { shouldEnableSpoilerMethod?.invoke(bs, msg, guildId) as? Boolean }.getOrNull()
 			} ?: false
-		}
+		} else false
+		
+		val tileHeights = getTileHeights(total)
 
 		for (i in 0 until total) {
 			var container: FrameLayout? = null
@@ -110,20 +158,18 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 				val playButton = ImageView(gridLayout.context).apply {
 					setImageResource(android.R.drawable.ic_media_play)
 					setColorFilter(Color.WHITE)					
-					val circleBg = GradientDrawable().apply {
+					background = GradientDrawable().apply {
 						setShape(GradientDrawable.OVAL)
 						setColor(Color.parseColor("#80000000"))
 					}
-					setBackground(circleBg)
-					val padding = (8 * gridLayout.context.resources.displayMetrics.density).toInt()
-					setPadding(padding, padding, padding, padding)
+					setPadding(playButtonPaddingPx, playButtonPaddingPx, playButtonPaddingPx, playButtonPaddingPx)
 					visibility = View.GONE
 					tag = "PLAY_BTN"
 				}
 				
-				val btnSize = (52 * gridLayout.context.resources.displayMetrics.density).toInt()
-				val btnParams = FrameLayout.LayoutParams(btnSize, btnSize)
-				btnParams.gravity = Gravity.CENTER
+				val btnParams = FrameLayout.LayoutParams(playButtonSizePx, playButtonSizePx).apply {
+					gravity = Gravity.CENTER
+				}
 
 				val spoilerOverlay = TextView(gridLayout.context).apply {
 					text = "SPOILER"
@@ -136,37 +182,26 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 					setClipToOutline(true)
 					visibility = View.GONE
 					tag = "SPOILER_VIEW" 
-					setOnClickListener { v ->
-						v.visibility = View.GONE 
-						isOpened.add(i)
-					}
 				}
-				
+
 				container.addView(imageView, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
 				container.addView(playButton, btnParams)
 				container.addView(spoilerOverlay, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
 				
-				gridLayout.addView(container)
+				//gridLayout.addView(container)
 			}
 
-			val rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1)
-			val colSpec = GridLayout.spec(GridLayout.UNDEFINED, spanSize, 1f)
-			val params = GridLayout.LayoutParams(rowSpec, colSpec).apply {
-				setMargins(6, 6, 6, 6)
-				width = 0
-				height = if (MosaicFork.squareMode) {
-					when (spanSize) {
-						2 -> realWidth / 3
-						3 -> realWidth / 2
-						4 -> realWidth / 3
-						6 -> realWidth / 2
-						else -> MosaicFork.targetHeight
-					}
-				} else {
-					MosaicFork.targetHeight
+            val tileHeight = tileHeights[i]
+            if (container.parent == null) {
+				gridLayout.addView(container, createTileLayoutParams(spanSize, tileHeight))
+				container.tag = spanSize
+			} else {
+				val currentParams = container.layoutParams as? GridLayout.LayoutParams
+				if (currentParams == null || currentParams.height != tileHeight || (container.tag as? Int) != spanSize) {
+					container.layoutParams = createTileLayoutParams(spanSize, tileHeight)
+					container.tag = spanSize
 				}
 			}
-			container.setLayoutParams(params)
 
 			val attachment = images.get(i)
 			val fileType = attachment.e().ordinal
@@ -176,35 +211,38 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 			val spoilerView = container.findViewWithTag<TextView>("SPOILER_VIEW")
 			
 			if (fileType == 0) {
-				if (MosaicFork.lowImage) {
-					imageUrl = attachment.c() + "format=jpeg&width=500&height=500&"
+				imageUrl = if (MosaicFork.lowImage) {
+					imageUrl + "format=jpeg&width=500&height=500&"
 				} else {
-					imageUrl = attachment.c() + "format=jpeg&"
+					imageUrl + "format=jpeg&"
 				}
-					
 				MGImages.setImage(imageView, imageUrl)
 				playBtn?.visibility = View.VISIBLE
 				playBtn?.bringToFront()
-				
 			} else {
-				if (imageUrl.lowercase().contains(".gif")) {
-					if (MosaicFork.aniMode) imageUrl = imageUrl + "animated=true&format=webp&" 
-					if (!MosaicFork.autoGif) imageUrl = imageUrl + "format=jpeg&" 
+				if (imageUrl.contains(".gif", ignoreCase = true)) {
+					if (MosaicFork.aniMode) imageUrl = imageUrl + "animated=true&format=webp&"
+					if (!MosaicFork.autoGif) imageUrl = imageUrl + "format=jpeg&"
 					if (MosaicFork.lowGif) imageUrl = imageUrl + "width=200&height=200&"
-				} else {
-					if (MosaicFork.lowImage) imageUrl = imageUrl + "width=500&height=500&"
+				} else if (MosaicFork.lowImage) {
+					imageUrl = imageUrl + "width=500&height=500&"
 				}
-		
+
 				MGImages.setImage(imageView, imageUrl)
 				playBtn?.visibility = View.GONE
 			}
 
-			if (shouldSpoilered || attachment.h()) {
-				if (!isOpened.contains(i)) {
-					spoilerView?.visibility = View.VISIBLE
-					spoilerView?.bringToFront()
+
+			val isSpoiler = shouldSpoilered || attachment.h()
+
+			if (isSpoiler) {
+				spoilerView?.setOnClickListener {
+					spoilerView.visibility = View.GONE
 				}
+				spoilerView?.visibility = View.VISIBLE
+				spoilerView?.bringToFront()
 			} else {
+				spoilerView?.setOnClickListener(null)
 				spoilerView?.visibility = View.GONE
 			}
 				
@@ -233,27 +271,18 @@ class MosaicViewHolder : MGRecyclerViewHolder<WidgetChatListAdapter, ChatListEnt
 	}
 
 
-	private fun getSpanSize(total: Int, position: Int): Int {
-		if (total == 1) return 6
+    private fun getSpanSize(total: Int, position: Int): Int {
+        if (total == 1) return 6
+        if (total == 2) return 3
+        if (total == 3) return if (position == 0) 6 else 3
+        if (total == 4) return 3
 
-		if (total == 2) return 3
+        if (total == 5 || total == 8) return if (position < 2) 3 else 2
 
-		if (total == 3) return if (position == 0) 6 else 3
-
-		if (total == 4) return 3
-
-		if (total == 5) return if (position == 0) 4 else if (position == 1) 2 else 2
-
-		if (total == 6) return 2
-
-		if (total == 7) return if (position == 0) 6 else 2
-
-		if (total == 8) return if (position == 0) 4 else if (position == 1) 2 else 2
-
-		if (total == 9) return 2
-
-		if (total == 10) return if (position == 0) 6 else 2
-
-		return 6
-	}
+        if (total == 6) return 2
+        if (total == 7) return if (position == 0) 6 else 2
+        if (total == 9) return 2
+        if (total == 10) return if (position == 0) 6 else 2
+        return 6
+    }
 }
