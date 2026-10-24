@@ -40,7 +40,6 @@ class MosaicFork: Plugin() {
 	private val MOSAIC_VIEW_TYPE = 1234
 	companion object {
         var inputWidth = 0.0f
-        var targetHeight = 0
         var paddingLeft = 0
         var targetHeightDP = 145
         var paddingLeftDP = 57
@@ -69,7 +68,7 @@ class MosaicFork: Plugin() {
 			val layout = getLinearLayout()
 
 			val width_input = TextInput(context, "Width Ratio (0.0 ~ 1.0, default: 0.93)", settings.getFloat("width", 0.93f).toString())
-			val height_input = TextInput(context, "Height DP (Int, default: 150)", settings.getInt("height", 150).toString())
+			//val height_input = TextInput(context, "Height DP (Int, default: 150)", settings.getInt("height", 150).toString())
 			val padding_input = TextInput(context, "Padding DP (Int, default: 57)", settings.getInt("padding", 57).toString())
 			
 			val auto_gif = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Auto play Gif","Operates independently of the app's native settings").apply {
@@ -100,22 +99,13 @@ class MosaicFork: Plugin() {
 				})
 			}
 			
-			val square = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Square Mode","Turn on if you want make grid images square").apply {
-				setChecked(settings.getBool("square", false))
-				setOnCheckedListener({
-					settings.setBool("square", it)
-				})
-			}
-			
 			var saveButton = Button(context)
 			saveButton.setText("Save")
 			saveButton.setOnClickListener({
 				val widthVal = runCatching { width_input.editText.text.toString().toFloat() }.getOrDefault(0.83f)
-				val heightVal = runCatching { height_input.editText.text.toString().toInt() }.getOrDefault(145)
 				val paddingVal = runCatching { padding_input.editText.text.toString().toInt() }.getOrDefault(57)
 
 				settings.setFloat("width", widthVal)
-				settings.setInt("height", heightVal)
 				settings.setInt("padding", paddingVal)
 
 				Utils.promptRestart()
@@ -123,13 +113,11 @@ class MosaicFork: Plugin() {
 
 			layout.apply {
 				addView(width_input)
-				addView(height_input)
 				addView(padding_input)
 				addView(auto_gif)
 				addView(ani_webp)
 				addView(low_gif)
 				addView(low_image)
-				addView(square)
 				addView(saveButton)
 			}
 		}
@@ -138,14 +126,12 @@ class MosaicFork: Plugin() {
 
 	override fun start(context: Context) {
 		inputWidth = settings.getFloat("width", 0.83f)
-		targetHeightDP = settings.getInt("height", 145)
 		paddingLeftDP = settings.getInt("padding", 57)
 		
 		val dm = context.getResources().getDisplayMetrics()
 		val density = dm.density
 		val screenWidth = dm.widthPixels 
 		//realWidth = (screenWidth * inputWidth).toInt()
-		targetHeight = (targetHeightDP * density + 0.5f).toInt()
 		paddingLeft = (paddingLeftDP * density + 0.5f).toInt()
 		
 		val createEmbedEntriesMethod by lazy { ChatListEntry.Companion::class.java.getDeclaredMethod("createEmbedEntries", Message::class.java, StoreMessageState.State::class.java, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, Channel::class.java, GuildMember::class.java, Map::class.java, Map::class.java) }
