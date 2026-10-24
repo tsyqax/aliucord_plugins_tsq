@@ -1,10 +1,17 @@
-version = "1.2.6" // Plugin version. Increment this to trigger an update
+version = "1.3.0" // Plugin version. Increment this to trigger an update
 description = "Make image to grid gird" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 1.3.0
+        * Default is SquareMode (removed from setting)
+        * Remove targetHeight from setting
+        * Spoiler Bug Fix
+        * More Optimization
+        * Make Grid better then before
+
         # 1.2.6
         * Oh my head: Fix squareMode
 
