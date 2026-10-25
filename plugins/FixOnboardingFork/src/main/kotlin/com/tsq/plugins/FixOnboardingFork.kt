@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 
 import com.aliucord.Http
@@ -31,6 +33,8 @@ import com.discord.utilities.rest.RestAPI
 import com.discord.views.CheckedSetting
 import com.discord.widgets.guilds.contextmenu.GuildContextMenuViewModel
 import com.discord.widgets.guilds.contextmenu.WidgetGuildContextMenu
+import com.discord.widgets.guilds.profile.WidgetGuildProfileSheet
+import com.discord.widgets.guilds.profile.WidgetGuildProfileSheetViewModel
 
 import com.lytefast.flexinput.R
 import com.lytefast.flexinput.model.Attachment
@@ -55,6 +59,8 @@ class FixOnboardingFork: Plugin() {
 	internal var userRealSelection: String? = null
 	// internal var resText: String? = null
 	internal var multiSelectionFlags: BooleanArray? = null
+
+	@Volatile private var openingChannelsAndRoles = false
 	
 	init { 
 		settingsTab = SettingsTab(PSettings::class.java, SettingsTab.Type.PAGE).withArgs(settings)
@@ -87,9 +93,17 @@ class FixOnboardingFork: Plugin() {
 					settings.setBool("old", it)
 				})
 			}
+			
+			val chChList = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Channels & Roles in ChannelList","Turn on when to view button for Channels & Roles in Channels List").apply {
+				setChecked(settings.getBool("chlist", false))
+				setOnCheckedListener({
+					settings.setBool("chlist", it)
+				})
+			}
 
 			layout.addView(auto)
 			layout.addView(oldPage)
+			layout.addView(chChList)
 		}
 	}
 	// ----- settings end -----
@@ -140,6 +154,25 @@ class FixOnboardingFork: Plugin() {
 				logger.error("gcmvm_cfg", e)
 			}
         })
+
+		try {
+			patcher.patch(
+				WidgetGuildProfileSheet::class.java,
+				"configureUI",
+				arrayOf(WidgetGuildProfileSheetViewModel.ViewState.Loaded::class.java),
+				Hook { param ->
+					try {
+						val sheet = param.thisObject as WidgetGuildProfileSheet
+						val state = param.args[0] as WidgetGuildProfileSheetViewModel.ViewState.Loaded
+						ensureChannelsAndRolesButton(sheet, state.guildId)
+					} catch (e: Exception) {
+						logger.error("profileSheetButton", e)
+					}
+				}
+			)
+		} catch (e: Exception) {
+			logger.error("profileSheetPatch", e)
+		}
 		
 		commands.registerCommand(
             "onboarding",
@@ -159,6 +192,31 @@ class FixOnboardingFork: Plugin() {
 					//showChainDialog(context, questions, 0, guildId, userId) // start question from idx 0
 					
 					CommandsAPI.CommandResult("Fetching onboarding details...", null, false)
+                } catch (t: Throwable) {
+					logger.error("CMD", t)
+                    CommandsAPI.CommandResult("Error: '" + t.message , null, false)
+                }
+            }
+        )
+		
+		commands.registerCommand(
+            "onboardingBrowser",
+            "Display Onboarding & Browse screen",
+            { ctx ->
+				try {
+					this.selectedResponses.clear()
+					this.promptsSeen.clear()
+					this.responsesSeen.clear()
+					
+					val guildId = StoreStream.getGuildSelected().getSelectedGuildId().toString()
+					val userId = ctx.getMe().getId().toString()
+					thread {
+						startChannelsAndRoles(getSafeActivity(ctx.context), guildId, userId)
+					}
+					
+					//showChainDialog(context, questions, 0, guildId, userId) // start question from idx 0
+					
+					CommandsAPI.CommandResult("Displayed!", null, false)
                 } catch (t: Throwable) {
 					logger.error("CMD", t)
                     CommandsAPI.CommandResult("Error: '" + t.message , null, false)
@@ -195,6 +253,51 @@ class FixOnboardingFork: Plugin() {
 			}
 		}
 	}
+
+	private fun ensureChannelsAndRolesButton(sheet: WidgetGuildProfileSheet, guildId: Long) {
+		val root = sheet.view ?: return
+		val cardId = Utils.getResId("guild_profile_sheet_secondary_actions", "id")
+		val card = if (cardId != 0) root.findViewById<CardView>(cardId) else null
+		val container = card?.getChildAt(0) as? LinearLayout ?: return
+
+		val row = container.findViewWithTag<TextView>("fof_car_button") ?: run {
+			val ctx = container.context
+			var styleId = Utils.getResId("GuildProfileSheet_Actions_Title", "style")
+			if (styleId == 0) styleId = Utils.getResId("GuildProfileSheet.Actions.Title", "style")
+			val fontSourceId = Utils.getResId("change_identity_header", "id")
+			val fontSource = if (fontSourceId != 0) root.findViewById<TextView>(fontSourceId) else null
+			val pad = (16 * ctx.resources.displayMetrics.density + 0.5f).toInt()
+
+			val tv = TextView(ctx, null, 0, styleId).apply {
+				tag = "fof_car_button"
+				text = "Onboarding & Browse"
+				if (styleId == 0) textSize = 16f
+				fontSource?.let { source ->
+					typeface = source.typeface
+					setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, source.textSize)
+					setTextColor(source.currentTextColor)
+					letterSpacing = source.letterSpacing
+				}
+				setPadding(pad, pad, pad, pad)
+				isClickable = true
+				isFocusable = true
+			}
+			container.addView(tv, 0, LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+			))
+			tv
+		}
+		row.visibility = View.VISIBLE
+
+		row.setOnClickListener {
+			val activity = sheet.activity ?: return@setOnClickListener
+			sheet.dismiss()
+			val userId = StoreStream.getUsers().getMe().getId().toString()
+			thread {
+				startChannelsAndRoles(activity, guildId.toString(), userId)
+			}
+		}
+	}
 	
 	fun startOnboarding(activity: Activity, guildId: String, userId: String) {
 		try {
@@ -226,6 +329,85 @@ class FixOnboardingFork: Plugin() {
 		}
 	}
 	
+	fun startChannelsAndRoles(activity: Activity, guildId: String, userId: String) {
+		if (openingChannelsAndRoles) return
+		openingChannelsAndRoles = true
+        try {
+			var questions: MutableList<JSONObject> = mutableListOf()
+			val defaultChannelIds = mutableSetOf<String>()
+			runCatching {
+				val resText = Http.Request.newDiscordRequest("/guilds/$guildId/onboarding", "GET").execute().text()
+				questions = parseQuestions(resText)
+				val defaults = JSONObject(resText).optJSONArray("default_channel_ids")
+				if (defaults != null) {
+					for (i in 0 until defaults.length()) defaultChannelIds.add(defaults.optString(i))
+				}
+			}.onFailure { logger.error("onboardingFetch", it) }
+
+            val gId = guildId.toLongOrNull() ?: 0L
+            val channelsResponseText = Http.Request.newDiscordRequest("/guilds/$guildId/channels", "GET").execute().text()
+            val responseArray = JSONArray(channelsResponseText)
+            
+            val channels = mutableListOf<JSONObject>()
+            val localPermissions = runCatching { StoreStream.getPermissions().permissionsByChannel }.getOrNull()
+			val guildSettings = runCatching { StoreStream.getUserGuildSettings().guildSettings[gId] }.getOrNull()
+
+            for (i in 0 until responseArray.length()) {
+                val channel = responseArray.getJSONObject(i)
+                val id = channel.optString("id").toLongOrNull() ?: continue
+                val type = channel.optInt("type", -1)
+
+                if (type !in setOf(0, 2, 5, 13, 15, 16) && type != 4) continue
+
+				val localPerm = localPermissions?.get(id)
+				if (localPerm != null && (localPerm and (1L shl 10)) == 0L) continue
+
+				val flags = runCatching { guildSettings?.getChannelOverride(id)?.flags }.getOrNull() ?: 0
+
+                channel.put("parent_id_long", channel.optString("parent_id").toLongOrNull() ?: 0L)
+                channel.put("position_int", channel.optInt("position", 0))
+				channel.put("is_opted_in", (flags and 4096) != 0)
+				channel.put("is_default", id.toString() in defaultChannelIds)
+                
+                channels.add(channel)
+            }
+
+            channels.sortWith(compareBy(
+                { it.optInt("position_int", 0) },
+                { it.optString("name", "") }
+            ))
+
+            Handler(Looper.getMainLooper()).post {
+                showChannelsAndRoles(activity, questions, guildId, userId, channels)
+            }
+            
+        } catch (e: Exception) {
+            logger.error("Error", e)
+            Utils.showToast(parseErrorMessage(e), false)
+        } finally {
+			openingChannelsAndRoles = false
+		}
+    }
+
+	internal fun showChannelsAndRoles(context: Context, questions: MutableList<JSONObject>, guildId: String, userId: String, channels: MutableList<JSONObject>) {
+		try {
+			Utils.openPageWithProxy(context, ChannelsAndRoles(this, questions, guildId, userId, channels))
+		} catch (e: Exception) {
+			logger.error("showChannelsAndRoles", e)
+			Utils.showToast(e.message ?: "Unknown Error", false)
+		}
+	}
+
+	private fun parseErrorMessage(e: Throwable): String {
+		val err = e.message ?: "Unknown Error"
+		return runCatching {
+			if (err.contains("\"message\": \"")) {
+				val rawMsg = err.split("\"message\": \"")[1].split("\"")[0]
+				Properties().apply { load(StringReader("m=$rawMsg")) }.getProperty("m")
+			} else err
+		}.getOrDefault(err)
+	}
+
 	//val themeColor = ContextCompat.getColor(context, R.i.UiKit_Settings_Text)
 	
 	// refered from FixOnboarding by @scourage_main
@@ -313,61 +495,52 @@ class FixOnboardingFork: Plugin() {
 		return payload
 	}
 
-	internal fun showChainDialog(context: Context, questions: MutableList<JSONObject>, index: Int, guildId: String, userId: String) {
-		if (index >= questions.size) { // Questions Ended
-			val finalPayload = buildPayloadLast(guildId, userId)
+	private fun sendOnboardingResponses(guildId: String, method: String, body: String) {
+		val req = Http.Request.newDiscordRequest("/guilds/$guildId/onboarding-responses", method)
+		req.setHeader("Content-Type", "application/json")
+		val res = req.executeWithBody(body)
+		res.assertOk()
+	}
+	
+	internal fun onboardingRequest(questions: MutableList<JSONObject>, guildId: String, userId: String, onResult: ((Boolean) -> Unit)? = null) {
+		val finalPayload = buildPayloadLast(guildId, userId)
 			
-			if (finalPayload == null) {
-				Utils.showToast("Error, you maybe will report it on Github?")
-				return
-			}
+		if (finalPayload == null) {
+			Utils.showToast("Error, you maybe will report it on Github?")
+			Utils.mainThread.post { onResult?.invoke(false) }
+			return
+		}
 			
-			logger.info(finalPayload.toString())
+		logger.info(finalPayload.toString())
+		val body = finalPayload.toString()
 			
-			thread {
-				thread {
-					val postResult = runCatching {
-						val req = Http.Request.newDiscordRequest("/guilds/$guildId/onboarding-responses", "POST")
-						req.setHeader("Content-Type", "application/json")
-						req.executeWithBody(finalPayload.toString()).text()
-					}
-					
-					if (postResult.isSuccess) {
-						Utils.showToast("Done!", false)
-						return@thread
-					}
-					
-					val e = postResult.exceptionOrNull() ?: Exception("Unknown POST Error")
-					val putResult = runCatching {
-						val req = Http.Request.newDiscordRequest("/guilds/$guildId/onboarding-responses", "PUT").apply {
-							setHeader("Content-Type", "application/json")
-							executeWithBody(finalPayload.toString()).text()
-						}
-					}
-					
-					if (putResult.isSuccess) {
-						Utils.showToast("Done!", false)
-						return@thread
-					}
-					
-					val ig = putResult.exceptionOrNull() ?: Exception("Unknown PUT Error")
-					logger.error("PUT_ERR", ig)
-					logger.error("ERR", e)
-					
-					val err = e.message ?: "Unknown Error"
-					
-					val msg = runCatching {
-						if (err.contains("\"message\": \"")) {
-							val rawMsg = err.split("\"message\": \"")[1].split("\"")[0]
-							java.util.Properties().apply { load(java.io.StringReader("m=$rawMsg")) }.getProperty("m")
-						} else {
-							err
-						}
-					}.getOrDefault(err)
-					
-					Utils.showToast(msg, false)
+		thread {
+			var firstError: Throwable? = null
+			var success = false
+
+			for (method in listOf("PUT", "POST")) {
+				try {
+					sendOnboardingResponses(guildId, method, body)
+					success = true
+					break
+				} catch (e: Throwable) {
+					logger.error("${method}_ERR", e)
+					if (firstError == null) firstError = e
 				}
 			}
+
+			if (success) {
+				Utils.showToast("Done!", false)
+			} else {
+				Utils.showToast(parseErrorMessage(firstError ?: Exception("Unknown Error")), false)
+			}
+			Utils.mainThread.post { onResult?.invoke(success) }
+		}
+	}
+
+	internal fun showChainDialog(context: Context, questions: MutableList<JSONObject>, index: Int, guildId: String, userId: String) {
+		if (index >= questions.size) { // Questions Ended
+			onboardingRequest(questions, guildId, userId)
 			return
 		}
 
@@ -418,6 +591,6 @@ class FixOnboardingFork: Plugin() {
 			Utils.showToast(e.message ?: "Unknown Error", false)
 		}
 	}
-	
+
 	override fun stop(context: Context) { patcher.unpatchAll() }
 }
