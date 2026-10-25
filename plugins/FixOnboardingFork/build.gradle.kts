@@ -1,10 +1,15 @@
-version = "1.3.2" // Plugin version. Increment this to trigger an update
+version = "2.0.0" // Plugin version. Increment this to trigger an update
 description = "Add Method to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 2.0.0
+        * Add "channels & Roles" feature inspired by Onboarding(yuta), ChannelBrowser(lamp) 
+        * Big refactoring hugely thanks to Pebble
+        * Sincerely, thanks to developers for this update
+
         # 1.3.2
         * Some slightly change
 
