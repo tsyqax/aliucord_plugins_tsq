@@ -150,7 +150,8 @@ class ChannelsAndRoles(
             action(this.getJSONObject(i))
         }
     }
-
+	
+	// Refered from ChannelBrowser by l6t9
 	private fun onChannelFollowChanged(ids: List<Long>, enabled: Boolean) {
 		val flags = if (enabled) 4096 else 0
 		ids.forEach { channelFlagsMap[it] = flags }
