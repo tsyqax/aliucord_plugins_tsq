@@ -103,7 +103,7 @@ class FixOnboardingFork: Plugin() {
 
 			layout.addView(auto)
 			layout.addView(oldPage)
-			layout.addView(chChList)
+			//layout.addView(chChList)
 		}
 	}
 	// ----- settings end -----
