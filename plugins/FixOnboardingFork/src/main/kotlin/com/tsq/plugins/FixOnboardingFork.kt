@@ -94,16 +94,17 @@ class FixOnboardingFork: Plugin() {
 				})
 			}
 			
-			val chChList = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Channels & Roles in ChannelList","Turn on when to view button for Channels & Roles in Channels List").apply {
+			val chChList = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Channels & Roles in Guild Menu","Turn on when to view button for Channels & Roles in Guild Menu").apply {
 				setChecked(settings.getBool("chlist", false))
 				setOnCheckedListener({
 					settings.setBool("chlist", it)
+					Utils.promptRestart()
 				})
 			}
 
 			layout.addView(auto)
 			layout.addView(oldPage)
-			//layout.addView(chChList)
+			layout.addView(chChList)
 		}
 	}
 	// ----- settings end -----
@@ -112,6 +113,9 @@ class FixOnboardingFork: Plugin() {
 		val viewId1 = View.generateViewId()
 		val mailIcon = ContextCompat.getDrawable(Utils.appActivity, R.e.ic_mail_24dp)?.mutate()
         Utils.tintToTheme(mailIcon)
+		
+		val autoMode = settings.getBool("auto", true)
+		val chChMode = settings.getBool("chlist", true)
 		
 		// Refered from BetterSpolier by Ushie
 		val getServerBindingMethod by lazy { WidgetGuildContextMenu::class.java.getDeclaredMethod("getBinding").apply { isAccessible = true } }
@@ -154,24 +158,27 @@ class FixOnboardingFork: Plugin() {
 				logger.error("gcmvm_cfg", e)
 			}
         })
-
-		try {
-			patcher.patch(
-				WidgetGuildProfileSheet::class.java,
-				"configureUI",
-				arrayOf(WidgetGuildProfileSheetViewModel.ViewState.Loaded::class.java),
-				Hook { param ->
-					try {
-						val sheet = param.thisObject as WidgetGuildProfileSheet
-						val state = param.args[0] as WidgetGuildProfileSheetViewModel.ViewState.Loaded
-						ensureChannelsAndRolesButton(sheet, state.guildId)
-					} catch (e: Exception) {
-						logger.error("profileSheetButton", e)
+	
+		
+		if (chChMode) {
+			try {
+				patcher.patch(
+					WidgetGuildProfileSheet::class.java,
+					"configureUI",
+					arrayOf(WidgetGuildProfileSheetViewModel.ViewState.Loaded::class.java),
+					Hook { param ->
+						try {
+							val sheet = param.thisObject as WidgetGuildProfileSheet
+							val state = param.args[0] as WidgetGuildProfileSheetViewModel.ViewState.Loaded
+							ensureChannelsAndRolesButton(sheet, state.guildId)
+						} catch (e: Exception) {
+							logger.error("profileSheetButton", e)
+						}
 					}
-				}
-			)
-		} catch (e: Exception) {
-			logger.error("profileSheetPatch", e)
+				)
+			} catch (e: Exception) {
+				logger.error("profileSheetPatch", e)
+			}
 		}
 		
 		commands.registerCommand(
@@ -223,8 +230,6 @@ class FixOnboardingFork: Plugin() {
                 }
             }
         )
-	
-		val autoMode = settings.getBool("auto", true)
 		
 		if (autoMode) {
 			try {
@@ -253,7 +258,8 @@ class FixOnboardingFork: Plugin() {
 			}
 		}
 	}
-
+	
+	// Refered from Onboarding by yutaplug
 	private fun ensureChannelsAndRolesButton(sheet: WidgetGuildProfileSheet, guildId: Long) {
 		val root = sheet.view ?: return
 		val cardId = Utils.getResId("guild_profile_sheet_secondary_actions", "id")
