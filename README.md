@@ -40,6 +40,7 @@ And... It is really bad to just make something and not release it.
 ## HOW TO USE?
 Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)**
 
+---
 ### For Atmosphere Purposes: VoiceChatFix1, VoiceChatFix2
 #### If you using Aliukoi but want to use Updator, then Use VoiceChatFix2!!
 I brought this over because I wanted to see a "Connected" status in the voice channel before an official voice patch is released.
