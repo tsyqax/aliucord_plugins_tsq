@@ -37,6 +37,8 @@ And... It is really bad to just make something and not release it.
 - [AutoIdle](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/AutoIdle.zip): Remove Debug Log (silent ver), Not my code.
 - [TranslateForkFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/TranslateForkFork.zip): Fix something maybe, Not my full code.
 
+## HOW TO USE?
+Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)**
 
 ### For Atmosphere Purposes: VoiceChatFix1, VoiceChatFix2
 #### If you using Aliukoi but want to use Updator, then Use VoiceChatFix2!!
@@ -72,9 +74,6 @@ If you UNDERSTAND all the above and still wish to use it, use the link below:
 
 ※ I will remove this if any issues arise with the code.  
 ※ DO NOT claim elsewhere that this code is my own plugin!
-
-## HOW TO USE?
-Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)**
 
 ---
 ## If you?
