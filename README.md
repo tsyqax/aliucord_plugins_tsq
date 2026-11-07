@@ -35,42 +35,26 @@ And... It is really bad to just make something and not release it.
 - ~~[QRCodeLoginFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/QRCodeLoginFork.zip): Add password auth to QRCodeLogin.~~
 - [QRCodeLogin](https://github.com/secp192k1/Aliucord-Plugins/raw/21770595a84b0961253155f0806e17d0f97db609/QRCodeLogin.zip): From Original Repo before deleted. I didn't write this.
 - [AutoIdle](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/AutoIdle.zip): Remove Debug Log (silent ver), Not my code.
-- [TranslateForkFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/TranslateForkFork.zip): Fix something maybe, Not my full code.
+- ~~[TranslateForkFork](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/TranslateForkFork.zip): Fix something maybe, Not my full code.~~ Use translateMessage than this
 
 ## HOW TO USE?
 Look **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)** **[THIS](https://github.com/tsyqax/aliucord_plugins_tsq/blob/main/USAGE.md)**
 
 ---
-### For Atmosphere Purposes: VoiceChatFix1, VoiceChatFix2
+### For Atmosphere Purposes: ~~VoiceChatFix1~~, VoiceChatFix2
 #### If you using Aliukoi but want to use Updator, then Use VoiceChatFix2!!
-I brought this over because I wanted to see a "Connected" status in the voice channel before an official voice patch is released.
+VoiceChatFix2(ebce3dfd) is version for testmonkey's app.  
+If your version is NORMAL, then VoiceChatFix2 is NOT working.
 
-I DID NOT WRITE this code (although I'm marked as the plugin author in menifest/details, I'm NEVER claiming this as my plugin);  
-this is a rough port of code(213c67d) from an Aliucord fork repository for VoiceChatFix1.  
-(I extracted the core plugin code and modified it into a normal plugin.)
-
-There is absolutely NO guarantee that this code will work.  
-
-Currently confirmed working features (VoiceChatFix1):  
-- Joining voice channels, hearing bot audio(without any user)
-
-The following features are currently known not to work on VoiceChatFix1, but this NEVER imply that they are impossible to implement in an official patch:  
-- Speaking, hearing human voices (sound is audible but unintelligible), turning on the camera, screen sharing, and viewing screen shares.
-
-+) Note: VoiceChatFix2(ebce3dfd) is version for testmonkey's version.  
-This working much better than VocieChatFix1.  
-Not working features on VoiceChatFix1 is working on VoiceChatFix2.  
-But if your version is NORMAL, then VoiceChatFix2 is NOT working.
-
-And, if your version is testmonkey, and if you turn on VoiceChatFix1 and VoiceChatFix2,  
+If your version is testmonkey, and you turn on both(VoiceChatFix1 and VoiceChatFix2),  
 then working is on VoiceChatFix1 even if you have VoiceChatFix2 which turns on.
 
-+) Note: If your version is not voice fixed version, then try to use Stage Channels.  
++) Tip: If your version is not voice fixed version, then try to use Stage Channels.  
 You can speak by selecting "Continue without starting" > "Become a speaker."    
 This usage method is unrelated to this temporary plugin.  
 
 If you UNDERSTAND all the above and still wish to use it, use the link below:  
-[VoiceChatFix1](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)  
+~~[VoiceChatFix1](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)~~ use DaveVoice than this.
 [VoiceChatFix2](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix2.zip)
 
 ※ I will remove this if any issues arise with the code.  
