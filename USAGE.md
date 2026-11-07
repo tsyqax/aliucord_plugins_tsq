@@ -45,11 +45,13 @@
 (It is actually implemented in a completely different way.)
 - If you join a server but messages fail to send, it may be due to an onboarding issue. Please follow the steps below.
 - (Since 1.3.0) Enable the 'Old Style' option if you prefer the classic onboarding screen.
+- (Since 2.0.0) If you turn off 'Channels & Roles in Guild Menu', then that menu will not appear literally.
 
 \<How to use Onboarding>
 - Use the `/onboarding` command.
 - (Since 1.1.1) You can also start onboarding via the guild menu that appears when you long-press the guild icon.
 - (Since 1.1.3) If 'Auto Mode' is enabled, onboarding is automatically checked when joining a server.
+- - (Since 2.0.0) You can change onboarding or following channels by clicking menu on the guild menu.
 
 ### MosaicFork
 - This is an unofficial successor to the Mozaic plugin.
@@ -63,7 +65,7 @@
 - (Since 1.1.9) Low GIF Preview: Lowers the resolution of GIF files within the grid.
 - (Since 1.1.9) Low Image Preview: Lowers the resolution of image files within the grid.
 - (Since 1.1.10) Auto Play GIF: Determines whether GIF files play automatically. This operates independently of the app's general settings; it is recommended to turn this off if performance lags due to a large number of GIFs.
-- (Since 1.2.5) SquareMode: Renders grid images as close to a square shape as possible (may not be a perfect square).
+- ~~(Since 1.2.5) SquareMode: Renders grid images as close to a square shape as possible (may not be a perfect square).~~ Since 1.3.0, this is deleted.
 
 ### ServerNicknameFix
 - No additional configuration required.
