@@ -65,7 +65,7 @@
 - (Since 1.1.9) Low GIF Preview: Lowers the resolution of GIF files within the grid.
 - (Since 1.1.9) Low Image Preview: Lowers the resolution of image files within the grid.
 - (Since 1.1.10) Auto Play GIF: Determines whether GIF files play automatically. This operates independently of the app's general settings; it is recommended to turn this off if performance lags due to a large number of GIFs.
-- ~~(Since 1.2.5) SquareMode: Renders grid images as close to a square shape as possible (may not be a perfect square).~~ Since 1.3.0, this is deleted.
+- ~~(Since 1.2.5) SquareMode: Renders grid images as close to a square shape as possible.~~ Since 1.3.0, this is deleted.
 
 ### ServerNicknameFix
 - No additional configuration required.
