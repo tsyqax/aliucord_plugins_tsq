@@ -1,10 +1,13 @@
-version = "2.0.1" // Plugin version. Increment this to trigger an update
+version = "2.0.2" // Plugin version. Increment this to trigger an update
 description = "Add Method to do onboarding" // Plugin description that will be shown to user
 
 aliucord {
     // Changelog of your plugin
     changelog.set(
         """
+        # 2.0.2
+        * Fix scroll bug
+
         # 2.0.1
         * Add setting for visibility of onboarding button in guild menu
         * Add comment for inspired(refered) on 2.0.0
