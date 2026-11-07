@@ -39,6 +39,7 @@ import com.aliucord.api.SettingsAPI
 import com.aliucord.fragments.SettingsPage
 import com.discord.utilities.color.ColorCompat
 
+
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -202,6 +203,7 @@ class OnboardingPage(
 		val scrollView = ScrollView(context).apply {
 			isFillViewport = true
 			isVerticalScrollBarEnabled = true
+			isNestedScrollingEnabled = true
 
 			layoutParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT).apply {
 				addRule(RelativeLayout.BELOW, ID_LAYOUT_HEADER)
