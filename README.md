@@ -54,7 +54,7 @@ You can speak by selecting "Continue without starting" > "Become a speaker."
 This usage method is unrelated to this temporary plugin.  
 
 If you UNDERSTAND all the above and still wish to use it, use the link below:  
-~~[VoiceChatFix1](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)~~ use DaveVoice than this.
+~~[VoiceChatFix1](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix.zip)~~ use DaveVoice than this.  
 [VoiceChatFix2](https://github.com/tsyqax/aliucord_plugins_tsq/raw/zips/VoiceChatFix2.zip)
 
 ※ I will remove this if any issues arise with the code.  
