@@ -36,35 +36,35 @@ class UItweaks: Plugin() {
 			var context = view.context
 			var layout = getLinearLayout()
 			
-			val th_del = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Add button to delete thread/channel on list menu","")
+			val th_del = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "ThreadDEL","Add delete button on thread/channel context menu")
 			th_del.setChecked(settings.getBool("ThreadDEL", true))
 			th_del.setOnCheckedListener({
 				settings.setBool("threadDEL", it)
 				Utils.promptRestart()
 			})
 			
-			val forum_line = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Add line to first forum message","")
+			val forum_line = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "ForumLine","Add visual separator below first forum message")
 			forum_line.setChecked(settings.getBool("ForumLine", true))
 			forum_line.setOnCheckedListener({
 				settings.setBool("forumLine", it)
 				Utils.promptRestart()
 			})
 			
-			val rule_ch_icon = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Make rules channel icon","")
+			val rule_ch_icon = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "RuleChIcon","Make rule channel has correct/better icon")
 			rule_ch_icon.setChecked(settings.getBool("RuleChIcon", true))
 			rule_ch_icon.setOnCheckedListener({
 				settings.setBool("ruleChIcon", it)
 				Utils.promptRestart()
 			})
 			
-			val plural_fix = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Fix plurals when no distinct","")
+			val plural_fix = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "PluralFix","Fix plural if not distinct one/ohters")
 			plural_fix.setChecked(settings.getBool("PluralFix", true))
 			plural_fix.setOnCheckedListener({
 				settings.setBool("PluralFix", it)
 				Utils.promptRestart()
 			})
 			
-			val profile_deco = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "Add deco on profile (beta)","")
+			val profile_deco = Utils.createCheckedSetting(context, CheckedSetting.ViewType.SWITCH, "ProflieDeco","Add static decoration on user profile screen")
 			profile_deco.setChecked(settings.getBool("ProfileDeco", true))
 			profile_deco.setOnCheckedListener({
 				settings.setBool("ProfileDeco", it)
